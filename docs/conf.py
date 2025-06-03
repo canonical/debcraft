@@ -1,4 +1,4 @@
-# This file is part of starbase.
+# This file is part of debcraft.
 #
 # Copyright 2024 Canonical Ltd.
 #
@@ -16,24 +16,24 @@
 
 import datetime
 
-project = "Starbase"
+project = "Debcraft"
 author = "Canonical"
 
 copyright = "2023-%s, %s" % (datetime.date.today().year, author)
 
 # region Configuration for canonical-sphinx
-ogp_site_url = "https://canonical-starbase.readthedocs-hosted.com/"
+ogp_site_url = "https://canonical-debcraft.readthedocs-hosted.com/"
 ogp_site_name = project
 ogp_image = "https://assets.ubuntu.com/v1/253da317-image-document-ubuntudocs.svg"
 
 html_context = {
-    "product_page": "github.com/canonical/starbase",
-    "github_url": "https://github.com/canonical/starbase",
+    "product_page": "github.com/canonical/debcraft",
+    "github_url": "https://github.com/canonical/debcraft",
 }
 
 # Target repository for the edit button on pages
 html_theme_options = {
-    "source_edit_link": "https://github.com/canonical/starbase",
+    "source_edit_link": "https://github.com/canonical/debcraft",
 }
 
 extensions = [
@@ -75,7 +75,7 @@ always_document_param_types = True
 
 # Github config
 github_username = "canonical"
-github_repository = "starbase"
+github_repository = "debcraft"
 
 # endregion
 
