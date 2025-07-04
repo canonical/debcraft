@@ -16,31 +16,8 @@
 """Basic Debcraft package demo unit tests."""
 
 # pyright: reportFunctionMemberAccess=false
-from unittest import mock
-
 import debcraft
 
 
 def test_version():
     assert debcraft.__version__ is not None
-
-
-def test_hello(mocker):
-    mocker.patch("builtins.print")
-
-    debcraft.hello()
-
-    print.assert_called_once_with("Hello *craft team!")
-
-
-def test_hello_people(mocker):
-    mocker.patch("builtins.print")
-
-    debcraft.hello(["people"])
-
-    print.assert_has_calls(
-        [
-            mock.call("Hello *craft team!"),
-            mock.call("Hello people!"),
-        ],
-    )

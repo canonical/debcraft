@@ -8,15 +8,15 @@ UV_LINT_GROUPS := "--group=lint" "--group=types"
 UV_TICS_GROUPS := "--group=tics"
 
 # If you have dev dependencies that depend on your distro version, uncomment these:
-# ifneq ($(wildcard /etc/os-release),)
-# include /etc/os-release
-# endif
-# ifdef VERSION_CODENAME
-# UV_TEST_GROUPS += "--group=dev-$(VERSION_CODENAME)"
-# UV_DOCS_GROUPS += "--group=dev-$(VERSION_CODENAME)"
-# UV_LINT_GROUPS += "--group=dev-$(VERSION_CODENAME)"
-# UV_TICS_GROUPS += "--group=dev-$(VERSION_CODENAME)"
-# endif
+ifneq ($(wildcard /etc/os-release),)
+include /etc/os-release
+endif
+ifdef VERSION_CODENAME
+UV_TEST_GROUPS += "--group=dev-$(VERSION_CODENAME)"
+UV_DOCS_GROUPS += "--group=dev-$(VERSION_CODENAME)"
+UV_LINT_GROUPS += "--group=dev-$(VERSION_CODENAME)"
+UV_TICS_GROUPS += "--group=dev-$(VERSION_CODENAME)"
+endif
 
 include common.mk
 
@@ -46,6 +46,9 @@ APT_PACKAGES += libxslt1-dev
 endif
 ifeq ($(wildcard /usr/share/doc/python3-venv/copyright),)
 APT_PACKAGES += python3-venv
+endif
+ifeq ($(wildcard /usr/share/doc/libgit2-dev/copyright),)
+APT_PACKAGES += libgit2-dev
 endif
 
 # Used for installing build dependencies in CI.
