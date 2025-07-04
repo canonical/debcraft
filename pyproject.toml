@@ -2,7 +2,9 @@
 name = "debcraft"
 description = "Pack up debs with the Crafting Experience"
 dynamic = ["version"]
-dependencies = []
+dependencies = [
+    "craft-application>=5.4.0",
+]
 classifiers = [
     "Development Status :: 1 - Planning",
     "Programming Language :: Python :: 3",
@@ -14,7 +16,7 @@ requires-python = ">=3.10"
 readme = { file = "README.md", content-type = "text/markdown" }
 
 [project.scripts]
-debcraft-hello = "debcraft:hello"
+debcraft = "debcraft.cli:main"
 
 [dependency-groups]
 lint = [
@@ -46,6 +48,26 @@ dev = [
     "types-setuptools",
 ]
 tics = ["flake8", "pylint"]
+# Python-apt bindings for specific Ubuntu versions.
+# Up to date package links can be found at https://launchpad.net/ubuntu/+source/python-apt
+# Note: These extras can break requirements from other packages, so
+# do not use them in dependencies unless you know what you're doing.
+dev-jammy = [
+    # Stay on 2.4 for Jammy
+    "python-apt~=2.4.0;sys_platform=='linux'",
+]
+dev-noble = [
+    # 2.7 for Noble
+    "python-apt~=2.7.0;sys_platform=='linux'",
+]
+dev-oracular = [
+    # 2.9 for Oracular+
+    "python-apt>=2.9.0;sys_platform=='linux'",
+]
+dev-plucky = [
+    # 2.9 for Oracular+
+    "python-apt>=2.9.0;sys_platform=='linux'",
+]
 
 [tool.uv]
 constraint-dependencies = [
@@ -72,7 +94,23 @@ constraint-dependencies = [
     "webencodings>=0.4.0",
     "wheel>=0.38",
 ]
+conflicts = [
+    [
+        { group = "dev-jammy" },
+        { group = "dev-noble" },
+        { group = "dev-oracular" },
+        { group = "dev-plucky" },
+    ]
+]
 
+
+[[tool.uv.index]]
+name = "python-apt-wheels"
+url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/"  # workaround to get python-apt to install across multiple platforms
+explicit = true
+
+[tool.uv.sources]
+python-apt = { index = "python-apt-wheels" }
 
 [build-system]
 requires = ["setuptools>=69.0", "setuptools_scm[toml]>=7.1"]
