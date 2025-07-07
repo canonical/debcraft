@@ -14,19 +14,10 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Tool to create Debian Packages using a Craft workflow."""
+"""Debcraft models."""
 
-from debcraft.application import Application, METADATA
-
-try:
-    from ._version import __version__
-except ImportError:  # pragma: no cover
-    from importlib.metadata import version, PackageNotFoundError
-
-    try:
-        __version__ = version("debcraft")
-    except PackageNotFoundError:
-        __version__ = "dev"
+from debcraft.models.metadata import Metadata
+from debcraft.models.project import Project
 
 
-__all__ = ["__version__", "Application", "METADATA"]
+__all__ = ["Project", "Metadata"]
