@@ -1,4 +1,4 @@
-#  This file is part of sourcecraft.
+#  This file is part of debcraft.
 #
 #  Copyright 2023-2025 Canonical Ltd.
 #
@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License along
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""Tests for sourcecraft's package service."""
+"""Tests for debcraft's package service."""
 
 import pytest
 from debcraft import models, services

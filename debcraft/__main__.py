@@ -1,4 +1,4 @@
-#  This file is part of sourcecraft
+#  This file is part of debcraft
 #
 #  Copyright 2025 Canonical Ltd.
 #

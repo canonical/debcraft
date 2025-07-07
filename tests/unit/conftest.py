@@ -1,4 +1,4 @@
-#  This file is part of sourcecraft.
+#  This file is part of debcraft.
 #
 #  Copyright 2023-2025 Canonical Ltd.
 #
@@ -13,7 +13,7 @@
 #
 #  You should have received a copy of the GNU General Public License along
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
-"""Configuration for sourcecraft unit tests."""
+"""Configuration for debcraft unit tests."""
 
 import pathlib
 from typing import Any, cast

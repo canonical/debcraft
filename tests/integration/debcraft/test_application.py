@@ -1,4 +1,4 @@
-#  This file is part of sourcecraft.
+#  This file is part of debcraft.
 #
 #  Copyright 2025 Canonical Ltd.
 #
@@ -55,7 +55,7 @@ def check_metadata(
 
 
 @noble_only
-def test_sourcecraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
+def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
     monkeypatch.setenv("CRAFT_DEBUG", "1")
     monkeypatch.setattr("sys.argv", ["debcraft", "pack", "--destructive-mode"])
 
