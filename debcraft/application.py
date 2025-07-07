@@ -18,10 +18,12 @@
 
 import craft_application
 
+from debcraft import models
+
 METADATA = craft_application.AppMetadata(
     name="debcraft",
     summary="Tool to create Debian Packages using a Craft workflow",
-    ProjectClass=craft_application.models.Project,
+    ProjectClass=models.Project,
 )
 
 
