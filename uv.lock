@@ -1,5 +1,5 @@
 version = 1
-revision = 2
+revision = 3
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -191,7 +191,7 @@ filecache = [
 
 [[package]]
 name = "canonical-sphinx"
-version = "0.4.1"
+version = "0.5.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "furo" },
@@ -199,9 +199,9 @@ dependencies = [
     { name = "myst-parser" },
     { name = "sphinx" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7b/86/7731f280e00073f53e041a0338d2c12b5a0007f96f1e01d93d97f04bb707/canonical_sphinx-0.4.1.tar.gz", hash = "sha256:288ac950fbbda5715e9569069da0116a5b1bff9352f561115e831da73dcbfffa", size = 1052442, upload-time = "2025-04-08T05:02:47.86Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/5e/47/f7add56cc67e06c917a86a9d2a74a5af31ddf47b80f8b1577be4e8d53bee/canonical_sphinx-0.5.1.tar.gz", hash = "sha256:3b94e564870270dc84ad69cf91dc152f9f009a6f90e6e55fead028f5b615402c", size = 1053111, upload-time = "2025-07-14T00:48:03.052Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/41/52/631041a7fb3c0928e6529a05a5ed56c8bbecf7452e83d50af18ea0cdb9fc/canonical_sphinx-0.4.1-py3-none-any.whl", hash = "sha256:e2e4142e9b7e01a8dff9ad8e7b68d62bd27ff9daa7998b56f449b9b2ef5c2125", size = 1029462, upload-time = "2025-04-08T05:02:46.132Z" },
+    { url = "https://files.pythonhosted.org/packages/c0/90/4fbdf7de70ee86ecf03f3eb07771bbc9b121e05985dfcbee44a8dfd2f267/canonical_sphinx-0.5.1-py3-none-any.whl", hash = "sha256:8c2c2e7c3f0d1a6b19136e1f906bdc5d2f024b9bf7f7b50ca9df7de646239391", size = 1030533, upload-time = "2025-07-14T00:48:01.315Z" },
 ]
 
 [[package]]
@@ -634,7 +634,7 @@ dev-noble = [{ name = "python-apt", marker = "sys_platform == 'linux'", specifie
 dev-oracular = [{ name = "python-apt", marker = "sys_platform == 'linux'", specifier = ">=2.9.0", index = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/" }]
 dev-plucky = [{ name = "python-apt", marker = "sys_platform == 'linux'", specifier = ">=2.9.0", index = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/" }]
 docs = [
-    { name = "canonical-sphinx", specifier = "~=0.4.0" },
+    { name = "canonical-sphinx", specifier = "~=0.5.1" },
     { name = "sphinx-autobuild", specifier = "~=2024.2" },
     { name = "sphinx-lint", specifier = "~=1.0" },
     { name = "sphinx-pydantic", specifier = "==0.1.1" },
@@ -711,7 +711,7 @@ name = "exceptiongroup"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-oracular' and extra == 'group-8-debcraft-dev-plucky')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-oracular' and extra == 'group-8-debcraft-dev-plucky')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/9f/a65090624ecf468cdca03533906e7c69ed7588582240cfe7cc9e770b50eb/exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88", size = 29749, upload-time = "2025-05-10T17:42:51.123Z" }
 wheels = [
@@ -813,7 +813,7 @@ name = "importlib-metadata"
 version = "8.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp" },
+    { name = "zipp", marker = "python_full_version < '3.11' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-oracular' and extra == 'group-8-debcraft-dev-plucky')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/66/650a33bd90f786193e4de4b3ad86ea60b53c89b669a5c7be931fac31cdb0/importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000", size = 56641, upload-time = "2025-04-27T15:29:01.736Z" }
 wheels = [
