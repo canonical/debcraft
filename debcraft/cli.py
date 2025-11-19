@@ -27,7 +27,7 @@ from debcraft import services
 
 def _create_app() -> debcraft.Application:
     """Create a Debcraft application instance."""
-    craft_application.ServiceFactory.register("package", services.Package)
+    services.register_services()
     app_services = craft_application.ServiceFactory(
         app=debcraft.METADATA  # type: ignore[call-arg]
     )

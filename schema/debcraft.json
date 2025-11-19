@@ -1,0 +1,380 @@
+{
+  "$defs": {
+    "DebianArchitecture": {
+      "description": "A Debian architecture.",
+      "enum": ["amd64", "arm64", "armhf", "i386", "ppc64el", "riscv64", "s390x"],
+      "title": "DebianArchitecture",
+      "type": "string"
+    },
+    "Package": {
+      "additionalProperties": false,
+      "description": "A single binary package.\n\nThe key in the dict where this is the value matches the package name (\"Package\")",
+      "properties": {
+        "architecture": {
+          "anyOf": [
+            {
+              "enum": ["any", "all"],
+              "type": "string"
+            },
+            {
+              "items": {
+                "$ref": "#/$defs/DebianArchitecture"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Architecture"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "passthrough": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Passthrough",
+          "type": "object"
+        }
+      },
+      "required": ["architecture", "passthrough"],
+      "title": "Package",
+      "type": "object"
+    },
+    "Platform": {
+      "additionalProperties": false,
+      "description": "A single platform entry in the platforms dictionary.\n\nThis model defines how a single value under the ``platforms`` key works for a project.",
+      "properties": {
+        "build-on": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array",
+              "uniqueItems": true
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "examples": ["amd64", ["arm64", "riscv64"]],
+          "minLength": 1,
+          "title": "Build-On"
+        },
+        "build-for": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "maxItems": 1,
+              "minItems": 1,
+              "type": "array"
+            },
+            {
+              "type": "string"
+            }
+          ],
+          "examples": ["amd64", ["riscv64"]],
+          "title": "Build-For"
+        }
+      },
+      "required": ["build-on", "build-for"],
+      "title": "Platform",
+      "type": "object"
+    },
+    "Priority": {
+      "description": "Priority for a deb package.",
+      "enum": ["required", "important", "standard", "optional"],
+      "title": "Priority",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Imagecraft project definition.",
+  "properties": {
+    "name": {
+      "description": "The name of the project. This is used when uploading, publishing, or installing.\n\nThe project name must consist only of lower-case ASCII letters (``a``-``z``), numerals\n(``0``-``9``), and hyphens (``-``). It must contain at least one letter, not start or\nend with a hyphen, and not contain two consecutive hyphens. The maximum length is 40\ncharacters.\n",
+      "examples": ["ubuntu", "jupyterlab-desktop", "lxd", "digikam", "kafka", "mysql-router-k8s"],
+      "maxLength": 40,
+      "minLength": 1,
+      "title": "Project Name",
+      "type": "string"
+    },
+    "title": {
+      "anyOf": [
+        {
+          "description": "A human-readable title.",
+          "examples": ["Ubuntu Linux", "Jupyter Lab Desktop", "LXD", "DigiKam", "Apache Kafka", "MySQL Router K8s charm"],
+          "maxLength": 40,
+          "minLength": 2,
+          "title": "Title",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Title"
+    },
+    "version": {
+      "anyOf": [
+        {
+          "description": "The version of the project, enclosed in quotation marks.",
+          "examples": ["\"0.1\"", "\"1.0.0\"", "\"v1.0.0\"", "\"24.04\""],
+          "maxLength": 32,
+          "title": "version string",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Version"
+    },
+    "summary": {
+      "anyOf": [
+        {
+          "description": "A short description of the project.",
+          "examples": ["Linux for Human Beings", "The cross-platform desktop application for JupyterLab", "Container and VM manager", "Photo Management Program", "Charm for routing MySQL databases in Kubernetes", "An open-source event streaming platform for high-performance data pipelines"],
+          "maxLength": 78,
+          "title": "Summary",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Summary"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The full description of the project.",
+      "title": "Description"
+    },
+    "base": {
+      "enum": ["ubuntu@22.04", "ubuntu@24.04"],
+      "title": "Base",
+      "type": "string"
+    },
+    "build-base": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Build-Base"
+    },
+    "platforms": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Platform"
+      },
+      "description": "Determines which architectures the project builds and runs on.",
+      "examples": ["{amd64: {build-on: [amd64], build-for: [amd64]}, arm64: {build-on: [amd64, arm64], build-for: [arm64]}}"],
+      "patternProperties": {
+        "(amd64|arm64|armhf|i386|ppc64el|riscv64|s390x)": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "properties": {
+                "build-on": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  ],
+                  "title": "Build-On"
+                },
+                "build-for": {
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  ],
+                  "title": "Build-For"
+                }
+              },
+              "required": ["build-on"],
+              "type": "object"
+            }
+          ]
+        }
+      },
+      "title": "Platforms",
+      "type": "object"
+    },
+    "contact": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The author's contact links and email addresses.",
+      "examples": ["[contact@example.com, https://example.com/contact]"],
+      "title": "Contact"
+    },
+    "issues": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array",
+          "uniqueItems": true
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The links and email addresses for submitting issues, bugs, and feature requests.",
+      "examples": ["[issues@example.com, https://example.com/issues]"],
+      "title": "Issues"
+    },
+    "source-code": {
+      "anyOf": [
+        {
+          "format": "uri",
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The links to the source code of the project.",
+      "examples": ["[https://github.com/canonical/craft-application]"],
+      "title": "Source-Code"
+    },
+    "license": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The project's license as an SPDX expression",
+      "examples": ["GPL-3.0+", "Apache-2.0"],
+      "title": "License"
+    },
+    "adopt-info": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Selects a part to inherit metadata from.",
+      "examples": ["foo-part"],
+      "title": "Adopt-Info"
+    },
+    "parts": {
+      "additionalProperties": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "description": "The self-contained software pieces needed to create the final artifact.",
+      "examples": ["{cloud-init:                 {plugin: python,                 source-type: git,                 source: https://git.launchpad.net/cloud-init}}"],
+      "title": "Parts",
+      "type": "object"
+    },
+    "package-repositories": {
+      "anyOf": [
+        {
+          "items": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "The package repositories to use for build and stage packages.",
+      "examples": ["[{type: apt,                components: [main],                suites: [xenial],                key-id: 78E1918602959B9C59103100F1831DDAFC42E99D,                url: http://ppa.launchpad.net/snappy-dev/snapcraft-daily/ubuntu}]"],
+      "title": "Package-Repositories"
+    },
+    "priority": {
+      "$ref": "#/$defs/Priority",
+      "default": "optional"
+    },
+    "passthrough": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Passthrough",
+      "type": "object"
+    },
+    "packages": {
+      "additionalProperties": {
+        "$ref": "#/$defs/Package"
+      },
+      "title": "Packages",
+      "type": "object"
+    }
+  },
+  "required": ["name", "base", "platforms", "parts", "passthrough", "packages"],
+  "title": "Project",
+  "type": "object"
+}

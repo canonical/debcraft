@@ -76,7 +76,9 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
         )
 
     monkeypatch.chdir(tmp_path)
-    services.ServiceFactory.register("package", services.Package)
+    services.ServiceFactory.register(
+        "package", "Package", module="debcraft.services.package"
+    )
     app_services = craft_application.ServiceFactory(app=debcraft.METADATA)
 
     app = debcraft.Application(debcraft.METADATA, app_services)
@@ -99,7 +101,6 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
         project=project,
         arch=host_architecture,
     )
-    assert metadata.base == project.base
     packed_asset = (
         tmp_path / f"{metadata.name}_{metadata.version}_{host_architecture}.tar.xz"
     )

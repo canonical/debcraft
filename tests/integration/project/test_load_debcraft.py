@@ -13,15 +13,26 @@
 #
 #  You should have received a copy of the GNU General Public License along
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""Tests for loading full debcraft YAML files."""
 
-"""Package metadata for Debcraft."""
+import pathlib
+import shutil
 
-from craft_application.models import BaseMetadata
+import craft_application
+import pytest
+
+VALID_PROJECTS_DIR = pathlib.Path(__file__).parent / "valid-projects"
 
 
-class Metadata(BaseMetadata):
-    """Structure to hold metadata.yaml."""
-
-    name: str
-    version: str
-    architecture: str
+@pytest.mark.parametrize(
+    "project_dir", [pytest.param(d, id=d.name) for d in VALID_PROJECTS_DIR.iterdir()]
+)
+def test_load_project(
+    real_services: craft_application.ServiceFactory,
+    project_dir: pathlib.Path,
+    in_project_path,
+):
+    shutil.copytree(project_dir, in_project_path, dirs_exist_ok=True)
+    project_service = real_services.get("project")
+    project_service.configure(platform=None, build_for=None)
+    project_service.get()

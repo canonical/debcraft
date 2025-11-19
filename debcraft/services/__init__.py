@@ -17,8 +17,13 @@
 """Debcraft services."""
 
 from craft_application.services import ServiceFactory
-from craft_application.services import ProjectService as Project
 from craft_application.services.buildplan import BuildPlanService as BuildPlan
-from debcraft.services.package import Package
 
-__all__ = ["Package", "Project", "BuildPlan", "ServiceFactory"]
+
+def register_services() -> None:
+    """Register debcraft services to the service factory."""
+    ServiceFactory.register("package", "Package", module="debcraft.services.package")
+    ServiceFactory.register("project", "Project", module="debcraft.services.project")
+
+
+__all__ = ["BuildPlan", "ServiceFactory"]

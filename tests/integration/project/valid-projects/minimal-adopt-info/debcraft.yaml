@@ -1,0 +1,12 @@
+name: debcraft-minimal
+maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+
+adopt-info: yolo
+
+# No longer necessary because we have adopt-info.
+# version: 0
+
+# This part exists so we have a valid adopt-info.
+parts:
+  yolo:
+    plugin: nil
