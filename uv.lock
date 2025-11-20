@@ -726,10 +726,10 @@ dev-noble = [
     { name = "python-apt", version = "2.7.7+ubuntu3", source = { registry = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/" }, marker = "sys_platform == 'linux'" },
 ]
 dev-oracular = [
-    { name = "python-apt", version = "3.0.0", source = { registry = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/" }, marker = "sys_platform == 'linux'" },
+    { name = "python-apt", version = "3.0.0+ubuntu1", source = { registry = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/" }, marker = "sys_platform == 'linux'" },
 ]
 dev-plucky = [
-    { name = "python-apt", version = "3.0.0", source = { registry = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/" }, marker = "sys_platform == 'linux'" },
+    { name = "python-apt", version = "3.0.0+ubuntu1", source = { registry = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/" }, marker = "sys_platform == 'linux'" },
 ]
 docs = [
     { name = "canonical-sphinx" },
@@ -758,7 +758,7 @@ dev = [
     { name = "build", specifier = ">=0.7.0" },
     { name = "coverage", extras = ["toml"], specifier = "~=7.4" },
     { name = "mypy", extras = ["reports"], specifier = "~=1.18.1" },
-    { name = "pytest", specifier = "~=8.0" },
+    { name = "pytest", specifier = "~=9.0" },
     { name = "pytest-cov", specifier = "~=7.0" },
     { name = "pytest-mock", specifier = "~=3.12" },
     { name = "types-colorama" },
@@ -774,7 +774,7 @@ docs = [
     { name = "sphinx-autobuild", specifier = "~=2024.2" },
     { name = "sphinx-lint", specifier = "~=1.0" },
     { name = "sphinx-pydantic", specifier = "==0.1.1" },
-    { name = "sphinx-toolbox", specifier = "~=3.5" },
+    { name = "sphinx-toolbox", specifier = "~=4.0" },
     { name = "sphinxext-rediraffe", specifier = "==0.3.0" },
 ]
 lint = []
@@ -859,7 +859,7 @@ name = "exceptiongroup"
 version = "1.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "typing-extensions", marker = "python_full_version < '3.13' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-oracular' and extra == 'group-8-debcraft-dev-plucky')" },
+    { name = "typing-extensions", marker = "python_full_version < '3.11' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-oracular' and extra == 'group-8-debcraft-dev-plucky')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/0b/9f/a65090624ecf468cdca03533906e7c69ed7588582240cfe7cc9e770b50eb/exceptiongroup-1.3.0.tar.gz", hash = "sha256:b241f5885f560bc56a59ee63ca4c6a8bfa46ae4ad651af316d4e81817bb9fd88", size = 29749, upload-time = "2025-05-10T17:42:51.123Z" }
 wheels = [
@@ -963,7 +963,7 @@ name = "importlib-metadata"
 version = "8.7.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
-    { name = "zipp" },
+    { name = "zipp", marker = "python_full_version < '3.11' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-oracular' and extra == 'group-8-debcraft-dev-plucky')" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/76/66/650a33bd90f786193e4de4b3ad86ea60b53c89b669a5c7be931fac31cdb0/importlib_metadata-8.7.0.tar.gz", hash = "sha256:d13b81ad223b890aa16c5471f2ac3056cf76c5f10f82d6f9292f0b415f389000", size = 56641, upload-time = "2025-04-27T15:29:01.736Z" }
 wheels = [
@@ -1756,7 +1756,7 @@ wheels = [
 
 [[package]]
 name = "pytest"
-version = "8.4.2"
+version = "9.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "colorama", marker = "sys_platform == 'win32' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-oracular' and extra == 'group-8-debcraft-dev-plucky')" },
@@ -1767,9 +1767,9 @@ dependencies = [
     { name = "pygments" },
     { name = "tomli", marker = "python_full_version < '3.11' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-oracular') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-oracular' and extra == 'group-8-debcraft-dev-plucky')" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a3/5c/00a0e072241553e1a7496d638deababa67c5058571567b92a7eaa258397c/pytest-8.4.2.tar.gz", hash = "sha256:86c0d0b93306b961d58d62a4db4879f27fe25513d4b969df351abdddb3c30e01", size = 1519618, upload-time = "2025-09-04T14:34:22.711Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/07/56/f013048ac4bc4c1d9be45afd4ab209ea62822fb1598f40687e6bf45dcea4/pytest-9.0.1.tar.gz", hash = "sha256:3e9c069ea73583e255c3b21cf46b8d3c56f6e3a1a8f6da94ccb0fcf57b9d73c8", size = 1564125, upload-time = "2025-11-12T13:05:09.333Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/a8/a4/20da314d277121d6534b3a980b29035dcd51e6744bd79075a6ce8fa4eb8d/pytest-8.4.2-py3-none-any.whl", hash = "sha256:872f880de3fc3a5bdc88a11b39c9710c3497a547cfa9320bc3c5e62fbf272e79", size = 365750, upload-time = "2025-09-04T14:34:20.226Z" },
+    { url = "https://files.pythonhosted.org/packages/0b/8b/6300fb80f858cda1c51ffa17075df5d846757081d11ab4aa35cef9e6258b/pytest-9.0.1-py3-none-any.whl", hash = "sha256:67be0030d194df2dfa7b556f2e56fb3c3315bd5c8822c6951162b92b32ce7dad", size = 373668, upload-time = "2025-11-12T13:05:07.379Z" },
 ]
 
 [[package]]
@@ -1826,6 +1826,10 @@ wheels = [
     { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-2.4.0+ubuntu4-cp313-cp313-manylinux_2_35_ppc64le.whl" },
     { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-2.4.0+ubuntu4-cp313-cp313-manylinux_2_35_s390x.whl" },
     { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-2.4.0+ubuntu4-cp313-cp313-manylinux_2_35_x86_64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-2.4.0+ubuntu4-cp314-cp314-manylinux_2_35_aarch64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-2.4.0+ubuntu4-cp314-cp314-manylinux_2_35_x86_64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-2.4.0+ubuntu4-cp314-cp314t-manylinux_2_35_aarch64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-2.4.0+ubuntu4-cp314-cp314t-manylinux_2_35_x86_64.whl" },
 ]
 
 [[package]]
@@ -1860,7 +1864,7 @@ wheels = [
 
 [[package]]
 name = "python-apt"
-version = "3.0.0"
+version = "3.0.0+ubuntu1"
 source = { registry = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/" }
 resolution-markers = [
     "python_full_version >= '3.13'",
@@ -1869,11 +1873,18 @@ resolution-markers = [
     "python_full_version < '3.11'",
 ]
 wheels = [
-    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0-cp310-cp310-manylinux_2_41_x86_64.whl" },
-    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0-cp311-cp311-manylinux_2_41_x86_64.whl" },
-    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0-cp312-cp312-manylinux_2_41_x86_64.whl" },
-    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0-cp313-cp313-manylinux_2_41_x86_64.whl" },
-    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0-cp314-cp314-manylinux_2_41_x86_64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp310-cp310-manylinux_2_42_aarch64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp310-cp310-manylinux_2_42_x86_64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp311-cp311-manylinux_2_42_aarch64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp311-cp311-manylinux_2_42_x86_64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp312-cp312-manylinux_2_42_aarch64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp312-cp312-manylinux_2_42_x86_64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp313-cp313-manylinux_2_42_aarch64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp313-cp313-manylinux_2_42_x86_64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp314-cp314-manylinux_2_42_aarch64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp314-cp314-manylinux_2_42_x86_64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp314-cp314t-manylinux_2_42_aarch64.whl" },
+    { url = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/python-apt/python_apt-3.0.0+ubuntu1-cp314-cp314t-manylinux_2_42_x86_64.whl" },
 ]
 
 [[package]]
@@ -2213,6 +2224,8 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/6b/fa/3234f913fe9a6525a7b97c6dad1f51e72b917e6872e051a5e2ffd8b16fbb/ruamel.yaml.clib-0.2.14-cp314-cp314-macosx_15_0_arm64.whl", hash = "sha256:70eda7703b8126f5e52fcf276e6c0f40b0d314674f896fc58c47b0aef2b9ae83", size = 137970, upload-time = "2025-09-22T19:51:09.472Z" },
     { url = "https://files.pythonhosted.org/packages/ef/ec/4edbf17ac2c87fa0845dd366ef8d5852b96eb58fcd65fc1ecf5fe27b4641/ruamel.yaml.clib-0.2.14-cp314-cp314-musllinux_1_2_i686.whl", hash = "sha256:a0cb71ccc6ef9ce36eecb6272c81afdc2f565950cdcec33ae8e6cd8f7fc86f27", size = 739639, upload-time = "2025-09-22T19:51:10.566Z" },
     { url = "https://files.pythonhosted.org/packages/15/18/b0e1fafe59051de9e79cdd431863b03593ecfa8341c110affad7c8121efc/ruamel.yaml.clib-0.2.14-cp314-cp314-musllinux_1_2_x86_64.whl", hash = "sha256:e7cb9ad1d525d40f7d87b6df7c0ff916a66bc52cb61b66ac1b2a16d0c1b07640", size = 764456, upload-time = "2025-09-22T19:51:11.736Z" },
+    { url = "https://files.pythonhosted.org/packages/e7/cd/150fdb96b8fab27fe08d8a59fe67554568727981806e6bc2677a16081ec7/ruamel_yaml_clib-0.2.14-cp314-cp314-win32.whl", hash = "sha256:9b4104bf43ca0cd4e6f738cb86326a3b2f6eef00f417bd1e7efb7bdffe74c539", size = 102394, upload-time = "2025-11-14T21:57:36.703Z" },
+    { url = "https://files.pythonhosted.org/packages/bd/e6/a3fa40084558c7e1dc9546385f22a93949c890a8b2e445b2ba43935f51da/ruamel_yaml_clib-0.2.14-cp314-cp314-win_amd64.whl", hash = "sha256:13997d7d354a9890ea1ec5937a219817464e5cc344805b37671562a401ca3008", size = 122673, upload-time = "2025-11-14T21:57:38.177Z" },
 ]
 
 [[package]]
@@ -2495,7 +2508,7 @@ wheels = [
 
 [[package]]
 name = "sphinx-toolbox"
-version = "3.10.0"
+version = "4.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "apeye" },
@@ -2518,9 +2531,9 @@ dependencies = [
     { name = "tabulate" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f4/2d/d916dc5a70bc7b006af8a31bba1a2767e99cdb884f3dfa47aa79a60cc1e9/sphinx_toolbox-3.10.0.tar.gz", hash = "sha256:6afea9ac9afabe76bd5bd4d2b01edfdad81d653a1a34768e776e6a56d5a6f572", size = 113656, upload-time = "2025-05-06T17:36:50.926Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/60/d2/fd68940102a02cbff392b91317618e0f87458e98a9684c0f74b1c58d4e49/sphinx_toolbox-4.0.0.tar.gz", hash = "sha256:48c31451db2e2d8c71c03939e72a19ef7bc92ca7850a62db63fc7bb8395b6785", size = 113819, upload-time = "2025-05-12T17:11:39.104Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/12/ec/d09521ae2059fe89d8b59b2b34f5a1713b82a14e70a9a018fca8d3d514be/sphinx_toolbox-3.10.0-py3-none-any.whl", hash = "sha256:675e5978eaee31adf21701054fa75bacf820459d56e93ac30ad01eaee047a6ef", size = 195622, upload-time = "2025-05-06T17:36:48.81Z" },
+    { url = "https://files.pythonhosted.org/packages/77/fd/5f03a1ad6623b3533a4b7ce8156f0b6a185f4a276d12567e434b855040d1/sphinx_toolbox-4.0.0-py3-none-any.whl", hash = "sha256:c700937baee505e440d44d46bc47ccd036ec282ae61b04e40342944128721117", size = 195781, upload-time = "2025-05-12T17:11:37.45Z" },
 ]
 
 [[package]]

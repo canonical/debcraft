@@ -32,14 +32,14 @@ docs = [
     "canonical-sphinx~=0.5.1",
     "sphinx-autobuild~=2024.2",
     "sphinx-pydantic==0.1.1",
-    "sphinx-toolbox~=3.5",
+    "sphinx-toolbox~=4.0",
     "sphinx-lint~=1.0",
     "sphinxext-rediraffe==0.3.0",
 ]
 dev = [
     "build>=0.7.0",
     "coverage[toml]~=7.4",
-    "pytest~=8.0",
+    "pytest~=9.0",
     "pytest-cov~=7.0",
     "pytest-mock~=3.12",
     "mypy[reports]~=1.18.1",
