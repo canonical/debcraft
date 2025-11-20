@@ -18,11 +18,13 @@
 
 import craft_platforms
 from craft_application import services
+from typing_extensions import override
 
 
 class Project(services.ProjectService):
     """The service for rendering Debcraft projects."""
 
+    @override
     def _app_render_legacy_platforms(self) -> dict[str, craft_platforms.PlatformDict]:
         """Provide the default platforms if no platforms are declared.
 
