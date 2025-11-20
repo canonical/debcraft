@@ -16,14 +16,13 @@
 
 """Integration tests for the application as a whole."""
 
-import tarfile
+import subprocess
 from textwrap import dedent
 from typing import cast
 
 import craft_application
 import debcraft
 import pytest
-import yaml
 from craft_parts import errors
 from craft_parts.utils import os_utils
 from debcraft import models, services
@@ -101,14 +100,15 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
     )
     assert metadata.base == project.base
     packed_asset = (
-        tmp_path / f"{metadata.name}_{metadata.version}_{host_architecture}.tar.xz"
+        tmp_path / f"{metadata.name}_{metadata.version}_{host_architecture}.deb"
     )
     assert packed_asset.exists()
-    with tarfile.open(packed_asset) as tar:
-        raw_tar_metadata = tar.extractfile("./metadata.yaml")
-        assert raw_tar_metadata is not None
-        tar_metadata = models.Metadata.unmarshal(yaml.safe_load(raw_tar_metadata))
-    assert tar_metadata == metadata
+
+    result = subprocess.run(
+        ["ar", "t", str(packed_asset)], check=True, capture_output=True, text=True
+    )
+    members = result.stdout.strip().splitlines()
+    assert members == ["debian-binary", "control.tar.zstd", "data.tar.zstd"]
 
     monkeypatch.setattr("sys.argv", ["debcraft", "clean", "--destructive-mode"])
     result = app.run()
