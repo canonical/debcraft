@@ -15,6 +15,9 @@
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Tests for debcraft's package service."""
 
+import subprocess
+from pathlib import Path
+
 import pytest
 from debcraft import models, services
 
@@ -28,21 +31,36 @@ def package_service_with_configured_project(
     return package_service
 
 
+def _list_ar_members(ar_path: Path) -> list[str]:
+    """Return the list of members in an ar archive."""
+    result = subprocess.run(
+        ["ar", "t", str(ar_path)],
+        check=True,
+        capture_output=True,
+        text=True
+    )
+    return result.stdout.strip().splitlines()
+
+
 def test_pack(
     package_service_with_configured_project: services.Package,
     tmp_path,
     default_project: models.Project,
     host_architecture: str,
 ):
+    (tmp_path / "prime").mkdir(exist_ok=True)
     package_service_with_configured_project.pack(
         prime_dir=tmp_path / "prime", dest=tmp_path
     )
 
-    source_tarball = (
+    deb_file = (
         tmp_path
-        / f"{default_project.name}_{default_project.version}_{host_architecture}.tar.xz"
+        / f"{default_project.name}_{default_project.version}_{host_architecture}.deb"
     )
-    assert source_tarball.exists()
+    assert deb_file.exists()
+
+    members = _list_ar_members(deb_file)
+    assert members == ["debian-binary", "control.tar.zstd", "data.tar.zstd"]
 
 
 def test_generate_metadata(
