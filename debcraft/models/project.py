@@ -26,7 +26,7 @@ from typing_extensions import Self
 
 from debcraft.models.package import Package
 
-DEBIAN_PACKAGE_NAME_REGEX = r"[a-z0-9][a-z0-9.+-]+"
+DEBIAN_PACKAGE_NAME_REGEX = r"^[a-z0-9][a-z0-9.+-]+$"
 """A regular expression to implement Debian package name rules.
 
 Based on the rules provided at:
