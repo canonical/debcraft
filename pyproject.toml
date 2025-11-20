@@ -4,7 +4,7 @@ description = "Pack up debs with the Crafting Experience"
 dynamic = ["version"]
 dependencies = [
     "craft-application>=5.4.0",
-    "zstandard>=0.25.0"
+    "zstandard>=0.25.0",
 ]
 classifiers = [
     "Development Status :: 1 - Planning",
