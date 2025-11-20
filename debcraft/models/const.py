@@ -18,5 +18,5 @@
 
 from typing import Literal
 
-CommonBaseStr = Literal["ubuntu@22.04", "ubuntu@24.04"]
+CommonBaseStr = Literal["ubuntu@22.04", "ubuntu@24.04", "ubuntu@26.04"]
 BaseStr = CommonBaseStr
