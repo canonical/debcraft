@@ -63,7 +63,7 @@ class Priority(enum.Enum):
 
 
 class Project(models.Project):
-    """Imagecraft project definition."""
+    """Debcraft project definition."""
 
     name: DebianPackageName
     """The name of the source package."""
