@@ -55,6 +55,8 @@ def check_metadata(
 
 
 @noble_only
+# The app stops a real emitter, but the testable RecordingEmitter makes stop a no-op.
+@pytest.mark.usefixtures("emitter")
 def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
     monkeypatch.setenv("CRAFT_DEBUG", "1")
     monkeypatch.setattr("sys.argv", ["debcraft", "pack", "--destructive-mode"])
