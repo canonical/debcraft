@@ -34,10 +34,7 @@ def package_service_with_configured_project(
 def _list_ar_members(ar_path: Path) -> list[str]:
     """Return the list of members in an ar archive."""
     result = subprocess.run(
-        ["ar", "t", str(ar_path)],
-        check=True,
-        capture_output=True,
-        text=True
+        ["ar", "t", str(ar_path)], check=True, capture_output=True, text=True
     )
     return result.stdout.strip().splitlines()
 
