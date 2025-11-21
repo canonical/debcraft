@@ -59,8 +59,11 @@ class Package(services.PackageService):
                 os.chdir(tmpdir)
                 _create_data_file(pathlib.Path(tmpdir), prime_dir)
                 _create_control_file(pathlib.Path(tmpdir), project, build_plan)
-
                 pathlib.Path("debian-binary").write_text("2.0\n")
+
+                # Order of files added to the deb file is important. The
+                # debian-binary file must come first, followed by the control
+                # tarball and then the data tarball.
                 subprocess.run(
                     [
                         "ar",
