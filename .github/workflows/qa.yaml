@@ -17,6 +17,9 @@ jobs:
     with:
       # Disable 3.11 and 3.13 tests while wheels for python-apt and
       # pygit2 are not fully available.
-      fast-test-platforms: '["ubuntu-24.04"]'
+      fast-test-platforms: '["ubuntu-22.04", "ubuntu-22.04-arm", "ubuntu-24.04", "ubuntu-24.04-arm"]'
       fast-test-python-versions: '["3.10", "3.12"]'
-      lowest-python-platform: "ubuntu-24.04"
+      slow-test-platforms: '["ubuntu-24.04", "ubuntu-24.04-arm"]'
+      slow-test-python-versions: '["3.12"]'
+      lowest-python-platform: "ubuntu-22.04"
+      lowest-python-version: "3.10"

@@ -63,13 +63,13 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
 
     with (tmp_path / "debcraft.yaml").open("w") as project_file:
         project_file.write(
-            dedent("""\
+            dedent(f"""\
                 name: test-deb
                 base: ubuntu@24.04
                 version: "1.0"
                 maintainer: Mike Maintainer <maintainer@example.com>
                 platforms:
-                    amd64:
+                    {host_architecture}:
 
                 parts:
                     nil:
