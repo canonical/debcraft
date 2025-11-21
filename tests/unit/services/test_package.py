@@ -16,20 +16,21 @@
 """Tests for debcraft's package service."""
 
 import pytest
-from debcraft import models, services
+from debcraft import models
+from debcraft.services import package
 
 
 @pytest.fixture
 def package_service_with_configured_project(
     project_service,
-    package_service: services.Package,
-) -> services.Package:
+    package_service: package.Package,
+) -> package.Package:
     project_service.configure(platform=None, build_for=None)
     return package_service
 
 
 def test_pack(
-    package_service_with_configured_project: services.Package,
+    package_service_with_configured_project: package.Package,
     tmp_path,
     default_project: models.Project,
     host_architecture: str,
@@ -46,13 +47,12 @@ def test_pack(
 
 
 def test_generate_metadata(
-    package_service_with_configured_project: services.Package,
+    package_service_with_configured_project: package.Package,
     host_architecture: str,
 ):
     expected = models.Metadata(
         name="fake-project",
         version="1.0",
-        base="ubuntu@24.04",
         architecture=host_architecture,
     )
 

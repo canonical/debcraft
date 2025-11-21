@@ -65,3 +65,7 @@ endif
 # If additional build dependencies need installing in order to build the linting env.
 .PHONY: install-lint-build-deps
 install-lint-build-deps:
+
+.PHONY: schema
+schema: install-uv  ## Generate a JSON schema for debcraft.yaml.
+	uv run tools/schema.py > schema/debcraft.json

@@ -56,6 +56,5 @@ class Package(services.PackageService):
         return models.Metadata(
             name=project.name,
             version=cast(str, project.version),
-            base=project.base,
             architecture=build_plan.build_for,
         )

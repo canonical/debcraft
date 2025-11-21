@@ -19,6 +19,8 @@ import pathlib
 from typing import Any, cast
 
 import debcraft
+import debcraft.services.package
+import debcraft.services.project
 import pytest
 from debcraft import models, services
 from typing_extensions import override
@@ -42,6 +44,7 @@ def default_project_raw(
         "base": "ubuntu@24.04",
         "platforms": {host_architecture: None},
         "parts": parts,
+        "maintainer": "Mike Maintainer <someone@example.com>",
     } | extra_project_params
 
 
@@ -54,8 +57,8 @@ def default_project(default_project_raw: dict[str, Any]) -> models.Project:
 def fake_project_service_class(
     default_project_raw: dict[str, Any],
     default_project: models.Project,
-) -> type[services.Project]:
-    class FakeProjectService(services.Project):
+) -> type[debcraft.services.project.Project]:
+    class FakeProjectService(debcraft.services.project.Project):
         @override
         def _load_raw_project(self) -> dict[str, Any]:  # type: ignore[reportIncompatibleMethodOverride]
             return default_project_raw
@@ -79,7 +82,9 @@ def default_factory(
     fake_project_service_class,
     project_path: pathlib.Path,
 ) -> services.ServiceFactory:
-    services.ServiceFactory.register("package", services.Package)
+    services.ServiceFactory.register(
+        "package", "Package", module="debcraft.services.package"
+    )
     services.ServiceFactory.register("project", fake_project_service_class)
     service_factory = services.ServiceFactory(app=debcraft.METADATA)
     service_factory.update_kwargs("project", project_dir=project_path)
@@ -87,8 +92,8 @@ def default_factory(
 
 
 @pytest.fixture
-def package_service(default_factory) -> services.Package:
-    return cast(services.Package, default_factory.package)
+def package_service(default_factory) -> debcraft.services.package.Package:
+    return cast(debcraft.services.package.Package, default_factory.package)
 
 
 @pytest.fixture
@@ -97,5 +102,5 @@ def build_plan_service(default_factory) -> services.BuildPlan:
 
 
 @pytest.fixture
-def project_service(default_factory) -> services.Project:
-    return cast(services.Project, default_factory.get("project"))
+def project_service(default_factory) -> debcraft.services.project.Project:
+    return cast(debcraft.services.project.Project, default_factory.get("project"))

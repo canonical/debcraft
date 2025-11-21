@@ -13,15 +13,19 @@
 #
 #  You should have received a copy of the GNU General Public License along
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""Common fixtures and pytest configuration for integration tests."""
 
-"""Package metadata for Debcraft."""
+import pathlib
 
-from craft_application.models import BaseMetadata
+import craft_application
+import debcraft
+import pytest
+from debcraft import services
 
 
-class Metadata(BaseMetadata):
-    """Structure to hold metadata.yaml."""
-
-    name: str
-    version: str
-    architecture: str
+@pytest.fixture
+def real_services(in_project_path: pathlib.Path) -> craft_application.ServiceFactory:
+    services.register_services()
+    factory = craft_application.ServiceFactory(app=debcraft.METADATA)
+    factory.update_kwargs("project", project_dir=in_project_path)
+    return factory
