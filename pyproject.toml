@@ -53,22 +53,11 @@ tics = ["flake8", "pylint"]
 # Up to date package links can be found at https://launchpad.net/ubuntu/+source/python-apt
 # Note: These extras can break requirements from other packages, so
 # do not use them in dependencies unless you know what you're doing.
-dev-jammy = [
-    # Stay on 2.4 for Jammy
-    "python-apt~=2.4.0;sys_platform=='linux'",
-]
-dev-noble = [
-    # 2.7 for Noble
-    "python-apt~=2.7.0;sys_platform=='linux'",
-]
-dev-oracular = [
-    # 2.9 for Oracular+
-    "python-apt>=2.9.0;sys_platform=='linux'",
-]
-dev-plucky = [
-    # 2.9 for Oracular+
-    "python-apt>=2.9.0;sys_platform=='linux'",
-]
+dev-jammy = ["python-apt~=2.4.0;sys_platform=='linux'"]
+dev-noble = ["python-apt~=2.7.0;sys_platform=='linux'"]
+dev-plucky = ["python-apt~=2.9.0;sys_platform=='linux'"]
+dev-questing = ["python-apt~=3.0.0;sys_platform=='linux'"]
+dev-resolute = ["python-apt~=3.0.0;sys_platform=='linux'"]
 
 [tool.uv]
 constraint-dependencies = [
@@ -99,10 +88,12 @@ conflicts = [
     [
         { group = "dev-jammy" },
         { group = "dev-noble" },
-        { group = "dev-oracular" },
         { group = "dev-plucky" },
+        { group = "dev-questing" },
+        { group = "dev-resolute" },
     ]
 ]
+environments = ["sys_platform == 'linux'"]
 
 
 [[tool.uv.index]]

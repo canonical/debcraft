@@ -22,23 +22,18 @@ from typing import cast
 
 import craft_application
 import debcraft
+import distro
 import pytest
+import yaml
 from craft_parts import errors
 from craft_parts.utils import os_utils
 from debcraft import models, services
 
+HOST_DISTRO = distro.LinuxDistribution()
 
-def is_ubuntu_series(series: str) -> bool:
-    """Return true if the current platform is the given Ubuntu series."""
-    release = os_utils.OsRelease()
-    try:
-        return release.id() == "ubuntu" and release.version_id() == series
-    except errors.OsReleaseIdError:
-        return False
-
-
-noble_only = pytest.mark.skipif(
-    not is_ubuntu_series("24.04"), reason="platform must be ubuntu 24.04"
+debian_like_only = pytest.mark.skipif(
+    HOST_DISTRO.id() != "debian" and "debian" not in HOST_DISTRO.like(),
+    reason="host OS must be debian-like",
 )
 
 
@@ -53,23 +48,23 @@ def check_metadata(
     assert metadata.architecture == arch
 
 
-@noble_only
+@debian_like_only
 def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
     monkeypatch.setenv("CRAFT_DEBUG", "1")
     monkeypatch.setattr("sys.argv", ["debcraft", "pack", "--destructive-mode"])
 
     with (tmp_path / "debcraft.yaml").open("w") as project_file:
         project_file.write(
-            dedent("""\
+            dedent(f"""\
                 name: test-deb
-                base: ubuntu@24.04
+                base: {HOST_DISTRO.id()}@{HOST_DISTRO.version()}
                 version: "1.0"
                 platforms:
-                    amd64:
+                    {host_architecture}:
 
                 parts:
-                    nil:
-                        plugin: nil
+                  nil:
+                    plugin: nil
 
         """)
         )
