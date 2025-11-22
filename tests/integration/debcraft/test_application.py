@@ -24,9 +24,6 @@ import craft_application
 import debcraft
 import distro
 import pytest
-import yaml
-from craft_parts import errors
-from craft_parts.utils import os_utils
 from debcraft import models, services
 
 HOST_DISTRO = distro.LinuxDistribution()
