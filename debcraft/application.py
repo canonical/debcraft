@@ -17,6 +17,8 @@
 """Main Debcraft Application."""
 
 import craft_application
+import craft_parts
+from typing_extensions import override
 
 from debcraft import models
 
@@ -29,3 +31,8 @@ METADATA = craft_application.AppMetadata(
 
 class Application(craft_application.Application):
     """Debcraft application definition."""
+
+    @override
+    def _enable_craft_parts_features(self) -> None:
+        """Enable partitions for packages."""
+        craft_parts.Features(enable_partitions=True)

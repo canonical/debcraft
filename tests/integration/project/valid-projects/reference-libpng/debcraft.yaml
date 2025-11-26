@@ -1,82 +1,69 @@
-# This is a reference file expanded from discussions on the week of 2025-11-03.
-# It is the closest we have to a formal specification for now.
-name: libpng2.6 # source name
+name: libpng1-6
 version: 1.6.43-5build1
 summary: PNG library - runtime (version 1.6)
-description: | # add start of line dots
+description: |
   libpng is a library implementing an interface for reading and writing
   PNG (Portable Network Graphics) format files.
 
   This package contains the runtime library files needed to run software
   using libpng.
-build-base: ubuntu@24.04
-# licenses from debcraft/copyright
-# fall back to debian/copyright
-
-priority: optional # optional entry
+base: ubuntu@24.04
 maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
-original-maintainer: Maintainers of libpng1.6 packages <libpng1.6@packages.debian.org> # optional entry
-#uploaders: ...  # optional entry
+original-maintainer: Maintainers of libpng1.6 packages <libpng1.6@packages.debian.org>
 
 section: libs
 
-# packages inherit summary, description, section unless overridden
+# to be removed, see https://github.com/canonical/debcraft/issues/52
+platforms:
+  amd64:
+
 packages:
   libpng16-16t64:
-    architectures: [amd64] #  Literal["any", "all"] | list[DebianArchitecture] = "any"
-    depends:
-      - mydependency
-      # These includes should be handled implicitly.
-      # - ${misc:Depends}      # the way today's flow works, but may be different in the future
-      # - ${shlibs:Depends}
-      - ... # more implicit ways with ways to opt out
-      - -libcurl* # exclude this from the list of depends
-    recommends:
-      - otherdependency
-      # - ${misc:Recommends}   # the way today's flow works, but may be different in the future
-      # - ${shlibs:Recommends}
-      - ... # more implicit ways with ways to opt out
-      - -libcurl*
     provides:
       - libpng16-16
     breaks:
       - libpng16-16 (<< 1.6.43-5build1)
     replaces:
       - libpng16-16
-    conflicts:
 
   libpng-dev:
     section: libdevel
     architectures: all
-    # ... rest same as above
+    summary: PNG library - development (version 1.6)
+    description: |
+      libpng is a library implementing an interface for reading and writing
+      PNG (Portable Network Graphics) format files.
+
+      This package contains the header and development files needed to build
+      programs and packages using libpng.
+
+  libpng-tools:
+    section: libdevel
+    summary: PNG library - tools (version 1.6)
+    description: |
+      libpng is a library implementing an interface for reading and writing
+      PNG (Portable Network Graphics) format files.
+
+      This package contains a program to interact with libpng from the
+      command line.
 
 parts:
   libpng1.6:
-    plugin: autotools # run debian/rules build, install docs & manpages
+    plugin: autotools
     autotools-configure-parameters:
-      - --prefix=/
+      - --prefix=/usr
     source: .
     build-packages:
       - build-essential
-      - debhelper-compat
-      - dpkg-dev
       - zlib1g-dev
-      - mawk
-      - for amd64: # revisit this
-          - libexif-dev
-    stage:
-      - -dontincludeme.txt
     organize:
       usr/bin/libpng-config: (package/libpng-dev)/usr/bin/
       usr/bin/libpng16-config: (package/libpng-dev)/usr/bin/
       usr/include: (package/libpng-dev)/usr
-      # some magic necessary here to use the var
       usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/pkgconfig: (package/libpng-dev)/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/
-      usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libpng.a: (package/libpng-dev)/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/
-      usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libpng16.a: (package/libpng-dev)/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/
-      usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libpng.so: (package/libpng-dev)/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/
-      usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libpng16.so: (package/libpng-dev)/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/
-      usr/share/doc/libpng-16: (package/libpng-dev)/usr/share/doc/ # the plugin gzips and installs doc files
-      usr/share/man: (package/libpng-dev)/usr/share/ # the plugin gzips and installs manpages
+      usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/*.a: (package/libpng-dev)/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/
+      usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/*.so: (package/libpng-dev)/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/
+      usr/share/doc/libpng-16: (package/libpng-dev)/usr/share/doc/
+      usr/share/man: (package/libpng-dev)/usr/share/
       usr/bin/png-fix-itxt: (package/libpng-tools)/usr/bin/
       usr/bin/pngfix: (package/libpng-tools)/usr/bin/

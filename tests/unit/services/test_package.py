@@ -46,15 +46,12 @@ def test_pack(
     default_project: models.Project,
     host_architecture: str,
 ):
-    (tmp_path / "prime").mkdir(exist_ok=True)
-    package_service_with_configured_project.pack(
-        prime_dir=tmp_path / "prime", dest=tmp_path
-    )
+    prime_dir = tmp_path / "work" / "partitions" / "package" / "package-1" / "prime"
+    prime_dir.mkdir(exist_ok=True, parents=True)
+    (prime_dir / "foo.txt").touch()
+    package_service_with_configured_project.pack(prime_dir=prime_dir, dest=tmp_path)
 
-    deb_file = (
-        tmp_path
-        / f"{default_project.name}_{default_project.version}_{host_architecture}.deb"
-    )
+    deb_file = tmp_path / f"package-1_2.0_{host_architecture}.deb"
     assert deb_file.exists()
 
     members = _list_ar_members(deb_file)

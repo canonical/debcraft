@@ -16,13 +16,35 @@
 
 """Project service for debcraft."""
 
+import pathlib
+from typing import cast
+
 import craft_platforms
 from craft_application import services
 from typing_extensions import override
 
+from debcraft.models.project import PackagesProject
+
 
 class Project(services.ProjectService):
     """The service for rendering Debcraft projects."""
+
+    __project_file_path: pathlib.Path | None = None
+
+    @override
+    def get_partitions_for(
+        self,
+        *,
+        platform: str,
+        build_for: str,
+        build_on: craft_platforms.DebianArchitecture,
+    ) -> list[str] | None:
+        project = self._preprocess(
+            build_for=build_for, build_on=cast(str, build_on), platform=platform
+        )
+
+        packages = PackagesProject.unmarshal(project)
+        return packages.get_partitions()
 
     @override
     def _app_render_legacy_platforms(self) -> dict[str, craft_platforms.PlatformDict]:

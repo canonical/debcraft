@@ -23,15 +23,14 @@ import pathlib
 import subprocess
 import tarfile
 import tempfile
-import textwrap
 from typing import cast
 
-import craft_application
 import zstandard as zstd
 from craft_application import services
 from craft_platforms import BuildInfo
 
-from debcraft import models
+from debcraft import control, errors, models
+from debcraft.services.lifecycle import Lifecycle
 
 _ZSTD_COMPRESSION_LEVEL = 3
 
@@ -45,40 +44,22 @@ class Package(services.PackageService):
         :param dest: Directory into which to write the package(s).
         :returns: A list of paths to created packages.
         """
-        project = self._services.get("project").get()
-        build_plan = self._services.get("build_plan").plan()[0]
+        project = cast(models.Project, self._services.get("project").get())
+        build_info = self._services.get("build_plan").plan()[0]
+        _ = prime_dir  # not used
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            cwd = pathlib.Path().absolute()
-            deb_name = (
-                dest.absolute()
-                / f"{project.name}_{project.version}_{build_plan.platform}.deb"
+        if not project.packages:
+            return []
+
+        debs: list[pathlib.Path] = []
+        for package_name in project.packages:
+            prime = cast(Lifecycle, self._services.lifecycle).get_prime_dir(
+                package_name
             )
+            deb = _create_package(dest, project, package_name, build_info, prime)
+            debs.append(deb)
 
-            try:
-                os.chdir(tmpdir)
-                _create_data_file(pathlib.Path(tmpdir), prime_dir)
-                _create_control_file(pathlib.Path(tmpdir), project, build_plan)
-                pathlib.Path("debian-binary").write_text("2.0\n")
-
-                # Order of files added to the deb file is important. The
-                # debian-binary file must come first, followed by the control
-                # tarball and then the data tarball.
-                subprocess.run(
-                    [
-                        "ar",
-                        "rcs",
-                        deb_name,
-                        "debian-binary",
-                        "control.tar.zstd",
-                        "data.tar.zstd",
-                    ],
-                    check=True,
-                )
-            finally:
-                os.chdir(cwd)
-
-        return [deb_name]
+        return debs
 
     @property
     def metadata(self) -> models.Metadata:
@@ -91,6 +72,49 @@ class Package(services.PackageService):
             version=cast(str, project.version),
             architecture=build_plan.build_for,
         )
+
+
+def _create_package(
+    dest: pathlib.Path,
+    project: models.Project,
+    package_name: str,
+    build_info: BuildInfo,
+    prime_dir: pathlib.Path,
+) -> pathlib.Path:
+    package = project.get_package(package_name)
+    version = package.version or project.version
+    cwd = pathlib.Path().absolute()
+    deb_name = dest.absolute() / f"{package_name}_{version}_{build_info.build_for}.deb"
+
+    installed_size = _get_dir_size(prime_dir)
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        try:
+            os.chdir(tmpdir)
+            _create_data_file(pathlib.Path(tmpdir), prime_dir)
+            _create_control_file(
+                pathlib.Path(tmpdir), project, package_name, build_info, installed_size
+            )
+            pathlib.Path("debian-binary").write_text("2.0\n")
+
+            # Order of files added to the deb file is important. The
+            # debian-binary file must come first, followed by the control
+            # tarball and then the data tarball.
+            subprocess.run(
+                [
+                    "ar",
+                    "rcs",
+                    deb_name,
+                    "debian-binary",
+                    "control.tar.zstd",
+                    "data.tar.zstd",
+                ],
+                check=True,
+            )
+        finally:
+            os.chdir(cwd)
+
+    return deb_name
 
 
 def _create_data_file(path: pathlib.Path, prime_dir: pathlib.Path) -> None:
@@ -109,7 +133,11 @@ def _create_data_file(path: pathlib.Path, prime_dir: pathlib.Path) -> None:
 
 
 def _create_control_file(
-    path: pathlib.Path, project: craft_application.models.Project, build_plan: BuildInfo
+    path: pathlib.Path,
+    project: models.Project,
+    package_name: str,
+    build_info: BuildInfo,
+    installed_size: int,
 ) -> None:
     """Create the control.tar.zstd file containing package metadata.
 
@@ -117,18 +145,46 @@ def _create_control_file(
     :param project: The project model.
     :param build_plan: Platform information.
     """
+    package = project.get_package(package_name)
     control_path = path / "control.tar.zstd"
 
+    version = package.version or project.version
+    if not version:
+        raise errors.DebcraftError(f"package {package_name} version was not set")
+
+    section = package.section or project.section
+    if not section:
+        raise errors.DebcraftError(f"package {package_name} section was not set")
+
+    summary = package.summary or project.summary
+    if not summary:
+        raise errors.DebcraftError(f"package {package_name} summary was not set")
+
+    description = package.description or project.description
+    if not description:
+        raise errors.DebcraftError(f"package {package_name} description was not set")
+
     # Change to use package data from the project model
-    control_data = textwrap.dedent(
-        f"""\
-        Package: {project.name}
-        Version: {project.version}
-        Architecture: {build_plan.platform}
-    """
+    ctl_data = models.DebianControl(
+        package=package_name,
+        source=project.name,
+        version=version,
+        architecture=package.get_architecture() or build_info.build_for,
+        maintainer=project.maintainer,
+        section=section,
+        installed_size=int(installed_size / 1024),
+        depends=package.depends,
+        priority=project.priority.value or "optional",
+        description=summary + "\n" + description,
+        original_maintainer=project.original_maintainer,
+        uploaders=project.uploaders,
     )
-    control = pathlib.Path("control")
-    control.write_text(control_data)
+
+    ctlfile = pathlib.Path("control")
+
+    with ctlfile.open("w") as f:
+        encoder = control.Encoder(f)
+        encoder.encode(ctl_data)
 
     with control_path.open("wb") as control_zstd:
         zcomp = zstd.ZstdCompressor(level=_ZSTD_COMPRESSION_LEVEL)
@@ -136,4 +192,8 @@ def _create_control_file(
             with tarfile.open(fileobj=comp, mode="w") as tar:
                 tar.add("control")
 
-    control.unlink()
+    ctlfile.unlink()
+
+
+def _get_dir_size(path: pathlib.Path) -> int:
+    return sum(f.stat().st_size for f in pathlib.Path(path).rglob("*") if f.is_file())
