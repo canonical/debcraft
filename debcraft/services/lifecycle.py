@@ -63,7 +63,7 @@ def _get_prime_dirs_from_project(project_info: ProjectInfo) -> dict[str | None, 
     partition_prime_dirs = project_info.prime_dirs
     package_prime_dirs: dict[str | None, Path] = {None: project_info.prime_dir}
 
-    # strip 'component/' prefix so that the package name is the key
+    # strip 'package/' prefix so that the package name is the key
     for partition, prime_dir in partition_prime_dirs.items():
         if partition and partition.startswith("package/"):
             package = partition.split("/", 1)[1]
