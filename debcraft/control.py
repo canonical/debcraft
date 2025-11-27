@@ -37,8 +37,6 @@ class Encoder:
             key = field.alias or name
 
             match value:
-                case None:
-                    continue
                 case str() if "\n" in value:
                     lines = value.splitlines()
                     self._file.write(f"{key}: {lines[0]}\n")
