@@ -196,4 +196,4 @@ def _create_control_file(
 
 
 def _get_dir_size(path: pathlib.Path) -> int:
-    return sum(f.stat().st_size for f in pathlib.Path(path).rglob("*") if f.is_file())
+    return sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
