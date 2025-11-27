@@ -16,7 +16,10 @@
 """Unit tests for the debcraft project model."""
 
 import pytest
+
+from debcraft import errors
 from debcraft.models import project
+from debcraft.models.package import Package
 
 
 @pytest.mark.parametrize(
@@ -96,16 +99,12 @@ def test_get_package_success(default_project):
 )
 def test_get_package_no_packages_defined(default_project):
     """Test that get_package raises an error when no packages are defined."""
-    from debcraft import errors
-
     with pytest.raises(errors.DebcraftError, match="no packages defined"):
         default_project.get_package("any-package")
 
 
 def test_get_package_not_found(default_project):
     """Test that get_package raises an error when package is not found."""
-    from debcraft import errors
-
     with pytest.raises(
         errors.DebcraftError, match="package nonexistent-package is not defined"
     ):
@@ -122,8 +121,6 @@ def test_get_partitions_no_packages():
 
 def test_get_partitions_with_packages():
     """Test that get_partitions returns correct list when packages are defined."""
-    from debcraft.models.package import Package
-
     packages_project = project.PackagesProject(
         packages={
             "pkg-a": Package(version="1.0"),
