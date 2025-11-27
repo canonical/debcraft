@@ -29,8 +29,6 @@ from debcraft.models.project import PackagesProject
 class Project(services.ProjectService):
     """The service for rendering Debcraft projects."""
 
-    __project_file_path: pathlib.Path | None = None
-
     @override
     def get_partitions_for(
         self,
