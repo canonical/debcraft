@@ -143,7 +143,7 @@ def _create_control_file(
 
     :param path: Directory where the control.tar.zstd file will be created.
     :param project: The project model.
-    :param build_plan: Platform information.
+    :param build_info: Platform information.
     """
     package = project.get_package(package_name)
     control_path = path / "control.tar.zstd"
