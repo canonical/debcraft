@@ -121,7 +121,9 @@ class PackagesProject(models.CraftBaseModel, extra="ignore"):
 
         :returns: A list of packages formatted as ['default', 'package/<name>', ...]
         """
-        if not self.packages:
-            return ["default"]
+        partitions = ["default"]
 
-        return ["default", *[f"package/{name}" for name in self.packages]]
+        if self.packages:
+            partitions.extend([f"package/{name}" for name in self.packages])
+
+        return partitions
