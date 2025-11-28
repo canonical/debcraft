@@ -112,6 +112,10 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
     packed_asset = tmp_path / f"package-1_1.23_{host_architecture}.deb"
     assert packed_asset.exists()
 
+    subprocess.run(
+        ["dpkg-deb", "--info", str(packed_asset)], check=True, capture_output=True, text=True
+    )
+
     result = subprocess.run(
         ["ar", "t", str(packed_asset)], check=True, capture_output=True, text=True
     )
@@ -120,8 +124,8 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
 
     craft_parts.Features.reset()
     monkeypatch.setattr("sys.argv", ["debcraft", "clean", "--destructive-mode"])
-    result = app.run()
 
+    result = app.run()
     assert result == 0
 
     assert not (tmp_path / "prime").exists()
