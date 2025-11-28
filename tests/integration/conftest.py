@@ -16,7 +16,8 @@
 """Common fixtures and pytest configuration for integration tests."""
 
 import pathlib
-from typing import Any, Generator
+from collections.abc import Generator
+from typing import Any
 
 import craft_application
 import craft_parts
