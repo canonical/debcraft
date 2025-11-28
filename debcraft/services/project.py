@@ -16,13 +16,40 @@
 
 """Project service for debcraft."""
 
+from typing import cast
+
+import craft_application.errors
 import craft_platforms
+import pydantic
 from craft_application import services
 from typing_extensions import override
+
+from debcraft.models.project import PackagesProject
 
 
 class Project(services.ProjectService):
     """The service for rendering Debcraft projects."""
+
+    @override
+    def get_partitions_for(
+        self,
+        *,
+        platform: str,
+        build_for: str,
+        build_on: craft_platforms.DebianArchitecture,
+    ) -> list[str] | None:
+        project = self._preprocess(
+            build_for=build_for, build_on=cast(str, build_on), platform=platform
+        )
+
+        try:
+            packages = PackagesProject.unmarshal(project)
+        except pydantic.ValidationError as error:
+            raise craft_application.errors.CraftValidationError.from_pydantic(
+                error, file_name="debcraft.yaml"
+            )
+
+        return packages.get_partitions()
 
     @override
     def _app_render_legacy_platforms(self) -> dict[str, craft_platforms.PlatformDict]:

@@ -24,6 +24,9 @@ def register_services() -> None:
     """Register debcraft services to the service factory."""
     ServiceFactory.register("package", "Package", module="debcraft.services.package")
     ServiceFactory.register("project", "Project", module="debcraft.services.project")
+    ServiceFactory.register(
+        "lifecycle", "Lifecycle", module="debcraft.services.lifecycle"
+    )
 
 
 __all__ = ["BuildPlan", "ServiceFactory"]

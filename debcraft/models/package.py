@@ -15,7 +15,7 @@
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
 """Model for defining deb binary packages."""
 
-from typing import Literal
+from typing import Literal, cast
 
 import pydantic
 from craft_application import models
@@ -31,8 +31,11 @@ class Package(models.CraftBaseModel):
     See: https://www.debian.org/doc/debian-policy/ch-controlfields.html
     """
 
-    architectures: Literal["any", "all"] | list[DebianArchitecture]
-    description: str | None = None  # Only none for the only pkg
+    architectures: Literal["any", "all"] | list[DebianArchitecture] | None = None
+    summary: str | None = None  # defaults to the project summary
+    description: str | None = None  # defaults to the project description
+
+    version: str | None = None  # defaults to the project version
 
     # These need validating: https://github.com/canonical/debcraft/issues/42
     # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
@@ -50,3 +53,13 @@ class Package(models.CraftBaseModel):
 
     Use of this key indicates something incomplete in debcraft.
     """
+
+    def get_architecture(self) -> str | list[str] | None:
+        """Get the formatted package architecture."""
+        if self.architectures in ("all", "any"):
+            return cast(str, self.architectures)
+
+        if self.architectures:
+            return [str(x) for x in self.architectures]
+
+        return None

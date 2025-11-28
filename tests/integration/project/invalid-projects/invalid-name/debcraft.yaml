@@ -2,3 +2,6 @@ name: -a-
 summary: A debcraft project with an invalid name.
 maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 version: 0
+
+platforms:
+  amd64:

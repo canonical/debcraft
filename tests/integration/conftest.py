@@ -16,11 +16,22 @@
 """Common fixtures and pytest configuration for integration tests."""
 
 import pathlib
+from collections.abc import Generator
+from typing import Any
 
 import craft_application
+import craft_parts
 import debcraft
 import pytest
 from debcraft import services
+
+
+@pytest.fixture
+def enable_partitions() -> Generator[Any, Any, Any]:
+    craft_parts.Features.reset()
+    craft_parts.Features(enable_partitions=True)
+    yield
+    craft_parts.Features.reset()
 
 
 @pytest.fixture

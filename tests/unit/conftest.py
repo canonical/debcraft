@@ -18,12 +18,23 @@
 import pathlib
 from typing import Any, cast
 
+import craft_application
+import craft_parts
 import debcraft
 import debcraft.services.package
 import debcraft.services.project
 import pytest
 from debcraft import models, services
+from debcraft.services import lifecycle
 from typing_extensions import override
+
+
+@pytest.fixture(scope="module", autouse=True)
+def global_setup():
+    craft_parts.Features.reset()
+    craft_parts.Features(enable_partitions=True)
+    yield
+    craft_parts.Features.reset()
 
 
 @pytest.fixture
@@ -42,9 +53,13 @@ def default_project_raw(
         "name": "fake-project",
         "version": "1.0",
         "base": "ubuntu@24.04",
+        "summary": "A package",
+        "description": "Really a package",
         "platforms": {host_architecture: None},
         "parts": parts,
         "maintainer": "Mike Maintainer <someone@example.com>",
+        "section": "libs",
+        "packages": {"package-1": {"version": "2.0"}},
     } | extra_project_params
 
 
@@ -77,15 +92,39 @@ def fake_project_service_class(
 
 
 @pytest.fixture
+def fake_lifecycle_service_class(tmp_path, host_architecture):
+    class FakeLifecycleService(lifecycle.Lifecycle):
+        def __init__(
+            self,
+            app: craft_application.AppMetadata,
+            services: services.ServiceFactory,
+            **lifecycle_kwargs: Any,
+        ):
+            super().__init__(
+                app,
+                services,
+                work_dir=tmp_path / "work",
+                cache_dir=tmp_path / "cache",
+                platform=None,
+                build_for=host_architecture,
+                **lifecycle_kwargs,
+            )
+
+    return FakeLifecycleService
+
+
+@pytest.fixture
 def default_factory(
     default_project,
     fake_project_service_class,
+    fake_lifecycle_service_class,
     project_path: pathlib.Path,
 ) -> services.ServiceFactory:
     services.ServiceFactory.register(
         "package", "Package", module="debcraft.services.package"
     )
     services.ServiceFactory.register("project", fake_project_service_class)
+    services.ServiceFactory.register("lifecycle", fake_lifecycle_service_class)
     service_factory = services.ServiceFactory(app=debcraft.METADATA)
     service_factory.update_kwargs("project", project_dir=project_path)
     return service_factory
