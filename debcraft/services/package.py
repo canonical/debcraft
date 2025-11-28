@@ -132,8 +132,7 @@ def _create_data_file(path: pathlib.Path, prime_dir: pathlib.Path) -> None:
             with tarfile.open(
                 fileobj=comp, mode="w", format=tarfile.USTAR_FORMAT
             ) as tar:
-                root_dir = prime_dir.absolute()
-                for entry in root_dir.iterdir():
+                for entry in prime_dir.absolute().iterdir():
                     tar.add(entry, arcname=entry.name)
 
 
