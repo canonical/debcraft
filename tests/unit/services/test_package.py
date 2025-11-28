@@ -93,3 +93,24 @@ def test_get_architecture(source_archs, binary_arch):
     pkg = models.Package(architectures=source_archs)
     arch = package._get_architecture(pkg, info)
     assert arch == binary_arch
+
+
+def test_md5sum(tmp_path):
+    foo = tmp_path / "foo.txt"
+    foo.write_text("file content")
+    result = package._md5sum(foo)
+    assert result == "d10b4c3ff123b26dc068d43a8bef2d23"
+
+
+def test_create_md5sums(tmp_path):
+    test_dir = tmp_path / "dir"
+    test_dir.mkdir()
+    foo = test_dir / "foo.txt"
+    bar = test_dir / "bar.txt"
+    foo.write_text("file content")
+    bar.write_text("more file content")
+    package._create_md5sums(test_dir, tmp_path / "md5sums")
+
+    content = (tmp_path / "md5sums").read_text()
+    assert "cc4005f23a42e90094a943e9eb5cbce3  bar.txt\n" in content
+    assert "d10b4c3ff123b26dc068d43a8bef2d23  foo.txt\n" in content

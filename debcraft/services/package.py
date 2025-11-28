@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
 import pathlib
 import subprocess
@@ -99,7 +100,12 @@ def _create_package(
             os.chdir(tmpdir)
             _create_data_file(pathlib.Path(tmpdir), prime_dir)
             _create_control_file(
-                pathlib.Path(tmpdir), project, package_name, arch, installed_size
+                pathlib.Path(tmpdir),
+                project,
+                package_name,
+                arch,
+                installed_size,
+                prime_dir,
             )
             pathlib.Path("debian-binary").write_text("2.0\n")
 
@@ -146,6 +152,7 @@ def _create_control_file(
     package_name: str,
     arch: str,
     installed_size: int,
+    prime_dir: pathlib.Path,
 ) -> None:
     """Create the control.tar.zst file containing package metadata.
 
@@ -190,10 +197,13 @@ def _create_control_file(
     )
 
     ctlfile = pathlib.Path("control")
+    md5file = pathlib.Path("md5sums")
 
     with ctlfile.open("w", encoding="utf-8", newline="\n") as f:
         encoder = control.Encoder(f)
         encoder.encode(ctl_data)
+
+    _create_md5sums(prime_dir, md5file)
 
     with control_path.open("wb") as control_zstd:
         zcomp = zstd.ZstdCompressor(level=_ZSTD_COMPRESSION_LEVEL)
@@ -202,8 +212,10 @@ def _create_control_file(
                 fileobj=comp, mode="w", format=tarfile.USTAR_FORMAT
             ) as tar:
                 tar.add("control")
+                tar.add("md5sums")
 
     ctlfile.unlink()
+    md5file.unlink()
 
 
 def _get_dir_size(path: pathlib.Path) -> int:
@@ -221,3 +233,22 @@ def _get_architecture(package: models.Package, build_info: BuildInfo) -> str | N
         return build_info.build_for
 
     return None
+
+
+def _md5sum(path: pathlib.Path) -> str:
+    """Compute MD5 checksum of a file."""
+    h = hashlib.md5()  # noqa: S324
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _create_md5sums(root: pathlib.Path, output_file: pathlib.Path) -> None:
+    """Walk subtree and write md5 checksums with relative paths."""
+    with output_file.open("w") as out:
+        for file in root.rglob("*"):
+            if file.is_file():
+                checksum = _md5sum(file)
+                relpath = file.relative_to(root)
+                out.write(f"{checksum}  {relpath}\n")

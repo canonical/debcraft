@@ -55,7 +55,8 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
 
     with (tmp_path / "debcraft.yaml").open("w") as project_file:
         project_file.write(
-            dedent(f"""\
+            dedent(
+                f"""\
                 name: test-deb
                 base: {HOST_DISTRO.id()}@{HOST_DISTRO.version()}
                 version: "1.0"
@@ -74,7 +75,8 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
                 parts:
                   nil:
                     plugin: nil
-        """)
+        """
+            )
         )
 
     monkeypatch.chdir(tmp_path)
@@ -112,6 +114,13 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
     packed_asset = tmp_path / f"package-1_1.23_{host_architecture}.deb"
     assert packed_asset.exists()
 
+    subprocess.run(
+        ["dpkg-deb", "--info", str(packed_asset)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
     result = subprocess.run(
         ["ar", "t", str(packed_asset)], check=True, capture_output=True, text=True
     )
@@ -120,8 +129,8 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
 
     craft_parts.Features.reset()
     monkeypatch.setattr("sys.argv", ["debcraft", "clean", "--destructive-mode"])
-    result = app.run()
 
+    result = app.run()
     assert result == 0
 
     assert not (tmp_path / "prime").exists()
