@@ -129,7 +129,9 @@ def _create_data_file(path: pathlib.Path, prime_dir: pathlib.Path) -> None:
         zcomp = zstd.ZstdCompressor(level=_ZSTD_COMPRESSION_LEVEL)
         with zcomp.stream_writer(data_zstd) as comp:
             with tarfile.open(fileobj=comp, mode="w") as tar:
-                tar.add(prime_dir.absolute(), arcname=".")
+                root_dir = prime_dir.absolute()
+                for entry in root_dir.iterdir():
+                    tar.add(entry, arcname=entry.name)
 
 
 def _create_control_file(
