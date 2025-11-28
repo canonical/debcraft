@@ -16,7 +16,6 @@
 
 """Project service for debcraft."""
 
-import pathlib
 from typing import cast
 
 import craft_platforms
