@@ -108,54 +108,47 @@ class TestLifecycleGetPrimeDir:
     """Tests for the Lifecycle.get_prime_dir method."""
 
     @pytest.fixture
-    def mock_lifecycle(self):
-        """Create a mock Lifecycle service with mocked internals."""
-        lifecycle = MagicMock(spec=Lifecycle)
-        lifecycle.get_prime_dir = Lifecycle.get_prime_dir.__get__(lifecycle, Lifecycle)
-        return lifecycle
+    def prime_dirs_mapping(self):
+        """Return a sample prime_dirs mapping for testing."""
+        return {
+            None: Path("/work/prime"),
+            "my-package": Path("/work/partitions/package/my-package/prime"),
+        }
 
-    def test_get_default_prime_dir(self, mock_lifecycle):
+    def test_get_default_prime_dir(self, prime_dirs_mapping):
         """Test getting the default prime directory with None."""
-        mock_lifecycle.prime_dirs = {
-            None: Path("/work/prime"),
-            "my-package": Path("/work/partitions/package/my-package/prime"),
-        }
+        lifecycle = MagicMock(spec=Lifecycle)
+        lifecycle.prime_dirs = prime_dirs_mapping
 
-        result = mock_lifecycle.get_prime_dir()
+        result = Lifecycle.get_prime_dir(lifecycle)
 
         assert result == Path("/work/prime")
 
-    def test_get_default_prime_dir_explicit_none(self, mock_lifecycle):
+    def test_get_default_prime_dir_explicit_none(self, prime_dirs_mapping):
         """Test getting the default prime directory with explicit None."""
-        mock_lifecycle.prime_dirs = {
-            None: Path("/work/prime"),
-            "my-package": Path("/work/partitions/package/my-package/prime"),
-        }
+        lifecycle = MagicMock(spec=Lifecycle)
+        lifecycle.prime_dirs = prime_dirs_mapping
 
-        result = mock_lifecycle.get_prime_dir(package=None)
+        result = Lifecycle.get_prime_dir(lifecycle, package=None)
 
         assert result == Path("/work/prime")
 
-    def test_get_package_prime_dir(self, mock_lifecycle):
+    def test_get_package_prime_dir(self, prime_dirs_mapping):
         """Test getting a package's prime directory."""
-        mock_lifecycle.prime_dirs = {
-            None: Path("/work/prime"),
-            "my-package": Path("/work/partitions/package/my-package/prime"),
-        }
+        lifecycle = MagicMock(spec=Lifecycle)
+        lifecycle.prime_dirs = prime_dirs_mapping
 
-        result = mock_lifecycle.get_prime_dir(package="my-package")
+        result = Lifecycle.get_prime_dir(lifecycle, package="my-package")
 
         assert result == Path("/work/partitions/package/my-package/prime")
 
-    def test_get_nonexistent_package_raises_error(self, mock_lifecycle):
+    def test_get_nonexistent_package_raises_error(self, prime_dirs_mapping):
         """Test that getting a non-existent package raises DebcraftError."""
-        mock_lifecycle.prime_dirs = {
-            None: Path("/work/prime"),
-            "my-package": Path("/work/partitions/package/my-package/prime"),
-        }
+        lifecycle = MagicMock(spec=Lifecycle)
+        lifecycle.prime_dirs = prime_dirs_mapping
 
         with pytest.raises(errors.DebcraftError) as exc_info:
-            mock_lifecycle.get_prime_dir(package="nonexistent")
+            Lifecycle.get_prime_dir(lifecycle, package="nonexistent")
 
         assert "nonexistent" in str(exc_info.value)
         assert "does not exist" in str(exc_info.value)
