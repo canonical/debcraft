@@ -116,7 +116,7 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
         ["ar", "t", str(packed_asset)], check=True, capture_output=True, text=True
     )
     members = result.stdout.strip().splitlines()
-    assert members == ["debian-binary", "control.tar.zstd", "data.tar.zstd"]
+    assert members == ["debian-binary", "control.tar.zst", "data.tar.zst"]
 
     craft_parts.Features.reset()
     monkeypatch.setattr("sys.argv", ["debcraft", "clean", "--destructive-mode"])

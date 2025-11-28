@@ -84,9 +84,11 @@ def _create_package(
     package = project.get_package(package_name)
     version = package.version or project.version
     cwd = pathlib.Path().absolute()
-    deb_name = dest.absolute() / f"{package_name}_{version}_{build_info.build_for}.deb"
+    deb_path = dest.absolute() / f"{package_name}_{version}_{build_info.build_for}.deb"
 
     installed_size = _get_dir_size(prime_dir)
+
+    deb_path.unlink(missing_ok=True)
 
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
@@ -103,32 +105,33 @@ def _create_package(
             subprocess.run(
                 [
                     "ar",
-                    "rcs",
-                    deb_name,
+                    "rc",
+                    deb_path,
                     "debian-binary",
-                    "control.tar.zstd",
-                    "data.tar.zstd",
+                    "control.tar.zst",
+                    "data.tar.zst",
                 ],
                 check=True,
             )
         finally:
             os.chdir(cwd)
 
-    return deb_name
+    return deb_path
 
 
 def _create_data_file(path: pathlib.Path, prime_dir: pathlib.Path) -> None:
-    """Create the data.tar.zstd file containing the prime contents.
+    """Create the data.tar.zst file containing the prime contents.
 
-    :param path: Directory where the data.tar.zstd file will be created.
+    :param path: Directory where the data.tar.zst file will be created.
     :param prime_dir: Directory containing the files to package.
     """
-    # This should return md5sums to use in the control metadata
-    data_path = path / "data.tar.zstd"
+    data_path = path / "data.tar.zst"
     with data_path.open("wb") as data_zstd:
         zcomp = zstd.ZstdCompressor(level=_ZSTD_COMPRESSION_LEVEL)
         with zcomp.stream_writer(data_zstd) as comp:
-            with tarfile.open(fileobj=comp, mode="w") as tar:
+            with tarfile.open(
+                fileobj=comp, mode="w", format=tarfile.USTAR_FORMAT
+            ) as tar:
                 root_dir = prime_dir.absolute()
                 for entry in root_dir.iterdir():
                     tar.add(entry, arcname=entry.name)
@@ -141,14 +144,14 @@ def _create_control_file(
     build_info: BuildInfo,
     installed_size: int,
 ) -> None:
-    """Create the control.tar.zstd file containing package metadata.
+    """Create the control.tar.zst file containing package metadata.
 
-    :param path: Directory where the control.tar.zstd file will be created.
+    :param path: Directory where the control.tar.zst file will be created.
     :param project: The project model.
     :param build_info: Platform information.
     """
     package = project.get_package(package_name)
-    control_path = path / "control.tar.zstd"
+    control_path = path / "control.tar.zst"
 
     version = package.version or project.version
     if not version:
@@ -184,14 +187,16 @@ def _create_control_file(
 
     ctlfile = pathlib.Path("control")
 
-    with ctlfile.open("w") as f:
+    with ctlfile.open("w", encoding="utf-8", newline="\n") as f:
         encoder = control.Encoder(f)
         encoder.encode(ctl_data)
 
     with control_path.open("wb") as control_zstd:
         zcomp = zstd.ZstdCompressor(level=_ZSTD_COMPRESSION_LEVEL)
         with zcomp.stream_writer(control_zstd) as comp:
-            with tarfile.open(fileobj=comp, mode="w") as tar:
+            with tarfile.open(
+                fileobj=comp, mode="w", format=tarfile.USTAR_FORMAT
+            ) as tar:
                 tar.add("control")
 
     ctlfile.unlink()
