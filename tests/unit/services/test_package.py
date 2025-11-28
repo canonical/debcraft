@@ -55,7 +55,7 @@ def test_pack(
     assert deb_file.exists()
 
     members = _list_ar_members(deb_file)
-    assert members == ["debian-binary", "control.tar.zstd", "data.tar.zstd"]
+    assert members == ["debian-binary", "control.tar.zst", "data.tar.zst"]
 
 
 def test_generate_metadata(
