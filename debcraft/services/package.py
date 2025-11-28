@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
 import pathlib
 import subprocess
@@ -86,14 +87,12 @@ def _create_package(
     cwd = pathlib.Path().absolute()
     deb_name = dest.absolute() / f"{package_name}_{version}_{build_info.build_for}.deb"
 
-    installed_size = _get_dir_size(prime_dir)
-
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
             os.chdir(tmpdir)
             _create_data_file(pathlib.Path(tmpdir), prime_dir)
             _create_control_file(
-                pathlib.Path(tmpdir), project, package_name, build_info, installed_size
+                pathlib.Path(tmpdir), project, package_name, build_info, prime_dir
             )
             pathlib.Path("debian-binary").write_text("2.0\n")
 
@@ -129,7 +128,7 @@ def _create_data_file(path: pathlib.Path, prime_dir: pathlib.Path) -> None:
         zcomp = zstd.ZstdCompressor(level=_ZSTD_COMPRESSION_LEVEL)
         with zcomp.stream_writer(data_zstd) as comp:
             with tarfile.open(fileobj=comp, mode="w") as tar:
-                tar.add(prime_dir.absolute(), arcname=".")
+                tar.add(prime_dir.absolute(), arcname="")
 
 
 def _create_control_file(
@@ -137,7 +136,7 @@ def _create_control_file(
     project: models.Project,
     package_name: str,
     build_info: BuildInfo,
-    installed_size: int,
+    prime_dir: pathlib.Path,
 ) -> None:
     """Create the control.tar.zstd file containing package metadata.
 
@@ -164,6 +163,8 @@ def _create_control_file(
     if not description:
         raise errors.DebcraftError(f"package {package_name} description was not set")
 
+    installed_size = _get_dir_size(prime_dir)
+
     # Change to use package data from the project model
     ctl_data = models.DebianControl(
         package=package_name,
@@ -181,19 +182,43 @@ def _create_control_file(
     )
 
     ctlfile = pathlib.Path("control")
+    md5file = pathlib.Path("md5sums")
 
     with ctlfile.open("w") as f:
         encoder = control.Encoder(f)
         encoder.encode(ctl_data)
+
+    _create_md5sums(prime_dir, md5file)
 
     with control_path.open("wb") as control_zstd:
         zcomp = zstd.ZstdCompressor(level=_ZSTD_COMPRESSION_LEVEL)
         with zcomp.stream_writer(control_zstd) as comp:
             with tarfile.open(fileobj=comp, mode="w") as tar:
                 tar.add("control")
+                tar.add("md5sums")
 
     ctlfile.unlink()
+    md5file.unlink()
 
 
 def _get_dir_size(path: pathlib.Path) -> int:
     return sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
+
+
+def _md5sum(path: pathlib.Path) -> str:
+    """Compute MD5 checksum of a file."""
+    h = hashlib.md5()  # noqa: S324
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _create_md5sums(root: pathlib.Path, output_file: pathlib.Path) -> None:
+    """Walk subtree and write md5 checksums with relative paths."""
+    with output_file.open("w") as out:
+        for file in root.rglob("*"):
+            if file.is_file():
+                checksum = _md5sum(file)
+                relpath = file.relative_to(root)
+                out.write(f"{checksum}  {relpath}\n")
