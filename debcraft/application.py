@@ -25,6 +25,7 @@ from debcraft import models
 METADATA = craft_application.AppMetadata(
     name="debcraft",
     summary="Tool to create Debian Packages using a Craft workflow",
+    source_ignore_patterns=["*.deb"],
     ProjectClass=models.Project,
 )
 
