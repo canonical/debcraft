@@ -16,6 +16,7 @@
 """Common fixtures and pytest configuration for integration tests."""
 
 import pathlib
+from typing import Any, Generator
 
 import craft_application
 import craft_parts
@@ -25,7 +26,7 @@ from debcraft import services
 
 
 @pytest.fixture
-def enable_partitions() -> None:
+def enable_partitions() -> Generator[Any, Any, Any]:
     craft_parts.Features.reset()
     craft_parts.Features(enable_partitions=True)
     yield
