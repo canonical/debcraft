@@ -18,9 +18,18 @@
 import pathlib
 
 import craft_application
+import craft_parts
 import debcraft
 import pytest
 from debcraft import services
+
+
+@pytest.fixture
+def enable_partitions() -> None:
+    craft_parts.Features.reset()
+    craft_parts.Features(enable_partitions=True)
+    yield
+    craft_parts.Features.reset()
 
 
 @pytest.fixture

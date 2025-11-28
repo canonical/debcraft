@@ -18,7 +18,9 @@
 
 from typing import cast
 
+import craft_application.errors
 import craft_platforms
+import pydantic
 from craft_application import services
 from typing_extensions import override
 
@@ -40,7 +42,13 @@ class Project(services.ProjectService):
             build_for=build_for, build_on=cast(str, build_on), platform=platform
         )
 
-        packages = PackagesProject.unmarshal(project)
+        try:
+            packages = PackagesProject.unmarshal(project)
+        except pydantic.ValidationError as error:
+            raise craft_application.errors.CraftValidationError.from_pydantic(
+                error, file_name="debcraft.yaml"
+            )
+
         return packages.get_partitions()
 
     @override
