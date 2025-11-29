@@ -16,7 +16,10 @@
 """Unit tests for the debcraft project model."""
 
 import pytest
+
+from debcraft import errors
 from debcraft.models import project
+from debcraft.models.package import Package
 
 
 @pytest.mark.parametrize(
@@ -78,3 +81,55 @@ def test_adopt_info_valid_part_name_error(default_project_raw):
         ValueError, match="'adopt-info' field must refer to the name of a part."
     ):
         project.Project.model_validate(default_project_raw)
+
+
+# Tests for Project.get_package()
+def test_get_package_success(default_project):
+    """Test that get_package returns the correct package."""
+    package = default_project.get_package("package-1")
+    assert package is not None
+    assert package.version == "2.0"
+
+
+@pytest.mark.parametrize(
+    "extra_project_params",
+    [
+        {"packages": None},
+    ],
+)
+def test_get_package_no_packages_defined(default_project):
+    """Test that get_package raises an error when no packages are defined."""
+    with pytest.raises(errors.DebcraftError, match="no packages defined"):
+        default_project.get_package("any-package")
+
+
+def test_get_package_not_found(default_project):
+    """Test that get_package raises an error when package is not found."""
+    with pytest.raises(
+        errors.DebcraftError, match="package nonexistent-package is not defined"
+    ):
+        default_project.get_package("nonexistent-package")
+
+
+# Tests for PackagesProject.get_partitions()
+def test_get_partitions_no_packages():
+    """Test that get_partitions returns ['default'] when no packages are defined."""
+    packages_project = project.PackagesProject(packages=None)
+    result = packages_project.get_partitions()
+    assert result == ["default"]
+
+
+def test_get_partitions_with_packages():
+    """Test that get_partitions returns correct list when packages are defined."""
+    packages_project = project.PackagesProject(
+        packages={
+            "pkg-a": Package(version="1.0"),
+            "pkg-b": Package(version="2.0"),
+        }
+    )
+    result = packages_project.get_partitions()
+    assert result is not None
+    assert "default" in result
+    assert "package/pkg-a" in result
+    assert "package/pkg-b" in result
+    assert len(result) == 3
