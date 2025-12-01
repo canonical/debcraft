@@ -28,11 +28,3 @@ class FeatureNotImplementedError(DebcraftError, NotImplementedError):
 
     def __init__(self, msg: str) -> None:
         super().__init__(f"Command or feature not implemented: {msg}")
-
-
-class PartsLifecycleError(DebcraftError):
-    """Error during parts processing."""
-
-
-class ProjectValidationError(DebcraftError):
-    """Error validating debcraft.yaml."""
