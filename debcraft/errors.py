@@ -23,7 +23,7 @@ class DebcraftError(CraftError):
     """Failure in a Debcraft operation."""
 
 
-class FeatureNotImplemented(DebcraftError):
+class FeatureNotImplementedError(DebcraftError, NotImplementedError):
     """Attempt to use an unimplemented feature."""
 
     def __init__(self, msg: str) -> None:
