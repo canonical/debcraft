@@ -6,7 +6,7 @@ adopt-info: yolo
 # No longer necessary because we have adopt-info.
 # version: 0
 
-platforms:  # Workaround for https://github.com/canonical/debcraft/issues/52
+platforms: # Workaround for https://github.com/canonical/debcraft/issues/52
   amd64:
 
 # This part exists so we have a valid adopt-info.
