@@ -169,7 +169,7 @@ def _create_control_file(
         raise errors.DebcraftError(f"package {package_name} description was not set")
 
     # Change to use package data from the project model
-    ctl_data = models.DebianControl(
+    ctl_data = models.DebianBinaryPackageControl(
         package=package_name,
         source=project.name,
         version=version,
