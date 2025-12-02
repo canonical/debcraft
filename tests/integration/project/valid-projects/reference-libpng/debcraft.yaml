@@ -2,11 +2,11 @@ name: libpng1.6
 version: 1.6.43-5build1
 summary: PNG library - runtime (version 1.6)
 description: |
-   libpng is a library implementing an interface for reading and writing
-   PNG (Portable Network Graphics) format files.
+  libpng is a library implementing an interface for reading and writing
+  PNG (Portable Network Graphics) format files.
 
-   This package contains the runtime library files needed to run software
-   using libpng.
+  This package contains the runtime library files needed to run software
+  using libpng.
 base: ubuntu@24.04
 maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 original-maintainer: Maintainers of libpng1.6 packages <libpng1.6@packages.debian.org>
@@ -66,4 +66,3 @@ parts:
       usr/share/man: (package/libpng-dev)/usr/share/
       usr/bin/png-fix-itxt: (package/libpng-tools)/usr/bin/
       usr/bin/pngfix: (package/libpng-tools)/usr/bin/
-
