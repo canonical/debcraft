@@ -52,11 +52,16 @@ class Package(services.PackageService):
             return []
 
         debs: list[pathlib.Path] = []
-        for package_name in project.packages:
+        for package_name, package in project.packages.items():
             prime = cast(Lifecycle, self._services.lifecycle).get_prime_dir(
                 package_name
             )
-            deb = _create_package(dest, project, package_name, build_info, prime)
+
+            arch = _get_architecture(package, build_info)
+            if not arch:
+                continue
+
+            deb = _create_package(dest, project, package_name, arch, prime)
             debs.append(deb)
 
         return debs
@@ -78,13 +83,13 @@ def _create_package(
     dest: pathlib.Path,
     project: models.Project,
     package_name: str,
-    build_info: BuildInfo,
+    arch: str,
     prime_dir: pathlib.Path,
 ) -> pathlib.Path:
     package = project.get_package(package_name)
     version = package.version or project.version
     cwd = pathlib.Path().absolute()
-    deb_path = dest.absolute() / f"{package_name}_{version}_{build_info.build_for}.deb"
+    deb_path = dest.absolute() / f"{package_name}_{version}_{arch}.deb"
 
     installed_size = _get_dir_size(prime_dir)
 
@@ -95,7 +100,7 @@ def _create_package(
             os.chdir(tmpdir)
             _create_data_file(pathlib.Path(tmpdir), prime_dir)
             _create_control_file(
-                pathlib.Path(tmpdir), project, package_name, build_info, installed_size
+                pathlib.Path(tmpdir), project, package_name, arch, installed_size
             )
             pathlib.Path("debian-binary").write_text("2.0\n")
 
@@ -140,19 +145,19 @@ def _create_control_file(
     path: pathlib.Path,
     project: models.Project,
     package_name: str,
-    build_info: BuildInfo,
+    arch: str,
     installed_size: int,
 ) -> None:
     """Create the control.tar.zst file containing package metadata.
 
     :param path: Directory where the control.tar.zst file will be created.
     :param project: The project model.
-    :param build_info: Platform information.
+    :param arch: The deb control architecture.
     """
     package = project.get_package(package_name)
     control_path = path / "control.tar.zst"
 
-    # These should be moved to model validation after we stabilize contents.
+    # To be moved to model validation after we stabilize contents.
     version = package.version or project.version
     if not version:
         raise errors.DebcraftError(f"package {package_name} version was not set")
@@ -174,7 +179,7 @@ def _create_control_file(
         package=package_name,
         source=project.name,
         version=version,
-        architecture=package.get_architecture() or build_info.build_for,
+        architecture=arch,
         maintainer=project.maintainer,
         section=section,
         installed_size=int(installed_size / 1024),
@@ -204,3 +209,16 @@ def _create_control_file(
 
 def _get_dir_size(path: pathlib.Path) -> int:
     return sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
+
+
+def _get_architecture(package: models.Package, build_info: BuildInfo) -> str | None:
+    if package.architectures == "any":
+        return build_info.build_for
+
+    if package.architectures == "all":
+        return "all"
+
+    if build_info.build_for in package.architectures:
+        return build_info.build_for
+
+    return None
