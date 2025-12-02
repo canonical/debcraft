@@ -34,7 +34,6 @@ def test_load_project(
     real_services: craft_application.ServiceFactory,
     project_dir: pathlib.Path,
     in_project_path,
-    enable_partitions,
 ):
     shutil.copytree(project_dir, in_project_path, dirs_exist_ok=True)
     project_service = real_services.get("project")
@@ -49,7 +48,6 @@ def test_load_invalid_project(
     real_services: craft_application.ServiceFactory,
     project_dir: pathlib.Path,
     in_project_path,
-    enable_partitions,
 ):
     shutil.copytree(project_dir, in_project_path, dirs_exist_ok=True)
     error_message = re.escape((project_dir / "error-message.txt").read_text().rstrip())

@@ -32,6 +32,7 @@ def setup_parts_features():
 def reset_parts_features() -> Generator[Any, Any, Any]:
     craft_parts.Features.reset()
     yield
+    craft_parts.Features.reset()
     craft_parts.Features(enable_partitions=True)
 
 
