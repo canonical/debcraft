@@ -38,7 +38,7 @@ _ZSTD_COMPRESSION_LEVEL = 3
 class Package(services.PackageService):
     """Package service subclass for Debcraft."""
 
-    def pack(self, prime_dir: pathlib.Path, dest: pathlib.Path) -> list[pathlib.Path]:
+    def pack(self, prime_dir: pathlib.Path, dest: pathlib.Path) -> list[pathlib.Path]:  # noqa: ARG002
         """Create one or more packages as appropriate.
 
         :param dest: Directory into which to write the package(s).
@@ -46,7 +46,6 @@ class Package(services.PackageService):
         """
         project = cast(models.Project, self._services.get("project").get())
         build_info = self._services.get("build_plan").plan()[0]
-        _ = prime_dir  # not used
 
         if not project.packages:
             return []
