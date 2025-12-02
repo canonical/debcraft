@@ -27,14 +27,6 @@ from debcraft import services
 
 
 @pytest.fixture
-def enable_partitions() -> Generator[Any, Any, Any]:
-    craft_parts.Features.reset()
-    craft_parts.Features(enable_partitions=True)
-    yield
-    craft_parts.Features.reset()
-
-
-@pytest.fixture
 def real_services(in_project_path: pathlib.Path) -> craft_application.ServiceFactory:
     services.register_services()
     factory = craft_application.ServiceFactory(app=debcraft.METADATA)

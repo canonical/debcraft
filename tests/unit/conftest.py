@@ -29,14 +29,6 @@ from debcraft.services import lifecycle
 from typing_extensions import override
 
 
-@pytest.fixture(scope="module", autouse=True)
-def global_setup():
-    craft_parts.Features.reset()
-    craft_parts.Features(enable_partitions=True)
-    yield
-    craft_parts.Features.reset()
-
-
 @pytest.fixture
 def extra_project_params():
     """Configuration fixture for the Project used by the default services."""

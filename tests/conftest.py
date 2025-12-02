@@ -17,6 +17,21 @@ import craft_platforms
 import pytest
 
 
+@pytest.fixture(scope="session", autouse=True)
+def setup_parts_features():
+    craft_parts.Features.reset()
+    craft_parts.Features(enable_partitions=True)
+    yield
+    craft_parts.Features.reset()  # We don't really need this but it looks cleaner
+
+
+@pytest.fixture
+def reset_parts_features() -> Generator[Any, Any, Any]:
+    craft_parts.Features.reset()
+    yield
+    craft_parts.Features(enable_partitions=True)
+
+
 @pytest.fixture
 def project_main_module() -> types.ModuleType:
     """Fixture that returns the project's principal package (imported)."""

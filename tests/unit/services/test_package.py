@@ -69,3 +69,4 @@ def test_generate_metadata(
     )
 
     assert package_service_with_configured_project.metadata == expected
+
