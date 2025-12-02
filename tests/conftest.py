@@ -12,7 +12,10 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 import types
+from collections.abc import Generator
+from typing import Any
 
+import craft_parts
 import craft_platforms
 import pytest
 

@@ -16,11 +16,8 @@
 """Common fixtures and pytest configuration for integration tests."""
 
 import pathlib
-from collections.abc import Generator
-from typing import Any
 
 import craft_application
-import craft_parts
 import debcraft
 import pytest
 from debcraft import services

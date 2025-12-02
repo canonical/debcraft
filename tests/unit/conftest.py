@@ -19,7 +19,6 @@ import pathlib
 from typing import Any, cast
 
 import craft_application
-import craft_parts
 import debcraft
 import debcraft.services.package
 import debcraft.services.project
