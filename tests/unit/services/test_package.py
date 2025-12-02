@@ -18,6 +18,7 @@
 import subprocess
 from pathlib import Path
 
+import craft_platforms
 import pytest
 from debcraft import models
 from debcraft.services import package
@@ -69,3 +70,26 @@ def test_generate_metadata(
     )
 
     assert package_service_with_configured_project.metadata == expected
+
+
+@pytest.mark.parametrize(
+    ("source_archs", "binary_arch"),
+    [
+        ("any", "arm64"),
+        ("all", "all"),
+        (["arm64"], "arm64"),
+        (["amd64", "arm64"], "arm64"),
+        (["amd64", "s390x"], None),
+        ([], None),
+    ],
+)
+def test_get_architecture(source_archs, binary_arch):
+    info = craft_platforms.BuildInfo(
+        "foo",
+        craft_platforms.DebianArchitecture.ARM64,
+        craft_platforms.DebianArchitecture.ARM64,
+        craft_platforms.DistroBase.from_str("ubuntu@22.04"),
+    )
+    pkg = models.Package(architectures=source_archs)
+    arch = package._get_architecture(pkg, info)
+    assert arch == binary_arch
