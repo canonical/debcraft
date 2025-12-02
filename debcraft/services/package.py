@@ -152,6 +152,7 @@ def _create_control_file(
     package = project.get_package(package_name)
     control_path = path / "control.tar.zst"
 
+    # These should be moved to model validation after we stabilize contents.
     version = package.version or project.version
     if not version:
         raise errors.DebcraftError(f"package {package_name} version was not set")
