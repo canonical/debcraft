@@ -39,7 +39,11 @@ _ZSTD_COMPRESSION_LEVEL = 3
 class Package(services.PackageService):
     """Package service subclass for Debcraft."""
 
-    def pack(self, prime_dir: pathlib.Path, dest: pathlib.Path) -> list[pathlib.Path]:  # noqa: ARG002
+    def pack(
+        self,
+        prime_dir: pathlib.Path,  # noqa: ARG002
+        dest: pathlib.Path,
+    ) -> list[pathlib.Path]:
         """Create one or more packages as appropriate.
 
         :param dest: Directory into which to write the package(s).
@@ -61,7 +65,13 @@ class Package(services.PackageService):
             if not arch:
                 continue
 
-            deb = _create_package(dest, project, package_name, arch, prime)
+            deb = _create_package(
+                dest,
+                project=project,
+                package_name=package_name,
+                arch=arch,
+                prime_dir=prime,
+            )
             debs.append(deb)
 
         return debs
@@ -81,6 +91,7 @@ class Package(services.PackageService):
 
 def _create_package(
     dest: pathlib.Path,
+    *,
     project: models.Project,
     package_name: str,
     arch: str,
@@ -98,14 +109,14 @@ def _create_package(
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
             os.chdir(tmpdir)
-            _create_data_file(pathlib.Path(tmpdir), prime_dir)
+            _create_data_file(pathlib.Path(tmpdir), prime_dir=prime_dir)
             _create_control_file(
                 pathlib.Path(tmpdir),
-                project,
-                package_name,
-                arch,
-                installed_size,
-                prime_dir,
+                project=project,
+                package_name=package_name,
+                arch=arch,
+                installed_size=installed_size,
+                prime_dir=prime_dir,
             )
             pathlib.Path("debian-binary").write_text("2.0\n")
 
@@ -129,7 +140,7 @@ def _create_package(
     return deb_path
 
 
-def _create_data_file(path: pathlib.Path, prime_dir: pathlib.Path) -> None:
+def _create_data_file(path: pathlib.Path, *, prime_dir: pathlib.Path) -> None:
     """Create the data.tar.zst file containing the prime contents.
 
     :param path: Directory where the data.tar.zst file will be created.
@@ -148,6 +159,7 @@ def _create_data_file(path: pathlib.Path, prime_dir: pathlib.Path) -> None:
 
 def _create_control_file(
     path: pathlib.Path,
+    *,
     project: models.Project,
     package_name: str,
     arch: str,
