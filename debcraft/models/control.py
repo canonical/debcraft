@@ -48,8 +48,8 @@ class DebianBinaryPackageControl(models.CraftBaseModel):
     breaks: list[str] | None = None
     replaces: list[str] | None = None
     provides: list[str] | None = None
-    section: str
-    priority: str
+    section: str | None = None
+    priority: str | None = None
     description: str
     original_maintainer: str | None = None
     uploaders: list[str] | None = None
