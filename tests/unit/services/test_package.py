@@ -18,6 +18,7 @@
 import subprocess
 from pathlib import Path
 
+import craft_platforms
 import pytest
 from debcraft import models
 from debcraft.services import package
@@ -46,19 +47,16 @@ def test_pack(
     default_project: models.Project,
     host_architecture: str,
 ):
-    (tmp_path / "prime").mkdir(exist_ok=True)
-    package_service_with_configured_project.pack(
-        prime_dir=tmp_path / "prime", dest=tmp_path
-    )
+    prime_dir = tmp_path / "work" / "partitions" / "package" / "package-1" / "prime"
+    prime_dir.mkdir(exist_ok=True, parents=True)
+    (prime_dir / "foo.txt").touch()
+    package_service_with_configured_project.pack(prime_dir=prime_dir, dest=tmp_path)
 
-    deb_file = (
-        tmp_path
-        / f"{default_project.name}_{default_project.version}_{host_architecture}.deb"
-    )
+    deb_file = tmp_path / f"package-1_2.0_{host_architecture}.deb"
     assert deb_file.exists()
 
     members = _list_ar_members(deb_file)
-    assert members == ["debian-binary", "control.tar.zstd", "data.tar.zstd"]
+    assert members == ["debian-binary", "control.tar.zst", "data.tar.zst"]
 
 
 def test_generate_metadata(
@@ -72,3 +70,26 @@ def test_generate_metadata(
     )
 
     assert package_service_with_configured_project.metadata == expected
+
+
+@pytest.mark.parametrize(
+    ("source_archs", "binary_arch"),
+    [
+        ("any", "arm64"),
+        ("all", "all"),
+        (["arm64"], "arm64"),
+        (["amd64", "arm64"], "arm64"),
+        (["amd64", "s390x"], None),
+        ([], None),
+    ],
+)
+def test_get_architecture(source_archs, binary_arch):
+    info = craft_platforms.BuildInfo(
+        "foo",
+        craft_platforms.DebianArchitecture.ARM64,
+        craft_platforms.DebianArchitecture.ARM64,
+        craft_platforms.DistroBase.from_str("ubuntu@22.04"),
+    )
+    pkg = models.Package(architectures=source_archs)
+    arch = package._get_architecture(pkg, info)
+    assert arch == binary_arch

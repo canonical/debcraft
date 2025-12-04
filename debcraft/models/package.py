@@ -31,8 +31,11 @@ class Package(models.CraftBaseModel):
     See: https://www.debian.org/doc/debian-policy/ch-controlfields.html
     """
 
-    architectures: Literal["any", "all"] | list[DebianArchitecture]
-    description: str | None = None  # Only none for the only pkg
+    architectures: Literal["any", "all"] | list[DebianArchitecture] = "any"
+    summary: str | None = None  # defaults to the project summary
+    description: str | None = None  # defaults to the project description
+
+    version: str | None = None  # defaults to the project version
 
     # These need validating: https://github.com/canonical/debcraft/issues/42
     # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps

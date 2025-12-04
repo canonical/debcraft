@@ -18,6 +18,8 @@
 
 from debcraft.models.metadata import Metadata
 from debcraft.models.project import Project
+from debcraft.models.package import Package
+from debcraft.models.control import DebianBinaryPackageControl
 
 
-__all__ = ["Project", "Metadata"]
+__all__ = ["Project", "Package", "DebianBinaryPackageControl", "Metadata"]

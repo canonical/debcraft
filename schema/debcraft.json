@@ -34,7 +34,20 @@
               "type": "array"
             }
           ],
+          "default": "any",
           "title": "Architectures"
+        },
+        "summary": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Summary"
         },
         "description": {
           "anyOf": [
@@ -47,6 +60,18 @@
           ],
           "default": null,
           "title": "Description"
+        },
+        "version": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Version"
         },
         "depends": {
           "anyOf": [
@@ -158,9 +183,6 @@
           "type": "object"
         }
       },
-      "required": [
-        "architectures"
-      ],
       "title": "Package",
       "type": "object"
     },

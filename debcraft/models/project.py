@@ -24,6 +24,7 @@ import pydantic
 from craft_application import models
 from typing_extensions import Self
 
+from debcraft import errors
 from debcraft.models.package import Package
 
 DEBIAN_PACKAGE_NAME_REGEX = r"^[a-z0-9][a-z0-9.+-]+$"
@@ -97,3 +98,33 @@ class Project(models.Project):
         if self.adopt_info and self.adopt_info not in self.parts:
             raise ValueError("'adopt-info' field must refer to the name of a part.")
         return self
+
+    def get_package(self, name: str) -> Package:
+        """Obtain the package definition for the given package name."""
+        if not self.packages:
+            raise errors.DebcraftError("no packages defined")
+
+        package = self.packages.get(name)
+        if not package:
+            raise errors.DebcraftError(f"package {name} is not defined")
+
+        return package
+
+
+class PackagesProject(models.CraftBaseModel, extra="ignore"):
+    """Project definition containing only package data."""
+
+    name: DebianPackageName
+    packages: dict[DebianPackageName, Package] | None = None
+
+    def get_partitions(self) -> list[str] | None:
+        """Get a list of partitions based on the project's packages.
+
+        :returns: A list of packages formatted as ['default', 'package/<name>', ...]
+        """
+        partitions = ["default"]
+
+        if self.packages:
+            partitions.extend([f"package/{name}" for name in self.packages])
+
+        return partitions

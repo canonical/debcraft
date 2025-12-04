@@ -21,6 +21,7 @@ from textwrap import dedent
 from typing import cast
 
 import craft_application
+import craft_parts
 import debcraft
 import distro
 import pytest
@@ -46,7 +47,7 @@ def check_metadata(
 
 
 # The app stops a real emitter, but the testable RecordingEmitter makes stop a no-op.
-@pytest.mark.usefixtures("emitter")
+@pytest.mark.usefixtures("emitter", "reset_parts_features")
 @debian_like_only
 def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
     monkeypatch.setenv("CRAFT_DEBUG", "1")
@@ -58,20 +59,33 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
                 name: test-deb
                 base: {HOST_DISTRO.id()}@{HOST_DISTRO.version()}
                 version: "1.0"
+                summary: A test deb
+                description: Just a test deb
                 maintainer: Mike Maintainer <maintainer@example.com>
+                section: libs
+
                 platforms:
-                    {host_architecture}:
+                  {host_architecture}:
+
+                packages:
+                  package-1:
+                    version: "1.23"
 
                 parts:
                   nil:
                     plugin: nil
-
         """)
         )
 
     monkeypatch.chdir(tmp_path)
     services.ServiceFactory.register(
+        "project", "Project", module="debcraft.services.project"
+    )
+    services.ServiceFactory.register(
         "package", "Package", module="debcraft.services.package"
+    )
+    services.ServiceFactory.register(
+        "lifecycle", "Lifecycle", module="debcraft.services.lifecycle"
     )
     app_services = craft_application.ServiceFactory(app=debcraft.METADATA)
 
@@ -95,17 +109,16 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
         project=project,
         arch=host_architecture,
     )
-    packed_asset = (
-        tmp_path / f"{metadata.name}_{metadata.version}_{host_architecture}.deb"
-    )
+    packed_asset = tmp_path / f"package-1_1.23_{host_architecture}.deb"
     assert packed_asset.exists()
 
     result = subprocess.run(
         ["ar", "t", str(packed_asset)], check=True, capture_output=True, text=True
     )
     members = result.stdout.strip().splitlines()
-    assert members == ["debian-binary", "control.tar.zstd", "data.tar.zstd"]
+    assert members == ["debian-binary", "control.tar.zst", "data.tar.zst"]
 
+    craft_parts.Features.reset()
     monkeypatch.setattr("sys.argv", ["debcraft", "clean", "--destructive-mode"])
     result = app.run()
 
