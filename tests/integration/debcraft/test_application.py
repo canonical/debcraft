@@ -114,6 +114,7 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
     packed_asset = tmp_path / f"package-1_1.23_{host_architecture}.deb"
     assert packed_asset.exists()
 
+    # Validate the output
     subprocess.run(
         ["dpkg-deb", "--info", str(packed_asset)],
         check=True,
