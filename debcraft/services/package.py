@@ -29,6 +29,7 @@ from typing import cast
 import zstandard as zstd
 from craft_application import services
 from craft_platforms import BuildInfo
+from typing_extensions import override
 
 from debcraft import control, errors, models
 from debcraft.services.lifecycle import Lifecycle
@@ -39,11 +40,8 @@ _ZSTD_COMPRESSION_LEVEL = 3
 class Package(services.PackageService):
     """Package service subclass for Debcraft."""
 
-    def pack(
-        self,
-        prime_dir: pathlib.Path,  # noqa: ARG002
-        dest: pathlib.Path,
-    ) -> list[pathlib.Path]:
+    @override
+    def pack(self, prime_dir: pathlib.Path, dest: pathlib.Path) -> list[pathlib.Path]:
         """Create one or more packages as appropriate.
 
         :param dest: Directory into which to write the package(s).
