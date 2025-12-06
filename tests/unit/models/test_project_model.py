@@ -87,7 +87,6 @@ def test_adopt_info_valid_part_name_error(default_project_raw):
 def test_get_package_success(default_project):
     """Test that get_package returns the correct package."""
     package = default_project.get_package("package-1")
-    assert package is not None
     assert package.version == "2.0"
 
 
@@ -128,8 +127,4 @@ def test_get_partitions_with_packages():
         }
     )
     result = packages_project.get_partitions()
-    assert result is not None
-    assert "default" in result
-    assert "package/pkg-a" in result
-    assert "package/pkg-b" in result
-    assert len(result) == 3
+    assert result == ["default", "package/pkg-a", "package/pkg-b"]
