@@ -32,12 +32,9 @@
                 "$ref": "#/$defs/DebianArchitecture"
               },
               "type": "array"
-            },
-            {
-              "type": "null"
             }
           ],
-          "default": null,
+          "default": "any",
           "title": "Architectures"
         },
         "summary": {

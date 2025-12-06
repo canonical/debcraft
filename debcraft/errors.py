@@ -23,16 +23,8 @@ class DebcraftError(CraftError):
     """Failure in a Debcraft operation."""
 
 
-class FeatureNotImplemented(DebcraftError):
+class FeatureNotImplementedError(DebcraftError, NotImplementedError):
     """Attempt to use an unimplemented feature."""
 
     def __init__(self, msg: str) -> None:
         super().__init__(f"Command or feature not implemented: {msg}")
-
-
-class PartsLifecycleError(DebcraftError):
-    """Error during parts processing."""
-
-
-class ProjectValidationError(DebcraftError):
-    """Error validating debcraft.yaml."""

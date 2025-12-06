@@ -27,7 +27,7 @@ class Encoder:
     def __init__(self, f: TextIO) -> None:
         self._file = f
 
-    def encode(self, model: models.DebianControl) -> None:
+    def encode(self, model: models.DebianBinaryPackageControl) -> None:
         """Encode the model."""
         for name, field in model.__class__.model_fields.items():
             value = getattr(model, name)

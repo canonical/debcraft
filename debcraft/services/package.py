@@ -18,6 +18,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import os
 import pathlib
 import subprocess
@@ -28,6 +29,7 @@ from typing import cast
 import zstandard as zstd
 from craft_application import services
 from craft_platforms import BuildInfo
+from typing_extensions import override
 
 from debcraft import control, errors, models
 from debcraft.services.lifecycle import Lifecycle
@@ -38,6 +40,7 @@ _ZSTD_COMPRESSION_LEVEL = 3
 class Package(services.PackageService):
     """Package service subclass for Debcraft."""
 
+    @override
     def pack(self, prime_dir: pathlib.Path, dest: pathlib.Path) -> list[pathlib.Path]:
         """Create one or more packages as appropriate.
 
@@ -46,17 +49,27 @@ class Package(services.PackageService):
         """
         project = cast(models.Project, self._services.get("project").get())
         build_info = self._services.get("build_plan").plan()[0]
-        _ = prime_dir  # not used
 
         if not project.packages:
             return []
 
         debs: list[pathlib.Path] = []
-        for package_name in project.packages:
+        for package_name, package in project.packages.items():
             prime = cast(Lifecycle, self._services.lifecycle).get_prime_dir(
                 package_name
             )
-            deb = _create_package(dest, project, package_name, build_info, prime)
+
+            arch = _get_architecture(package, build_info)
+            if not arch:
+                continue
+
+            deb = _create_package(
+                dest,
+                project=project,
+                package_name=package_name,
+                arch=arch,
+                prime_dir=prime,
+            )
             debs.append(deb)
 
         return debs
@@ -76,24 +89,32 @@ class Package(services.PackageService):
 
 def _create_package(
     dest: pathlib.Path,
+    *,
     project: models.Project,
     package_name: str,
-    build_info: BuildInfo,
+    arch: str,
     prime_dir: pathlib.Path,
 ) -> pathlib.Path:
     package = project.get_package(package_name)
     version = package.version or project.version
     cwd = pathlib.Path().absolute()
-    deb_name = dest.absolute() / f"{package_name}_{version}_{build_info.build_for}.deb"
+    deb_path = dest.absolute() / f"{package_name}_{version}_{arch}.deb"
 
     installed_size = _get_dir_size(prime_dir)
+
+    deb_path.unlink(missing_ok=True)
 
     with tempfile.TemporaryDirectory() as tmpdir:
         try:
             os.chdir(tmpdir)
-            _create_data_file(pathlib.Path(tmpdir), prime_dir)
+            _create_data_file(pathlib.Path(tmpdir), prime_dir=prime_dir)
             _create_control_file(
-                pathlib.Path(tmpdir), project, package_name, build_info, installed_size
+                pathlib.Path(tmpdir),
+                project=project,
+                package_name=package_name,
+                arch=arch,
+                installed_size=installed_size,
+                prime_dir=prime_dir,
             )
             pathlib.Path("debian-binary").write_text("2.0\n")
 
@@ -103,51 +124,56 @@ def _create_package(
             subprocess.run(
                 [
                     "ar",
-                    "rcs",
-                    deb_name,
+                    "rc",
+                    deb_path,
                     "debian-binary",
-                    "control.tar.zstd",
-                    "data.tar.zstd",
+                    "control.tar.zst",
+                    "data.tar.zst",
                 ],
                 check=True,
             )
         finally:
             os.chdir(cwd)
 
-    return deb_name
+    return deb_path
 
 
-def _create_data_file(path: pathlib.Path, prime_dir: pathlib.Path) -> None:
-    """Create the data.tar.zstd file containing the prime contents.
+def _create_data_file(path: pathlib.Path, *, prime_dir: pathlib.Path) -> None:
+    """Create the data.tar.zst file containing the prime contents.
 
-    :param path: Directory where the data.tar.zstd file will be created.
+    :param path: Directory where the data.tar.zst file will be created.
     :param prime_dir: Directory containing the files to package.
     """
-    # This should return md5sums to use in the control metadata
-    data_path = path / "data.tar.zstd"
+    data_path = path / "data.tar.zst"
     with data_path.open("wb") as data_zstd:
         zcomp = zstd.ZstdCompressor(level=_ZSTD_COMPRESSION_LEVEL)
         with zcomp.stream_writer(data_zstd) as comp:
-            with tarfile.open(fileobj=comp, mode="w") as tar:
-                tar.add(prime_dir.absolute(), arcname=".")
+            with tarfile.open(
+                fileobj=comp, mode="w", format=tarfile.USTAR_FORMAT
+            ) as tar:
+                for entry in prime_dir.absolute().iterdir():
+                    tar.add(entry, arcname=entry.name)
 
 
 def _create_control_file(
     path: pathlib.Path,
+    *,
     project: models.Project,
     package_name: str,
-    build_info: BuildInfo,
+    arch: str,
     installed_size: int,
+    prime_dir: pathlib.Path,
 ) -> None:
-    """Create the control.tar.zstd file containing package metadata.
+    """Create the control.tar.zst file containing package metadata.
 
-    :param path: Directory where the control.tar.zstd file will be created.
+    :param path: Directory where the control.tar.zst file will be created.
     :param project: The project model.
-    :param build_info: Platform information.
+    :param arch: The deb control architecture.
     """
     package = project.get_package(package_name)
-    control_path = path / "control.tar.zstd"
+    control_path = path / "control.tar.zst"
 
+    # To be moved to model validation after we stabilize contents.
     version = package.version or project.version
     if not version:
         raise errors.DebcraftError(f"package {package_name} version was not set")
@@ -165,11 +191,11 @@ def _create_control_file(
         raise errors.DebcraftError(f"package {package_name} description was not set")
 
     # Change to use package data from the project model
-    ctl_data = models.DebianControl(
+    ctl_data = models.DebianBinaryPackageControl(
         package=package_name,
         source=project.name,
         version=version,
-        architecture=package.get_architecture() or build_info.build_for,
+        architecture=arch,
         maintainer=project.maintainer,
         section=section,
         installed_size=int(installed_size / 1024),
@@ -181,19 +207,58 @@ def _create_control_file(
     )
 
     ctlfile = pathlib.Path("control")
+    md5file = pathlib.Path("md5sums")
 
-    with ctlfile.open("w") as f:
+    with ctlfile.open("w", encoding="utf-8", newline="\n") as f:
         encoder = control.Encoder(f)
         encoder.encode(ctl_data)
+
+    _create_md5sums(prime_dir, md5file)
 
     with control_path.open("wb") as control_zstd:
         zcomp = zstd.ZstdCompressor(level=_ZSTD_COMPRESSION_LEVEL)
         with zcomp.stream_writer(control_zstd) as comp:
-            with tarfile.open(fileobj=comp, mode="w") as tar:
+            with tarfile.open(
+                fileobj=comp, mode="w", format=tarfile.USTAR_FORMAT
+            ) as tar:
                 tar.add("control")
+                tar.add("md5sums")
 
     ctlfile.unlink()
+    md5file.unlink()
 
 
 def _get_dir_size(path: pathlib.Path) -> int:
     return sum(f.stat().st_size for f in path.rglob("*") if f.is_file())
+
+
+def _get_architecture(package: models.Package, build_info: BuildInfo) -> str | None:
+    if package.architectures == "any":
+        return build_info.build_for
+
+    if package.architectures == "all":
+        return "all"
+
+    if build_info.build_for in package.architectures:
+        return build_info.build_for
+
+    return None
+
+
+def _md5sum(path: pathlib.Path) -> str:
+    """Compute MD5 checksum of a file."""
+    h = hashlib.md5()  # noqa: S324
+    with path.open("rb") as f:
+        for chunk in iter(lambda: f.read(8192), b""):
+            h.update(chunk)
+    return h.hexdigest()
+
+
+def _create_md5sums(root: pathlib.Path, output_file: pathlib.Path) -> None:
+    """Walk subtree and write md5 checksums with relative paths."""
+    with output_file.open("w") as out:
+        for file in root.rglob("*"):
+            if file.is_file():
+                checksum = _md5sum(file)
+                relpath = file.relative_to(root)
+                out.write(f"{checksum}  {relpath}\n")

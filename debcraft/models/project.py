@@ -114,6 +114,7 @@ class Project(models.Project):
 class PackagesProject(models.CraftBaseModel, extra="ignore"):
     """Project definition containing only package data."""
 
+    name: DebianPackageName
     packages: dict[DebianPackageName, Package] | None = None
 
     def get_partitions(self) -> list[str] | None:

@@ -1,4 +1,4 @@
-name: libpng1-6
+name: libpng1.6
 version: 1.6.43-5build1
 summary: PNG library - runtime (version 1.6)
 description: |
@@ -28,7 +28,6 @@ packages:
 
   libpng-dev:
     section: libdevel
-    architectures: all
     summary: PNG library - development (version 1.6)
     description: |
       libpng is a library implementing an interface for reading and writing

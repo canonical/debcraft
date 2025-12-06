@@ -19,7 +19,6 @@ import pathlib
 from typing import Any, cast
 
 import craft_application
-import craft_parts
 import debcraft
 import debcraft.services.package
 import debcraft.services.project
@@ -27,14 +26,6 @@ import pytest
 from debcraft import models, services
 from debcraft.services import lifecycle
 from typing_extensions import override
-
-
-@pytest.fixture(scope="module", autouse=True)
-def global_setup():
-    craft_parts.Features.reset()
-    craft_parts.Features(enable_partitions=True)
-    yield
-    craft_parts.Features.reset()
 
 
 @pytest.fixture

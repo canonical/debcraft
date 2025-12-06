@@ -12,9 +12,28 @@
 # You should have received a copy of the GNU General Public License along
 # with this program.  If not, see <http://www.gnu.org/licenses/>.
 import types
+from collections.abc import Generator
+from typing import Any
 
+import craft_parts
 import craft_platforms
 import pytest
+
+
+@pytest.fixture(scope="session", autouse=True)
+def setup_parts_features():
+    craft_parts.Features.reset()
+    craft_parts.Features(enable_partitions=True)
+    yield
+    craft_parts.Features.reset()  # We don't really need this but it looks cleaner
+
+
+@pytest.fixture
+def reset_parts_features() -> Generator[Any, Any, Any]:
+    craft_parts.Features.reset()
+    yield
+    craft_parts.Features.reset()
+    craft_parts.Features(enable_partitions=True)
 
 
 @pytest.fixture

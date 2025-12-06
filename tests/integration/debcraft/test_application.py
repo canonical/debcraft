@@ -47,7 +47,7 @@ def check_metadata(
 
 
 # The app stops a real emitter, but the testable RecordingEmitter makes stop a no-op.
-@pytest.mark.usefixtures("emitter")
+@pytest.mark.usefixtures("emitter", "reset_parts_features")
 @debian_like_only
 def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
     monkeypatch.setenv("CRAFT_DEBUG", "1")
@@ -55,7 +55,8 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
 
     with (tmp_path / "debcraft.yaml").open("w") as project_file:
         project_file.write(
-            dedent(f"""\
+            dedent(
+                f"""\
                 name: test-deb
                 base: {HOST_DISTRO.id()}@{HOST_DISTRO.version()}
                 version: "1.0"
@@ -74,7 +75,8 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
                 parts:
                   nil:
                     plugin: nil
-        """)
+        """
+            )
         )
 
     monkeypatch.chdir(tmp_path)
@@ -112,16 +114,24 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
     packed_asset = tmp_path / f"package-1_1.23_{host_architecture}.deb"
     assert packed_asset.exists()
 
+    # Validate the output
+    subprocess.run(
+        ["dpkg-deb", "--info", str(packed_asset)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
     result = subprocess.run(
         ["ar", "t", str(packed_asset)], check=True, capture_output=True, text=True
     )
     members = result.stdout.strip().splitlines()
-    assert members == ["debian-binary", "control.tar.zstd", "data.tar.zstd"]
+    assert members == ["debian-binary", "control.tar.zst", "data.tar.zst"]
 
     craft_parts.Features.reset()
     monkeypatch.setattr("sys.argv", ["debcraft", "clean", "--destructive-mode"])
-    result = app.run()
 
+    result = app.run()
     assert result == 0
 
     assert not (tmp_path / "prime").exists()

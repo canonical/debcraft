@@ -26,8 +26,13 @@ def _field_alias(field_name: str) -> str:
     return "-".join(capitalized_parts)
 
 
-class DebianControl(models.CraftBaseModel):
-    """Debian control file definition."""
+class DebianBinaryPackageControl(models.CraftBaseModel):
+    """Debian binary package control file model.
+
+    The Debian binary control file contains the most vital (and
+    version-dependent) information about a binary package.
+    See: https://www.debian.org/doc/debian-policy/ch-controlfields.html
+    """
 
     model_config = ConfigDict(alias_generator=_field_alias, populate_by_name=True)
 
@@ -43,8 +48,8 @@ class DebianControl(models.CraftBaseModel):
     breaks: list[str] | None = None
     replaces: list[str] | None = None
     provides: list[str] | None = None
-    section: str
-    priority: str
+    section: str | None = None
+    priority: str | None = None
     description: str
     original_maintainer: str | None = None
     uploaders: list[str] | None = None
