@@ -1,2 +1,2 @@
 Bad debcraft.yaml content:
-- package names must consist only of lower case letters (a-z), digits (0-9), plus (+) and minus (-) signs, and periods (.). They must be at least two characters long and must start with an alphanumeric character. (in field 'name')
+- package names must consist only of lower case letters (a-z), digits (0-9), plus (+) and minus (-) signs, and periods (.). They must be at least two characters long and must start with an alphanumeric character. (in field 'name', input: '-a-')
