@@ -25,7 +25,15 @@ import debcraft.services.package
 import debcraft.services.project
 import pytest
 from debcraft import models, services
-from debcraft.services import gencontrol, lifecycle, makedeb, makeshlibs, md5sums, strip
+from debcraft.services import (
+    gencontrol,
+    lifecycle,
+    makedeb,
+    makeshlibs,
+    md5sums,
+    shlibdeps,
+    strip,
+)
 from typing_extensions import override
 
 
@@ -145,6 +153,19 @@ def fake_makeshlibs_service_class(tmp_path, host_architecture):
 
 
 @pytest.fixture
+def fake_shlibdeps_service_class(tmp_path, host_architecture):
+    class FakeShlibdepsService(shlibdeps.ShlibdepsService):
+        def __init__(
+            self,
+            app: craft_application.AppMetadata,
+            services: services.ServiceFactory,
+        ):
+            super().__init__(app, services)
+
+    return FakeShlibdepsService
+
+
+@pytest.fixture
 def fake_gencontrol_service_class(tmp_path, host_architecture):
     class FakeGencontrolService(gencontrol.GencontrolService):
         def __init__(
@@ -178,6 +199,7 @@ def default_factory(
     fake_strip_service_class,
     fake_md5sums_service_class,
     fake_makeshlibs_service_class,
+    fake_shlibdeps_service_class,
     fake_gencontrol_service_class,
     fake_makedeb_service_class,
     project_path: pathlib.Path,
@@ -190,6 +212,7 @@ def default_factory(
     services.ServiceFactory.register("strip", fake_strip_service_class)
     services.ServiceFactory.register("md5sums", fake_md5sums_service_class)
     services.ServiceFactory.register("makeshlibs", fake_makeshlibs_service_class)
+    services.ServiceFactory.register("shlibdeps", fake_shlibdeps_service_class)
     services.ServiceFactory.register("gencontrol", fake_gencontrol_service_class)
     services.ServiceFactory.register("makedeb", fake_makedeb_service_class)
     service_factory = services.ServiceFactory(app=debcraft.METADATA)

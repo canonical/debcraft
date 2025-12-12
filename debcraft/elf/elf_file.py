@@ -86,7 +86,6 @@ class _Library:
     :param soname: The library soname.
     :param soname_path: The full path to the version-named library.
     :param search_paths: Library search paths.
-    :param base_path: The core base path to search for missing dependencies.
     :param arch_tuple: A tuple that identifies the architecture of the ELF file,
         containing the class, data byte order, and machine instruction set
         (e.g. ``(ELFCLASS64, ELFDATA2LSB, EM_X86_64)``).
@@ -99,28 +98,20 @@ class _Library:
         soname: str,
         soname_path: Path,
         search_paths: list[Path],
-        base_path: Path | None,
         arch_tuple: _ElfArchitectureTuple,
         soname_cache: SonameCache,
     ) -> None:
         self.soname = soname
         self.soname_path = soname_path
         self.search_paths = search_paths
-        self.base_path = base_path
         self.arch_tuple = arch_tuple
         self.soname_cache = soname_cache
 
         # Resolve path, if possible.
         self.path = self._crawl_for_path()
 
-        if base_path is not None and base_path in self.path.parents:
-            self.in_base_snap = True
-        else:
-            self.in_base_snap = False
-
         emit.debug(
-            f"{soname} with original path {soname_path} found on {str(self.path)!r} "
-            f"in base {self.in_base_snap!r}"
+            f"{soname} with original path {soname_path} found on {str(self.path)!r}"
         )
 
     def _update_soname_cache(self, resolved_path: Path) -> None:
@@ -337,8 +328,6 @@ class ElfFile:
     def load_dependencies(
         self,
         root_path: Path,
-        base_path: Path | None,
-        content_dirs: list[Path],
         arch_triplet: str,
         soname_cache: SonameCache | None = None,
     ) -> set[Path]:
@@ -348,8 +337,6 @@ class ElfFile:
         The object's .dependencies attribute is set after loading.
 
         :param root_path: the root path to search for missing dependencies.
-        :param base_path: the core base path to search for missing dependencies.
-        :param content_dirs: list of paths sourced from content snaps.
         :param arch_triplet: architecture triplet of the platform.
         :param soname_cache: a cache of previously search dependencies.
 
@@ -360,13 +347,7 @@ class ElfFile:
 
         emit.debug(f"Getting dependencies for {str(self.path)!r}")
 
-        search_paths = [root_path, *content_dirs]
-        if base_path is not None:
-            search_paths.append(base_path)
-
-        ld_library_paths: list[str] = []
-        for path in search_paths:
-            ld_library_paths.extend(_get_common_ld_library_paths(path, arch_triplet))
+        ld_library_paths = _get_common_ld_library_paths(root_path, arch_triplet)
 
         libraries = _determine_libraries(
             path=self.path, ld_library_paths=ld_library_paths, arch_triplet=arch_triplet
@@ -379,8 +360,7 @@ class ElfFile:
                 _Library(
                     soname=soname,
                     soname_path=Path(soname_path),
-                    search_paths=search_paths,
-                    base_path=base_path,
+                    search_paths=[root_path],
                     arch_tuple=self.arch_tuple,
                     soname_cache=soname_cache,
                 )
@@ -389,8 +369,7 @@ class ElfFile:
         # Return the set of dependency paths, minus those found in the base.
         dependencies: set[Path] = set()
         for library in self.dependencies:
-            if not library.in_base_snap:
-                dependencies.add(library.path)
+            dependencies.add(library.path)
         return dependencies
 
 
