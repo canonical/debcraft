@@ -27,6 +27,13 @@ def register_services() -> None:
     ServiceFactory.register(
         "lifecycle", "Lifecycle", module="debcraft.services.lifecycle"
     )
+    ServiceFactory.register("strip", "StripService", module="debcraft.services.strip")
+    ServiceFactory.register(
+        "md5sums", "Md5sumsService", module="debcraft.services.md5sums"
+    )
+    ServiceFactory.register(
+        "makeshlibs", "MakeshlibsService", module="debcraft.services.makeshlibs"
+    )
 
 
 __all__ = ["BuildPlan", "ServiceFactory"]

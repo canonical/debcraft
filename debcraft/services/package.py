@@ -18,7 +18,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import os
 import pathlib
 import subprocess
@@ -33,6 +32,9 @@ from typing_extensions import override
 
 from debcraft import control, errors, models
 from debcraft.services.lifecycle import Lifecycle
+from debcraft.services.makeshlibs import MakeshlibsService
+from debcraft.services.md5sums import Md5sumsService
+from debcraft.services.strip import StripService
 
 _ZSTD_COMPRESSION_LEVEL = 3
 
@@ -55,15 +57,14 @@ class Package(services.PackageService):
 
         debs: list[pathlib.Path] = []
         for package_name, package in project.packages.items():
-            prime = cast(Lifecycle, self._services.lifecycle).get_prime_dir(
-                package_name
-            )
+            lifecycle = cast(Lifecycle, self._services.lifecycle)
+            prime = lifecycle.get_prime_dir(package_name)
 
             arch = _get_architecture(package, build_info)
             if not arch:
                 continue
 
-            deb = _create_package(
+            deb = self._create_package(
                 dest,
                 project=project,
                 package_name=package_name,
@@ -86,37 +87,64 @@ class Package(services.PackageService):
             architecture=build_plan.build_for,
         )
 
+    def _create_package(
+        self,
+        dest: pathlib.Path,
+        *,
+        project: models.Project,
+        package_name: str,
+        arch: str,
+        prime_dir: pathlib.Path,
+    ) -> pathlib.Path:
+        package = project.get_package(package_name)
+        version = cast(str, package.version or project.version)
+        deb_path = dest.absolute() / f"{package_name}_{version}_{arch}.deb"
 
-def _create_package(
-    dest: pathlib.Path,
-    *,
-    project: models.Project,
-    package_name: str,
-    arch: str,
-    prime_dir: pathlib.Path,
-) -> pathlib.Path:
-    package = project.get_package(package_name)
-    version = package.version or project.version
-    cwd = pathlib.Path().absolute()
-    deb_path = dest.absolute() / f"{package_name}_{version}_{arch}.deb"
+        installed_size = _get_dir_size(prime_dir)
 
-    installed_size = _get_dir_size(prime_dir)
+        deb_path.unlink(missing_ok=True)
 
-    deb_path.unlink(missing_ok=True)
+        cast(StripService, self._services.get("strip")).run(prime_dir=prime_dir)
 
-    with tempfile.TemporaryDirectory() as tmpdir:
-        try:
-            os.chdir(tmpdir)
-            _create_data_file(pathlib.Path(tmpdir), prime_dir=prime_dir)
+        with tempfile.TemporaryDirectory() as ctl_dir:
+            control_dir = pathlib.Path(ctl_dir)
+
             _create_control_file(
-                pathlib.Path(tmpdir),
                 project=project,
                 package_name=package_name,
                 arch=arch,
                 installed_size=installed_size,
-                prime_dir=prime_dir,
+                dest_dir=control_dir,
             )
-            pathlib.Path("debian-binary").write_text("2.0\n")
+
+            # Run helpers
+            cast(Md5sumsService, self._services.get("md5sums")).run(
+                prime_dir, dest_dir=control_dir
+            )
+            cast(MakeshlibsService, self._services.get("makeshlibs")).run(
+                prime_dir, package_name, version, dest_dir=control_dir
+            )
+
+            _create_deb(deb_path, prime_dir=prime_dir, control_dir=control_dir)
+
+            return deb_path
+
+
+def _create_deb(
+    deb_path: pathlib.Path, *, prime_dir: pathlib.Path, control_dir: pathlib.Path
+) -> None:
+    with tempfile.TemporaryDirectory() as tmpdir:
+        data_tar = pathlib.Path(tmpdir, "data.tar.zst")
+        control_tar = pathlib.Path(tmpdir, "control.tar.zst")
+        debian_binary_file = pathlib.Path(tmpdir, "debian-binary")
+
+        _create_tarball(root=prime_dir, dest_file=data_tar)
+        _create_tarball(root=control_dir, dest_file=control_tar)
+        debian_binary_file.write_text("2.0\n")
+
+        cwd = pathlib.Path().absolute()
+        try:
+            os.chdir(tmpdir)
 
             # Order of files added to the deb file is important. The
             # debian-binary file must come first, followed by the control
@@ -135,43 +163,40 @@ def _create_package(
         finally:
             os.chdir(cwd)
 
-    return deb_path
 
-
-def _create_data_file(path: pathlib.Path, *, prime_dir: pathlib.Path) -> None:
+def _create_tarball(*, root: pathlib.Path, dest_file: pathlib.Path) -> None:
     """Create the data.tar.zst file containing the prime contents.
 
-    :param path: Directory where the data.tar.zst file will be created.
-    :param prime_dir: Directory containing the files to package.
+    :param root: Directory containing the files to package.
+    :param dest_file: The tar file to be created.
     """
-    data_path = path / "data.tar.zst"
-    with data_path.open("wb") as data_zstd:
+    with dest_file.open("wb") as data_zstd:
         zcomp = zstd.ZstdCompressor(level=_ZSTD_COMPRESSION_LEVEL)
         with zcomp.stream_writer(data_zstd) as comp:
             with tarfile.open(
                 fileobj=comp, mode="w", format=tarfile.USTAR_FORMAT
             ) as tar:
-                for entry in prime_dir.absolute().iterdir():
+                for entry in root.absolute().iterdir():
                     tar.add(entry, arcname=entry.name)
 
 
 def _create_control_file(
-    path: pathlib.Path,
     *,
     project: models.Project,
     package_name: str,
     arch: str,
     installed_size: int,
-    prime_dir: pathlib.Path,
+    dest_dir: pathlib.Path,
 ) -> None:
-    """Create the control.tar.zst file containing package metadata.
+    """Create the control file containing package metadata.
 
-    :param path: Directory where the control.tar.zst file will be created.
     :param project: The project model.
+    :param package_name: The name of the package being created.
     :param arch: The deb control architecture.
+    :param installed_size: The size of installed files in bytes.
+    :param dest_dir: Directory where the control file will be created.
     """
     package = project.get_package(package_name)
-    control_path = path / "control.tar.zst"
 
     # To be moved to model validation after we stabilize contents.
     version = package.version or project.version
@@ -206,26 +231,11 @@ def _create_control_file(
         uploaders=project.uploaders,
     )
 
-    ctlfile = pathlib.Path("control")
-    md5file = pathlib.Path("md5sums")
+    output_file = dest_dir / "control"
 
-    with ctlfile.open("w", encoding="utf-8", newline="\n") as f:
+    with output_file.open("w", encoding="utf-8", newline="\n") as f:
         encoder = control.Encoder(f)
         encoder.encode(ctl_data)
-
-    _create_md5sums(prime_dir, md5file)
-
-    with control_path.open("wb") as control_zstd:
-        zcomp = zstd.ZstdCompressor(level=_ZSTD_COMPRESSION_LEVEL)
-        with zcomp.stream_writer(control_zstd) as comp:
-            with tarfile.open(
-                fileobj=comp, mode="w", format=tarfile.USTAR_FORMAT
-            ) as tar:
-                tar.add("control")
-                tar.add("md5sums")
-
-    ctlfile.unlink()
-    md5file.unlink()
 
 
 def _get_dir_size(path: pathlib.Path) -> int:
@@ -243,22 +253,3 @@ def _get_architecture(package: models.Package, build_info: BuildInfo) -> str | N
         return build_info.build_for
 
     return None
-
-
-def _md5sum(path: pathlib.Path) -> str:
-    """Compute MD5 checksum of a file."""
-    h = hashlib.md5()  # noqa: S324
-    with path.open("rb") as f:
-        for chunk in iter(lambda: f.read(8192), b""):
-            h.update(chunk)
-    return h.hexdigest()
-
-
-def _create_md5sums(root: pathlib.Path, output_file: pathlib.Path) -> None:
-    """Walk subtree and write md5 checksums with relative paths."""
-    with output_file.open("w") as out:
-        for file in root.rglob("*"):
-            if file.is_file():
-                checksum = _md5sum(file)
-                relpath = file.relative_to(root)
-                out.write(f"{checksum}  {relpath}\n")

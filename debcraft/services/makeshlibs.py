@@ -1,0 +1,57 @@
+#  This file is part of debcraft.
+#
+#  Copyright 2025 Canonical Ltd.
+#
+#  This program is free software: you can redistribute it and/or modify it
+#  under the terms of the GNU General Public License version 3, as
+#  published by the Free Software Foundation.
+#
+#  This program is distributed in the hope that it will be useful, but WITHOUT
+#  ANY WARRANTY; without even the implied warranties of MERCHANTABILITY,
+#  SATISFACTORY QUALITY, or FITNESS FOR A PARTICULAR PURPOSE.
+#  See the GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License along
+#  with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+"""Debcraft makeshlibs helper service."""
+
+import pathlib
+
+from craft_cli import emit
+
+from debcraft.elf import elf_utils
+
+from .helper import HelperService
+
+
+class MakeshlibsService(HelperService):
+    """Debcraft makeshlibs helper service.
+
+    The makeshlibs helper will:
+    - Scan prime dir for ELF shared libraries
+    - Create a shlibs file listing the shared libraries
+    """
+
+    def run(
+        self,
+        prime_dir: pathlib.Path,
+        package_name: str,
+        version: str,
+        *,
+        dest_dir: pathlib.Path,
+    ) -> None:
+        """Create a list of shared libraries present in this package."""
+        output_file = dest_dir / "shlibs"
+        primed_elf_files = elf_utils.get_elf_files(prime_dir)
+        primed_shlibs = (x for x in primed_elf_files if x.soname)
+
+        with output_file.open("w") as out:
+            for elf in primed_shlibs:
+                name = elf.soname.split(".")
+                if len(name) < 3 or name[1] != "so":  # noqa: PLR2004
+                    emit.warning(f"cannot parse shlib soname: {elf.soname}")
+                    continue
+
+                emit.progress(f"ELF shared library: {elf.soname}")
+                out.write(f"{name[0]} {name[2]} {package_name} (>= {version})\n")

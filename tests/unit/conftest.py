@@ -20,11 +20,12 @@ from typing import Any, cast
 
 import craft_application
 import debcraft
+import debcraft.services.md5sums
 import debcraft.services.package
 import debcraft.services.project
 import pytest
 from debcraft import models, services
-from debcraft.services import lifecycle
+from debcraft.services import lifecycle, md5sums
 from typing_extensions import override
 
 
@@ -105,10 +106,24 @@ def fake_lifecycle_service_class(tmp_path, host_architecture):
 
 
 @pytest.fixture
+def fake_md5sums_service_class(tmp_path, host_architecture):
+    class FakeMd5sumsService(md5sums.Md5sumsService):
+        def __init__(
+            self,
+            app: craft_application.AppMetadata,
+            services: services.ServiceFactory,
+        ):
+            super().__init__(app, services)
+
+    return FakeMd5sumsService
+
+
+@pytest.fixture
 def default_factory(
     default_project,
     fake_project_service_class,
     fake_lifecycle_service_class,
+    fake_md5sums_service_class,
     project_path: pathlib.Path,
 ) -> services.ServiceFactory:
     services.ServiceFactory.register(
@@ -116,6 +131,7 @@ def default_factory(
     )
     services.ServiceFactory.register("project", fake_project_service_class)
     services.ServiceFactory.register("lifecycle", fake_lifecycle_service_class)
+    services.ServiceFactory.register("md5sums", fake_md5sums_service_class)
     service_factory = services.ServiceFactory(app=debcraft.METADATA)
     service_factory.update_kwargs("project", project_dir=project_path)
     return service_factory
@@ -134,3 +150,8 @@ def build_plan_service(default_factory) -> services.BuildPlan:
 @pytest.fixture
 def project_service(default_factory) -> debcraft.services.project.Project:
     return cast(debcraft.services.project.Project, default_factory.get("project"))
+
+
+@pytest.fixture
+def md5sums_service(default_factory) -> debcraft.services.md5sums.Md5sumsService:
+    return cast(debcraft.services.md5sums.Md5sumsService, default_factory.md5sums)

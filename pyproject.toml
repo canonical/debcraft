@@ -5,6 +5,7 @@ dynamic = ["version"]
 dependencies = [
     "craft-application>=5.4.0",
     "zstandard>=0.25.0",
+    "pyelftools>=0.32",
 ]
 classifiers = [
     "Development Status :: 1 - Planning",
