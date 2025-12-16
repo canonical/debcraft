@@ -93,10 +93,16 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
         "strip", "StripService", module="debcraft.services.strip"
     )
     services.ServiceFactory.register(
+        "md5sums", "Md5sumsService", module="debcraft.services.md5sums"
+    )
+    services.ServiceFactory.register(
         "makeshlibs", "MakeshlibsService", module="debcraft.services.makeshlibs"
     )
     services.ServiceFactory.register(
-        "md5sums", "Md5sumsService", module="debcraft.services.md5sums"
+        "gencontrol", "GencontrolService", module="debcraft.services.gencontrol"
+    )
+    services.ServiceFactory.register(
+        "makedeb", "MakedebService", module="debcraft.services.makedeb"
     )
     app_services = craft_application.ServiceFactory(app=debcraft.METADATA)
 
