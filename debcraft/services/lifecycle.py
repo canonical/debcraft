@@ -19,33 +19,12 @@
 from pathlib import Path
 
 from craft_application import LifecycleService
-from craft_parts import Step, StepInfo, callbacks
 
 from debcraft import errors
 
 
 class Lifecycle(LifecycleService):
     """Debcraft specialization of the Lifecycle Service."""
-
-    def run(self, step_name: str | None, part_names: list[str] | None = None) -> None:
-        """Run the debcraft lifecycle service."""
-        callbacks.register_post_step(self._run_helpers, step_list=[Step.PRIME])
-        super().run(step_name, part_names)
-
-    def _run_helpers(self, step_info: StepInfo) -> bool:
-        for partition in step_info.partitions:
-            if not partition.startswith("package/"):
-                continue
-
-            package = partition.split("/", 1)[1]
-            self._run_helpers_on_package(package)
-
-        return True
-
-    def _run_helpers_on_package(self, package: str) -> None:
-        # This method is intentionally left empty as a hook for future helper logic
-        # to be run on each package.
-        pass
 
     def get_prime_dir(self, package: str | None = None) -> Path:
         """Get the prime directory path for the default prime dir or a package.
