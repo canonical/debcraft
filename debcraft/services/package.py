@@ -17,7 +17,6 @@
 """Package service for debcraft."""
 
 import pathlib
-import shutil
 import tempfile
 from typing import Any, cast
 
@@ -46,8 +45,7 @@ class _HelperRunner:
         return self
 
     def __exit__(self, *exc: object) -> None:
-        emit.debug(f"remove temporary directory {self._temp_dir.name}")
-        shutil.rmtree(self._temp_dir.name)
+        pass
 
     def run(
         self, helper_name: str, helper: HelperService, *args: Any, **kwargs: Any
