@@ -176,7 +176,7 @@ class ElfFile:
     def __init__(self, *, path: Path) -> None:
         """Initialize an ElfFile instance.
 
-        :param str path: path to an elf_file within a snapcraft project.
+        :param str path: path to an elf_file within a debcraft project.
         """
         self.path = path
         self.dependencies: set[_Library] = set()
