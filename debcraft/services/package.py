@@ -19,12 +19,12 @@
 import pathlib
 import shutil
 import tempfile
-from typing import Any, Self, cast
+from typing import Any, cast
 
 from craft_application import services
 from craft_cli import emit
 from craft_platforms import BuildInfo
-from typing_extensions import override
+from typing_extensions import Self, override
 
 from debcraft import models
 from debcraft.services.helper import HelperService
@@ -52,7 +52,7 @@ class _HelperRunner:
     def run(
         self, helper_name: str, helper: HelperService, *args: Any, **kwargs: Any
     ) -> None:
-        project = cast(models.Project, self._project)
+        project = self._project
         build_info = self._build_info
 
         if not project.packages:
