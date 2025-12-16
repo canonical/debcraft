@@ -18,6 +18,7 @@
 
 import hashlib
 import pathlib
+from typing import Any
 
 from .helper import HelperService
 
@@ -30,14 +31,20 @@ class Md5sumsService(HelperService):
     - Create a md5sums file listing the MD5 digests and files
     """
 
-    def run(self, root: pathlib.Path, dest_dir: pathlib.Path) -> None:
+    def run(
+        self,
+        *,
+        prime_dir: pathlib.Path,
+        control_dir: pathlib.Path,
+        **kwargs: Any,  # noqa: ARG002
+    ) -> None:
         """Walk subtree and write md5 checksums with relative paths."""
-        output_file = dest_dir / "md5sums"
+        output_file = control_dir / "md5sums"
         with output_file.open("w") as out:
-            for file in root.rglob("*"):
+            for file in prime_dir.rglob("*"):
                 if file.is_file():
                     checksum = _md5sum(file)
-                    relpath = file.relative_to(root)
+                    relpath = file.relative_to(prime_dir)
                     out.write(f"{checksum}  {relpath}\n")
 
 

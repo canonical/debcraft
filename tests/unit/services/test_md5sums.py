@@ -34,7 +34,7 @@ def test_md5sums(tmp_path, md5sums_service):
     foo.write_text("file content")
     bar.write_text("more file content")
 
-    md5sums_service.run(test_dir, tmp_path)
+    md5sums_service.run(prime_dir=test_dir, control_dir=tmp_path)
 
     content = (tmp_path / "md5sums").read_text()
     assert "cc4005f23a42e90094a943e9eb5cbce3  bar.txt\n" in content

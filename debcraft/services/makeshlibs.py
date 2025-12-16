@@ -17,9 +17,11 @@
 """Debcraft makeshlibs helper service."""
 
 import pathlib
+from typing import Any, cast
 
 from craft_cli import emit
 
+from debcraft import models
 from debcraft.elf import elf_utils
 
 from .helper import HelperService
@@ -35,16 +37,23 @@ class MakeshlibsService(HelperService):
 
     def run(
         self,
-        prime_dir: pathlib.Path,
-        package_name: str,
-        version: str,
         *,
-        dest_dir: pathlib.Path,
+        prime_dir: pathlib.Path,
+        control_dir: pathlib.Path,
+        project: models.Project,
+        package_name: str,
+        **kwargs: Any,  # noqa: ARG002
     ) -> None:
         """Create a list of shared libraries present in this package."""
-        output_file = dest_dir / "shlibs"
+        output_file = control_dir / "shlibs"
+        package = project.get_package(package_name)
+        version = cast(str, package.version or project.version)
         primed_elf_files = elf_utils.get_elf_files(prime_dir)
         primed_shlibs = (x for x in primed_elf_files if x.soname)
+
+        if not primed_shlibs:
+            emit.debug(f"no primed shlibs in package {package_name}")
+            return
 
         with output_file.open("w") as out:
             for elf in primed_shlibs:

@@ -16,8 +16,15 @@
 
 """Debcraft base helper service."""
 
+from abc import ABC, abstractmethod
+from typing import Any
+
 from craft_application import AppService
 
 
-class HelperService(AppService):
+class HelperService(AppService, ABC):
     """Debcraft base helper Service."""
+
+    @abstractmethod
+    def run(self, *args: Any, **kwargs: Any) -> None:
+        """Run the helper."""

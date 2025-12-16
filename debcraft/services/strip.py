@@ -18,6 +18,7 @@
 
 import pathlib
 import subprocess
+from typing import Any
 
 from craft_cli import emit
 
@@ -36,7 +37,7 @@ class StripService(HelperService):
     - Call the strip tool on the primed ELF files
     """
 
-    def run(self, *, prime_dir: pathlib.Path) -> None:
+    def run(self, *, prime_dir: pathlib.Path, **kwargs: Any) -> None:  # noqa: ARG002
         """Strip primed files in the given package.
 
         :param prime_dir: the directory containing the files to be stripped.

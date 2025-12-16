@@ -22,18 +22,18 @@ from craft_application.services.buildplan import BuildPlanService as BuildPlan
 
 def register_services() -> None:
     """Register debcraft services to the service factory."""
-    ServiceFactory.register("package", "Package", module="debcraft.services.package")
-    ServiceFactory.register("project", "Project", module="debcraft.services.project")
-    ServiceFactory.register(
-        "lifecycle", "Lifecycle", module="debcraft.services.lifecycle"
-    )
-    ServiceFactory.register("strip", "StripService", module="debcraft.services.strip")
-    ServiceFactory.register(
-        "md5sums", "Md5sumsService", module="debcraft.services.md5sums"
-    )
-    ServiceFactory.register(
-        "makeshlibs", "MakeshlibsService", module="debcraft.services.makeshlibs"
-    )
+    _register("package", "Package", module="debcraft.services.package")
+    _register("project", "Project", module="debcraft.services.project")
+    _register("lifecycle", "Lifecycle", module="debcraft.services.lifecycle")
+    _register("strip", "StripService", module="debcraft.services.strip")
+    _register("md5sums", "Md5sumsService", module="debcraft.services.md5sums")
+    _register("makeshlibs", "MakeshlibsService", module="debcraft.services.makeshlibs")
+    _register("gencontrol", "GencontrolService", module="debcraft.services.gencontrol")
+    _register("makedeb", "MakedebService", module="debcraft.services.makedeb")
+
+
+def _register(name: str, classname: str, *, module: str) -> None:
+    ServiceFactory.register(name, classname, module=module)
 
 
 __all__ = ["BuildPlan", "ServiceFactory"]
