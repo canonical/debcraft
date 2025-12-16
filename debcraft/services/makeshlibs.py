@@ -40,6 +40,7 @@ class MakeshlibsService(HelperService):
         *,
         prime_dir: pathlib.Path,
         control_dir: pathlib.Path,
+        state_dir: pathlib.Path,
         project: models.Project,
         package_name: str,
         **kwargs: Any,  # noqa: ARG002
@@ -55,7 +56,8 @@ class MakeshlibsService(HelperService):
             emit.debug(f"no primed shlibs in package {package_name}")
             return
 
-        with output_file.open("w") as out:
+        # Write shlibs file
+        with output_file.open("w", encoding="utf-8") as f:
             for elf in primed_shlibs:
                 name = elf.soname.split(".")
                 if len(name) < 3 or name[1] != "so":  # noqa: PLR2004
@@ -63,4 +65,13 @@ class MakeshlibsService(HelperService):
                     continue
 
                 emit.progress(f"ELF shared library: {elf.soname}")
-                out.write(f"{name[0]} {name[2]} {package_name} (>= {version})\n")
+                f.write(f"{name[0]} {name[2]} {package_name} (>= {version})\n")
+
+        # Write helper state file
+        output_file = state_dir / "makeshlibs"
+        with output_file.open("w", encoding="utf-8") as f:
+            for elf in primed_shlibs:
+                relative_path = pathlib.Path(elf.path).relative_to(prime_dir)
+                installed_path = pathlib.Path("/") / relative_path
+                installed_lib = installed_path.parent / elf.soname
+                f.write(f"{installed_lib!s} {package_name} {version}")

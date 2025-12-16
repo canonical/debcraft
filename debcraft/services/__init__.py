@@ -28,6 +28,7 @@ def register_services() -> None:
     _register("strip", "StripService", module="debcraft.services.strip")
     _register("md5sums", "Md5sumsService", module="debcraft.services.md5sums")
     _register("makeshlibs", "MakeshlibsService", module="debcraft.services.makeshlibs")
+    _register("shlibdeps", "ShlibdepsService", module="debcraft.services.shlibdeps")
     _register("gencontrol", "GencontrolService", module="debcraft.services.gencontrol")
     _register("makedeb", "MakedebService", module="debcraft.services.makedeb")
 
