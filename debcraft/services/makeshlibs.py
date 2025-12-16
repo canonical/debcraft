@@ -49,7 +49,7 @@ class MakeshlibsService(HelperService):
         package = project.get_package(package_name)
         version = cast(str, package.version or project.version)
         primed_elf_files = elf_utils.get_elf_files(prime_dir)
-        primed_shlibs = (x for x in primed_elf_files if x.soname)
+        primed_shlibs = [x for x in primed_elf_files if x.soname]
 
         if not primed_shlibs:
             emit.debug(f"no primed shlibs in package {package_name}")
