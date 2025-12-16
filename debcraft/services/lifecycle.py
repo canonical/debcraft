@@ -19,7 +19,6 @@
 from pathlib import Path
 
 from craft_application import LifecycleService
-from craft_parts import ProjectInfo
 
 from debcraft import errors
 
@@ -50,23 +49,14 @@ class Lifecycle(LifecycleService):
 
         'None' maps to the default prime directory.
         """
-        return _get_prime_dirs_from_project(self._lcm.project_info)
+        project_info = self._lcm.project_info
+        partition_prime_dirs = project_info.prime_dirs
+        package_prime_dirs: dict[str | None, Path] = {None: project_info.prime_dir}
 
+        # strip 'package/' prefix so that the package name is the key
+        for partition, prime_dir in partition_prime_dirs.items():
+            if partition and partition.startswith("package/"):
+                package = partition.split("/", 1)[1]
+                package_prime_dirs[package] = prime_dir
 
-def _get_prime_dirs_from_project(project_info: ProjectInfo) -> dict[str | None, Path]:
-    """Get a mapping of package names to prime directories from a ProjectInfo.
-
-    'None' maps to the default prime directory.
-
-    :param project_info: The ProjectInfo to get the prime directory mapping from.
-    """
-    partition_prime_dirs = project_info.prime_dirs
-    package_prime_dirs: dict[str | None, Path] = {None: project_info.prime_dir}
-
-    # strip 'package/' prefix so that the package name is the key
-    for partition, prime_dir in partition_prime_dirs.items():
-        if partition and partition.startswith("package/"):
-            package = partition.split("/", 1)[1]
-            package_prime_dirs[package] = prime_dir
-
-    return package_prime_dirs
+        return package_prime_dirs
