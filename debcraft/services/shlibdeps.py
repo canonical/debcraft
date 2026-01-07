@@ -94,13 +94,14 @@ class ShlibdepsService(HelperService):
                     ver = _check_symbols(name, ver, undefined_symbols)
                     pkg_deps.add(f"{name} {ver}")
 
-        if pkg_deps:
-            dep_list = ", ".join(pkg_deps)
+        pkg_list = sorted(pkg_deps)
+        if pkg_list:
+            dep_list = ", ".join(pkg_list)
             emit.progress(f"Package {package_name} dependencies: {dep_list}")
 
         output_file = state_dir / "shlibdeps"
         with output_file.open("w", encoding="utf-8") as f:
-            f.writelines(line + "\n" for line in pkg_deps)
+            f.writelines(line + "\n" for line in pkg_list)
 
 
 def _read_packaged_shlibs(state_dir_map: dict[str, pathlib.Path]) -> _SonameMap:
