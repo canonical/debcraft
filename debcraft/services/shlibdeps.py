@@ -23,12 +23,13 @@ from typing import Any
 
 from craft_cli import emit
 
+from debcraft import errors
 from debcraft.elf import elf_utils
 
 from .helper import HelperService
 
-# Map soname and major to package name and version
-_SonameMap = dict[tuple[str, str], tuple[str, str]]
+# Map soname and major to package names and versions
+_SonameMap = dict[tuple[str, str], str]
 
 
 class ShlibdepsService(HelperService):
@@ -75,24 +76,18 @@ class ShlibdepsService(HelperService):
         pkg_deps: set[str] = set()
 
         for lib in lib_files:
-            name, ver = None, None
             soname, major = lib.split(".so.")
 
             # Check if any dependency matches libs from this source
-            shlib = self._packaged_shlibs.get((soname, major))
-            if shlib:
-                name, ver = shlib
-                if name != package_name:
-                    pkg_deps.add(f"{name} {ver}")
+            raw_deps = self._packaged_shlibs.get((soname, major))
+            if raw_deps and not _package_in_deps(package_name, raw_deps):
+                pkg_deps.add(raw_deps)
                 continue
 
             # Check dependency in /var/lib/dpkg/info/*.shlibs files
-            shlib = self._deb_info_shlibs.get((soname, major))
-            if shlib:
-                name, ver = shlib
-                if name != package_name:
-                    ver = _check_symbols(name, ver, undefined_symbols)
-                    pkg_deps.add(f"{name} {ver}")
+            raw_deps = self._deb_info_shlibs.get((soname, major))
+            if raw_deps and not _package_in_deps(package_name, raw_deps):
+                pkg_deps.add(raw_deps)
 
         pkg_list = sorted(pkg_deps)
         if pkg_list:
@@ -102,6 +97,21 @@ class ShlibdepsService(HelperService):
         output_file = state_dir / "shlibdeps"
         with output_file.open("w", encoding="utf-8") as f:
             f.writelines(line + "\n" for line in pkg_list)
+
+
+def _package_in_deps(package_name: str, raw_deps: str) -> bool:
+    if not raw_deps:
+        return False
+
+    # Handle "and" dependency blocks
+    for and_block in raw_deps.split(","):
+        # Handle "or" dependency blocks
+        for or_block in and_block.split("|"):
+            name = or_block.strip().split()[0]
+            if package_name == name:
+                return True
+
+    return False
 
 
 def _read_packaged_shlibs(state_dir_map: dict[str, pathlib.Path]) -> _SonameMap:
@@ -126,8 +136,8 @@ def _parse_shlibs_files(shlibs_files: Iterator[pathlib.Path]) -> _SonameMap:
                 line = raw_line.split("#", 1)[0].strip()  # Remove comments
                 if not line or line.startswith("udeb:"):
                     continue
-                soname, maj, pkg, ver = _split_shlibs_line(line)
-                libmap[(soname, maj)] = (pkg, ver)
+                soname, maj, pkgdeps = _split_shlibs_line(line)
+                libmap[(soname, maj)] = pkgdeps
     return libmap
 
 
@@ -147,11 +157,15 @@ def _get_elf_dependencies(binary: pathlib.Path) -> tuple[set[str], set[str]]:
     return sonames, symbols
 
 
-def _split_shlibs_line(line: str) -> tuple[str, str, str, str]:
-    soname, maj, pkg_ver = line.strip().split(maxsplit=2)
-    pkg, *rest = pkg_ver.split(maxsplit=1)
-    ver = rest[0] if rest else ""
-    return soname, maj, pkg, ver
+def _split_shlibs_line(line: str) -> tuple[str, str, str]:
+    # Example line from /var/lib/dpkg/info/libbinutils:amd64.shlibs:
+    # libopcodes 2.42-system libbinutils (>= 2.42), libbinutils (<< 2.42.1)
+    parts = line.strip().split(maxsplit=2)
+    if len(parts) < 3:  # noqa: PLR2004
+        raise errors.DebcraftError(f"malformed shlibs entry: {line.strip()}")
+
+    soname, maj, pkgdeps = parts
+    return soname, maj, pkgdeps
 
 
 def _check_symbols(name: str, ver: str, undefined_symbols: set[str]) -> str:  # noqa: ARG001
