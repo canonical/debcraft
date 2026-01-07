@@ -16,14 +16,16 @@
 
 """Debcraft makeshlibs helper service."""
 
+import functools
 import pathlib
 import shutil
+import subprocess
 from typing import Any, cast
 
 from craft_cli import emit
 
-from debcraft import models
-from debcraft.elf import elf_utils
+from debcraft import models, util
+from debcraft.elf import get_elf_files
 
 from .helper import HelperService
 
@@ -51,24 +53,59 @@ class MakeshlibsService(HelperService):
         shlibs_file = control_dir / "shlibs"
         package = project.get_package(package_name)
         version = cast(str, package.version or project.version)
-        primed_elf_files = elf_utils.get_elf_files(prime_dir)
-        primed_shlibs = [x for x in primed_elf_files if x.soname]
+        arch_triplet = util.get_arch_triplet()
+        lib_dirs = _get_lib_dirs(arch_triplet)
+
+        primed_elf_files = []
+        for lib_dir in lib_dirs:
+            primed_elf_files.extend(
+                get_elf_files(prime_dir / lib_dir.lstrip("/"), recursive=False)
+            )
+
+        primed_shlibs = [x for x in primed_elf_files if x.soname and x.ver]
 
         if not primed_shlibs:
             emit.debug(f"no primed shlibs in package {package_name}")
             return
 
         # Write shlibs file
+        dedup: set[tuple[str, str]] = set()
         with shlibs_file.open("w", encoding="utf-8") as f:
             for elf in primed_shlibs:
-                name = elf.soname.split(".")
-                if len(name) < 3 or name[1] != "so":  # noqa: PLR2004
-                    emit.warning(f"cannot parse shlib soname: {elf.soname}")
+                if elf.arch != arch:
                     continue
 
-                emit.progress(f"ELF shared library: {elf.soname}")
-                f.write(f"{name[0]} {name[2]} {package_name} (>= {version})\n")
+                # Deduplicate multiple occurences of the same library
+                if (elf.soname, elf.ver) in dedup:
+                    continue
+
+                dedup.add((elf.soname, elf.ver))
+                emit.progress(
+                    f"Shared library in {package_name}: {elf.soname}.so.{elf.ver}"
+                )
+                f.write(f"{elf.soname} {elf.ver} {package_name} (>= {version})\n")
 
         # Copy to helper state
         state_shlibs_file = state_dir / f"{package_name}:{arch}.shlibs"
         shutil.copy(shlibs_file, state_shlibs_file)
+
+
+@functools.lru_cache
+def _get_lib_dirs(arch_triplet: str) -> list[str]:
+    """Obtain a list of paths used by the dynamic linker to find libraries."""
+    lib_dirs = {
+        "/lib",
+        "/usr/lib",
+        f"/lib/{arch_triplet}",
+        f"/usr/lib/{arch_triplet}",
+        "/usr/local/lib",
+    }
+
+    output = subprocess.check_output(
+        ["ldconfig", "-vNX"], stderr=subprocess.DEVNULL
+    ).decode()
+    for line in output.splitlines():
+        if line.startswith("/"):
+            lib_dirs.add(line.split(":")[0].strip())
+
+    return sorted(lib_dirs)
