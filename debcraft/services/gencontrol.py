@@ -112,7 +112,9 @@ def _parse_dependency(dep: str) -> tuple[str, str]:
 
 
 def _filter_dependencies(deps: list[str], user_deps: list[str] | None) -> list[str]:
-    """Override generated dependencies with dependencies specified by the user.
+    """Merge generated dependencies with dependencies specified by the user.
+
+    If names match, user-specified entries will override generated dependencies.
 
     :param deps: The list of generated dependencies.
     :param user_deps: The list of user-specified dependencies.
