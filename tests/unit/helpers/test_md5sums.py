@@ -16,7 +16,7 @@
 
 """Tests for debcraft's md5sums service."""
 
-from debcraft.services import md5sums
+from debcraft.helpers import md5sums
 
 
 def test_md5sum(tmp_path):
@@ -26,7 +26,7 @@ def test_md5sum(tmp_path):
     assert result == "d10b4c3ff123b26dc068d43a8bef2d23"
 
 
-def test_md5sums(tmp_path, md5sums_service):
+def test_md5sums(tmp_path):
     test_dir = tmp_path / "dir"
     test_dir.mkdir()
     foo = test_dir / "foo.txt"
@@ -34,7 +34,8 @@ def test_md5sums(tmp_path, md5sums_service):
     foo.write_text("file content")
     bar.write_text("more file content")
 
-    md5sums_service.run(prime_dir=test_dir, control_dir=tmp_path)
+    helper = md5sums.Md5sums()
+    helper.run(prime_dir=test_dir, control_dir=tmp_path)
 
     content = (tmp_path / "md5sums").read_text()
     assert "cc4005f23a42e90094a943e9eb5cbce3  bar.txt\n" in content

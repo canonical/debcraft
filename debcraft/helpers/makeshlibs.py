@@ -27,11 +27,11 @@ from craft_cli import emit
 from debcraft import models, util
 from debcraft.elf import get_elf_files
 
-from .helper import HelperService
+from .helpers import Helper
 
 
-class MakeshlibsService(HelperService):
-    """Debcraft makeshlibs helper service.
+class Makeshlibs(Helper):
+    """Debcraft makeshlibs helper.
 
     The makeshlibs helper will:
     - Scan prime dir for ELF shared libraries

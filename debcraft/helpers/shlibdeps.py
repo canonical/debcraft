@@ -25,14 +25,14 @@ from craft_cli import emit
 from debcraft import errors
 from debcraft.elf import ElfLibrary, ElfSymbol, get_elf_files
 
-from .helper import HelperService
+from .helpers import Helper
 
 # Map soname and major to package names and versions
 _SonameMap = dict[tuple[str, str], str]
 
 
-class ShlibdepsService(HelperService):
-    """Debcraft shlibdeps helper service.
+class Shlibdeps(Helper):
+    """Debcraft shlibdeps helper.
 
     The shlibdeps helper will:
     - Scan prime dir for ELF files

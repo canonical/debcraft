@@ -16,7 +16,7 @@
 """Tests for debcraft's gencontrol helper."""
 
 import pytest
-from debcraft.services import gencontrol
+from debcraft.helpers import gencontrol
 
 
 @pytest.mark.parametrize(
