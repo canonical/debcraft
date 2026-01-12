@@ -127,7 +127,7 @@ def _filter_dependencies(deps: list[str], user_deps: list[str] | None) -> list[s
     dep_map = dict(_parse_dependency(dep) for dep in deps)
     dep_map.update(_parse_dependency(dep) for dep in user_deps)
 
-    return sorted([f"{pkg} {ver}".strip() for pkg, ver in dep_map.items()])
+    return sorted([f"{pkg} {ver}".strip() for pkg, ver in dep_map.items() if pkg != ""])
 
 
 def _get_dir_size(path: pathlib.Path) -> int:
