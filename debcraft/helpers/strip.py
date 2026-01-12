@@ -25,11 +25,11 @@ from craft_cli import emit
 from debcraft import errors
 from debcraft.elf import elf_utils
 
-from .helper import HelperService
+from .helpers import Helper
 
 
-class StripService(HelperService):
-    """Debcraft strip helper service.
+class Strip(Helper):
+    """Debcraft strip helper.
 
     The strip helper will:
     - Scan prime dir for ELF files

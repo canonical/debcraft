@@ -20,11 +20,11 @@ import hashlib
 import pathlib
 from typing import Any
 
-from .helper import HelperService
+from .helpers import Helper
 
 
-class Md5sumsService(HelperService):
-    """Debcraft md5sums helper service.
+class Md5sums(Helper):
+    """Debcraft md5sums helper.
 
     The md5sums helper will:
     - Scan prime dir for files

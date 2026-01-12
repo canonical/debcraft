@@ -23,11 +23,11 @@ from craft_cli import emit
 
 from debcraft import control, errors, models
 
-from .helper import HelperService
+from .helpers import Helper
 
 
-class GencontrolService(HelperService):
-    """Debcraft gencontrol helper service."""
+class Gencontrol(Helper):
+    """Debcraft gencontrol helper."""
 
     def run(
         self,
