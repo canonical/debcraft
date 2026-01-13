@@ -92,7 +92,7 @@ class ElfFile:
             try:
                 elf_file = elffile.ELFFile(file)
             except ELFError as err:
-                raise errors.DebcraftError(f"cannot load ELF file: {err!s}")
+                raise errors.DebcraftError(f"cannot load ELF file: {err}")
 
             elf_data = cls(path=path)
             elf_data.arch = _get_elf_debian_arch(elf_file)
