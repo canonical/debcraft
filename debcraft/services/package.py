@@ -57,24 +57,35 @@ class _HelperRunner:
             return
 
         for package_name, package in project.packages.items():
+            emit.debug(f"Run helper {helper_name} for package {package_name}")
             prime_dir = self._lifecycle.get_prime_dir(package_name)
             arch = _get_architecture(package, build_info)
             if not arch:
                 continue
 
-            control_dir = pathlib.Path(self._temp_dir.name) / package_name / "control"
-            control_dir.mkdir(parents=True, exist_ok=True)
+            package_dir = pathlib.Path(self._temp_dir.name) / package_name
+            control_dir = package_dir / "control"
+            deb_dir = package_dir / "deb"
+            state_dir = package_dir / "state"
 
-            deb_dir = pathlib.Path(self._temp_dir.name) / package_name / "deb"
+            control_dir.mkdir(parents=True, exist_ok=True)
             deb_dir.mkdir(parents=True, exist_ok=True)
+            state_dir.mkdir(parents=True, exist_ok=True)
+
+            state_dir_map = {
+                name: pathlib.Path(self._temp_dir.name) / name / "state"
+                for name in project.packages
+            }
 
             common_kwargs = {
                 "prime_dir": prime_dir,
                 "arch": arch,
                 "control_dir": control_dir,
+                "state_dir": state_dir,
                 "deb_dir": deb_dir,
                 "project": project,
                 "package_name": package_name,
+                "state_dir_map": state_dir_map,
             }
 
             common_kwargs |= kwargs
@@ -107,6 +118,7 @@ class Package(services.PackageService):
             helper.run(*self._get_helper("strip"))
             helper.run(*self._get_helper("md5sums"))
             helper.run(*self._get_helper("makeshlibs"))
+            helper.run(*self._get_helper("shlibdeps"))
             helper.run(*self._get_helper("gencontrol"))
             helper.run(*self._get_helper("makedeb"), output_dir=dest, deb_list=debs)
 

@@ -17,6 +17,7 @@
 """Debcraft makeshlibs helper service."""
 
 import pathlib
+import shutil
 from typing import Any, cast
 
 from craft_cli import emit
@@ -40,12 +41,14 @@ class MakeshlibsService(HelperService):
         *,
         prime_dir: pathlib.Path,
         control_dir: pathlib.Path,
+        state_dir: pathlib.Path,
         project: models.Project,
         package_name: str,
+        arch: str,
         **kwargs: Any,  # noqa: ARG002
     ) -> None:
         """Create a list of shared libraries present in this package."""
-        output_file = control_dir / "shlibs"
+        shlibs_file = control_dir / "shlibs"
         package = project.get_package(package_name)
         version = cast(str, package.version or project.version)
         primed_elf_files = elf_utils.get_elf_files(prime_dir)
@@ -55,7 +58,8 @@ class MakeshlibsService(HelperService):
             emit.debug(f"no primed shlibs in package {package_name}")
             return
 
-        with output_file.open("w") as out:
+        # Write shlibs file
+        with shlibs_file.open("w", encoding="utf-8") as f:
             for elf in primed_shlibs:
                 name = elf.soname.split(".")
                 if len(name) < 3 or name[1] != "so":  # noqa: PLR2004
@@ -63,4 +67,8 @@ class MakeshlibsService(HelperService):
                     continue
 
                 emit.progress(f"ELF shared library: {elf.soname}")
-                out.write(f"{name[0]} {name[2]} {package_name} (>= {version})\n")
+                f.write(f"{name[0]} {name[2]} {package_name} (>= {version})\n")
+
+        # Copy to helper state
+        state_shlibs_file = state_dir / f"{package_name}:{arch}.shlibs"
+        shutil.copy(shlibs_file, state_shlibs_file)
