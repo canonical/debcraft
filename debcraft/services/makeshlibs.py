@@ -24,7 +24,7 @@ from typing import Any, cast
 
 from craft_cli import emit
 
-from debcraft import models, util
+from debcraft import errors, models, util
 from debcraft.elf import get_elf_files
 
 from .helper import HelperService
@@ -101,9 +101,15 @@ def _get_lib_dirs(arch_triplet: str) -> list[str]:
         "/usr/local/lib",
     }
 
-    output = subprocess.check_output(
-        ["ldconfig", "-vNX"], stderr=subprocess.DEVNULL
-    ).decode()
+    try:
+        output = subprocess.check_output(
+            ["ldconfig", "-vNX"], stderr=subprocess.DEVNULL
+        ).decode()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        raise errors.DebcraftError(
+            "cannot query ldconfig for library directories: {err}"
+        )
+
     for line in output.splitlines():
         if line.startswith("/"):
             lib_dirs.add(line.split(":")[0].strip())
