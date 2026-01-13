@@ -20,7 +20,7 @@ import os
 import pathlib
 import subprocess
 import tarfile
-from typing import cast
+from typing import Any, cast
 
 import zstandard as zstd
 from craft_cli import emit
@@ -46,6 +46,7 @@ class MakedebService(HelperService):
         deb_dir: pathlib.Path,
         output_dir: pathlib.Path,
         deb_list: list[pathlib.Path],
+        **kwargs: Any,  # noqa: ARG002
     ) -> None:
         """Create deb package."""
         package = project.get_package(package_name)
