@@ -26,7 +26,7 @@ from .elf_file import ElfFile
 def get_elf_files(path: pathlib.Path, *, recursive: bool = True) -> list[ElfFile]:
     """Obtain a list of all ELF files in a directory or subtree.
 
-    :param root_path: The root of the subtree to list ELF files from.
+    :param path: The root of the subtree to list ELF files from.
     :param recursive: Whether this will be a recursive search.
 
     :return: A list of ELF files found in the given directory or subtree.
