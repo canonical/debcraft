@@ -1,4 +1,6 @@
 name: debcraft-minimal
+summary: A minimal debcraft project
+description: A minimal debcraft project for testing purposes
 maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 version: 0
 
