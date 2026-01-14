@@ -24,14 +24,14 @@ from debcraft import errors, util
 @pytest.mark.parametrize(
     ("arch", "triplet"),
     [
-        ("aarch64", "aarch64-linux-gnu"),
-        ("armv7l", "arm-linux-gnueabihf"),
-        ("ppc64le", "powerpc64le-linux-gnu"),
-        ("riscv64", "riscv64-linux-gnu"),
-        ("s390x", "s390x-linux-gnu"),
-        ("x86_64", "x86_64-linux-gnu"),
-        ("i686", "i386-linux-gnu"),
-        (None, "aarch64-linux-gnu"),
+        pytest.param("aarch64", "aarch64-linux-gnu", id="arch_aarch64"),
+        pytest.param("armv7l", "arm-linux-gnueabihf", id="arch_armv7l"),
+        pytest.param("ppc64le", "powerpc64le-linux-gnu", id="arch_pp64le"),
+        pytest.param("riscv64", "riscv64-linux-gnu", id="arch_risc64v"),
+        pytest.param("s390x", "s390x-linux-gnu", id="arch_s390x"),
+        pytest.param("x86_64", "x86_64-linux-gnu", id="arch_x86_64"),
+        pytest.param("i686", "i386-linux-gnu", id="arch_i686"),
+        pytest.param(None, "aarch64-linux-gnu", id="arch_None"),
     ],
 )
 def test_get_arch_triplet(
