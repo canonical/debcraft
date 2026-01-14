@@ -43,8 +43,6 @@ def test_get_arch_triplet(
 
 
 def test_get_arch_triplet_error():
-    with pytest.raises(errors.DebcraftError) as raised:
+    expected = "arch triplet is not defined for arch 'other'"
+    with pytest.raises(errors.DebcraftError, match=expected):
         util.get_arch_triplet("other")
-
-    err = str(raised.value)
-    assert err == "arch triplet is not defined for arch 'other'"
