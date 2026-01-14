@@ -105,9 +105,9 @@ def _get_lib_dirs(arch_triplet: str) -> list[str]:
         output = subprocess.check_output(
             ["ldconfig", "-vNX"], stderr=subprocess.DEVNULL
         ).decode()
-    except (subprocess.CalledProcessError, FileNotFoundError):
+    except (subprocess.CalledProcessError, FileNotFoundError) as err:
         raise errors.DebcraftError(
-            "cannot query ldconfig for library directories: {err}"
+            f"cannot query ldconfig for library directories: {err}"
         )
 
     for line in output.splitlines():
