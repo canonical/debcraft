@@ -28,9 +28,9 @@ from debcraft.elf.elf_file import _get_elf_debian_arch
 from elftools.elf import elffile
 
 if platform.machine() == "aarch64":
-    extra_library = {ElfLibrary("ld-linux-aarch64", "1")}
+    EXTRA_LIBRARY = {ElfLibrary("ld-linux-aarch64", "1")}
 else:
-    extra_library = set()
+    EXTRA_LIBRARY = set()
 
 
 def _lib_triplet() -> pathlib.Path:
@@ -41,7 +41,7 @@ def _lib_triplet() -> pathlib.Path:
     ("filename", "soname", "ver", "needed"),
     [
         (_lib_triplet() / "libdl.so.2", "libdl", "2", {ElfLibrary("libc", "6")}),
-        ("/bin/gzip", "", "", {ElfLibrary("libc", "6")} | extra_library),
+        ("/bin/gzip", "", "", {ElfLibrary("libc", "6")} | EXTRA_LIBRARY),
     ],
 )
 def test_elf_file(filename: str, soname: str, ver: str, needed: set[ElfLibrary]):
