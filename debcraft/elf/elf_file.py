@@ -30,7 +30,7 @@ from debcraft import errors
 class ElfLibrary:
     """Representation of an ELF dynamic library."""
 
-    soname: str
+    libname: str
     ver: str
 
     @classmethod
@@ -42,10 +42,10 @@ class ElfLibrary:
         :return: A newly created ElfLibrary instance.
         """
         if ".so." not in name:
-            return cls(soname=name, ver="")
+            return cls(libname=name, ver="")
 
-        soname, ver = name.split(".so.", maxsplit=1)
-        return cls(soname, ver)
+        libname, ver = name.split(".so.", maxsplit=1)
+        return cls(libname, ver)
 
 
 @dataclass(frozen=True)
@@ -62,7 +62,7 @@ class ElfFile:
 
     path: pathlib.Path
     is_dynamic: bool = False
-    soname: str = ""
+    libname: str = ""
     ver: str = ""
     arch: str = ""
     needed: set[ElfLibrary] = field(default_factory=set)
@@ -115,7 +115,7 @@ class ElfFile:
                 elif tag.entry.d_tag == "DT_SONAME":
                     soname = tag.soname  # pyright: ignore[reportAttributeAccessIssue]
                     elf_lib = ElfLibrary.from_name(soname)
-                    elf_data.soname = elf_lib.soname
+                    elf_data.libname = elf_lib.libname
                     elf_data.ver = elf_lib.ver
 
         return elf_data

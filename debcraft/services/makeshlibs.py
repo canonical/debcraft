@@ -62,7 +62,7 @@ class MakeshlibsService(HelperService):
                 get_elf_files(prime_dir / lib_dir.lstrip("/"), recursive=False)
             )
 
-        primed_shlibs = [x for x in primed_elf_files if x.soname and x.ver]
+        primed_shlibs = [x for x in primed_elf_files if x.libname and x.ver]
 
         if not primed_shlibs:
             emit.debug(f"no primed shlibs in package {package_name}")
@@ -76,14 +76,14 @@ class MakeshlibsService(HelperService):
                     continue
 
                 # Deduplicate multiple occurrences of the same library
-                if (elf.soname, elf.ver) in dedup:
+                if (elf.libname, elf.ver) in dedup:
                     continue
 
-                dedup.add((elf.soname, elf.ver))
+                dedup.add((elf.libname, elf.ver))
                 emit.progress(
-                    f"Shared library in {package_name}: {elf.soname}.so.{elf.ver}"
+                    f"Shared library in {package_name}: {elf.libname}.so.{elf.ver}"
                 )
-                f.write(f"{elf.soname} {elf.ver} {package_name} (>= {version})\n")
+                f.write(f"{elf.libname} {elf.ver} {package_name} (>= {version})\n")
 
         # Copy to helper state
         state_shlibs_file = state_dir / f"{package_name}:{arch}.shlibs"

@@ -38,20 +38,32 @@ def _lib_triplet() -> pathlib.Path:
 
 
 @pytest.mark.parametrize(
-    ("filename", "soname", "ver", "needed"),
+    ("filename", "libname", "ver", "needed"),
     [
-        (_lib_triplet() / "libdl.so.2", "libdl", "2", {ElfLibrary("libc", "6")}),
-        ("/bin/gzip", "", "", {ElfLibrary("libc", "6")} | EXTRA_LIBRARY),
+        pytest.param(
+            _lib_triplet() / "libdl.so.2",
+            "libdl",
+            "2",
+            {ElfLibrary("libc", "6")},
+            id="with_library",
+        ),
+        pytest.param(
+            "/bin/gzip",
+            "",
+            "",
+            {ElfLibrary("libc", "6")} | EXTRA_LIBRARY,
+            id="with_binary",
+        ),
     ],
 )
-def test_elf_file(filename: str, soname: str, ver: str, needed: set[ElfLibrary]):
+def test_elf_file(filename: str, libname: str, ver: str, needed: set[ElfLibrary]):
     path = pathlib.Path(filename)
     assert ElfFile.is_elf(path)
 
     elf_file = ElfFile.from_path(path)
     assert elf_file.path == path
     assert elf_file.arch == get_host_architecture()
-    assert elf_file.soname == soname
+    assert elf_file.libname == libname
     assert elf_file.ver == ver
     assert elf_file.needed == needed
 
@@ -65,35 +77,35 @@ def test_elf_file_not_elf():
 
 
 @pytest.mark.parametrize(
-    ("filename", "soname", "ver"),
+    ("filename", "libname", "ver"),
     [
-        ("libfoo.so.123", "libfoo", "123"),
-        ("libbar.so", "libbar.so", ""),
-        ("", "", ""),
+        pytest.param("libfoo.so.123", "libfoo", "123", id="with_so_ver_suffix"),
+        pytest.param("libbar.so", "libbar.so", "", id="with_so_suffix"),
+        pytest.param("", "", "", id="empty"),
     ],
 )
-def test_elf_library(filename: str, soname: str, ver: str):
+def test_elf_library(filename: str, libname: str, ver: str):
     lib = ElfLibrary.from_name(filename)
-    assert lib.soname == soname
+    assert lib.libname == libname
     assert lib.ver == ver
 
 
 @pytest.mark.parametrize(
     ("e_machine", "ei_class", "ei_data", "arch"),
     [
-        ("EM_X86_64", "ELFCLASS64", "ELFDATA2LSB", "amd64"),
-        ("EM_386", "ELFCLASS32", "ELFDATA2LSB", "i386"),
-        ("EM_AARCH64", "ELFCLASS64", "ELFDATA2LSB", "arm64"),
-        ("EM_ARM", "ELFCLASS32", "ELFDATA2LSB", "armhf"),
-        ("EM_PPC64", "ELFCLASS64", "ELFDATA2LSB", "ppc64el"),
-        ("EM_PPC64", "ELFCLASS64", "ELFDATA2MSB", "ppc64"),
-        ("EM_MIPS", "ELFCLASS32", "ELFDATA2LSB", "mipsel"),
-        ("EM_MIPS", "ELFCLASS32", "ELFDATA2MSB", "mips"),
-        ("EM_S390", "ELFCLASS64", "ELFDATA2MSB", "s390x"),
-        ("EM_RISCV", "ELFCLASS64", "ELFDATA2LSB", "riscv64"),
-        ("other", "ELFCLASS64", "ELFDATA2LSB", "unknown"),
-        ("EM_X86_64", "other", "ELFDATA2LSB", "unknown"),
-        ("EM_X86_64", "ELFCLASS64", "other", "unknown"),
+        pytest.param("EM_X86_64", "ELFCLASS64", "ELFDATA2LSB", "amd64", id="amd64"),
+        pytest.param("EM_386", "ELFCLASS32", "ELFDATA2LSB", "i386", id="i386"),
+        pytest.param("EM_AARCH64", "ELFCLASS64", "ELFDATA2LSB", "arm64", id="arm64"),
+        pytest.param("EM_ARM", "ELFCLASS32", "ELFDATA2LSB", "armhf", id="armhf"),
+        pytest.param("EM_PPC64", "ELFCLASS64", "ELFDATA2LSB", "ppc64el", id="ppc64el"),
+        pytest.param("EM_PPC64", "ELFCLASS64", "ELFDATA2MSB", "ppc64", id="ppc64"),
+        pytest.param("EM_MIPS", "ELFCLASS32", "ELFDATA2LSB", "mipsel", id="mipsel"),
+        pytest.param("EM_MIPS", "ELFCLASS32", "ELFDATA2MSB", "mips", id="mips"),
+        pytest.param("EM_S390", "ELFCLASS64", "ELFDATA2MSB", "s390x", id="s390x"),
+        pytest.param("EM_RISCV", "ELFCLASS64", "ELFDATA2LSB", "riscv64", id="riscv64"),
+        pytest.param("x", "ELFCLASS64", "ELFDATA2LSB", "unknown", id="machine_unknown"),
+        pytest.param("EM_X86_64", "x", "ELFDATA2LSB", "unknown", id="class_unknown"),
+        pytest.param("EM_X86_64", "ELFCLASS64", "x", "unknown", id="arch_unknown"),
     ],
 )
 def test_get_elf_debian_arch(

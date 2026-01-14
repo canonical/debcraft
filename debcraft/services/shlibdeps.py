@@ -75,13 +75,13 @@ class ShlibdepsService(HelperService):
 
         for lib in lib_files:
             # Check if any dependency matches libs from this source
-            raw_deps = self._packaged_shlibs.get((lib.soname, lib.ver))
+            raw_deps = self._packaged_shlibs.get((lib.libname, lib.ver))
             if raw_deps and not _package_in_deps(package_name, raw_deps):
                 pkg_deps.add(raw_deps)
                 continue
 
             # Check dependency in /var/lib/dpkg/info/*.shlibs files
-            raw_deps = self._deb_info_shlibs.get((lib.soname, lib.ver))
+            raw_deps = self._deb_info_shlibs.get((lib.libname, lib.ver))
             if raw_deps and not _package_in_deps(package_name, raw_deps):
                 pkg_deps.add(raw_deps)
 
