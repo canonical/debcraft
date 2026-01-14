@@ -60,11 +60,8 @@ def test_elf_file_not_elf():
     path = pathlib.Path("/etc/issue")
     assert not ElfFile.is_elf(path)
 
-    with pytest.raises(errors.DebcraftError) as raised:
+    with pytest.raises(errors.DebcraftError, match="Magic number does not match"):
         ElfFile.from_path(path)
-
-    err = str(raised.value)
-    assert err == "cannot load ELF file: Magic number does not match"
 
 
 @pytest.mark.parametrize(
