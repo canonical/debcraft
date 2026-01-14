@@ -48,7 +48,7 @@ class ElfLibrary:
         return cls(soname, ver)
 
 
-@dataclass
+@dataclass(frozen=True)
 class ElfSymbol:
     """Representation of an ELF symbol."""
 
