@@ -17,14 +17,13 @@
 """Debcraft shlibdeps helper service."""
 
 import pathlib
-import subprocess
 from collections.abc import Iterator
 from typing import Any
 
 from craft_cli import emit
 
 from debcraft import errors
-from debcraft.elf import elf_utils
+from debcraft.elf import ElfLibrary, ElfSymbol, get_elf_files
 
 from .helper import HelperService
 
@@ -59,33 +58,30 @@ class ShlibdepsService(HelperService):
         **kwargs: Any,  # noqa: ARG002
     ) -> None:
         """Find shared library dependencies."""
-        primed_elf_files = elf_utils.get_elf_files(prime_dir)
+        primed_elf_files = get_elf_files(prime_dir)
         if not self._packaged_shlibs:
             self._packaged_shlibs = _read_packaged_shlibs(state_dir_map)
         if not self._deb_info_shlibs:
             self._deb_info_shlibs = _read_deb_info_shlibs(arch)
 
-        lib_files: set[str] = set()
-        undefined_symbols: set[str] = set()
+        lib_files: set[ElfLibrary] = set()
+        undefined_symbols: set[ElfSymbol] = set()
 
         for elf_file in primed_elf_files:
-            dependencies, symbols = _get_elf_dependencies(elf_file.path)
-            lib_files.update(dependencies)
-            undefined_symbols.update(symbols)
+            lib_files.update(elf_file.needed)
+            undefined_symbols.update(elf_file.symbols)
 
         pkg_deps: set[str] = set()
 
         for lib in lib_files:
-            soname, major = lib.split(".so.")
-
             # Check if any dependency matches libs from this source
-            raw_deps = self._packaged_shlibs.get((soname, major))
+            raw_deps = self._packaged_shlibs.get((lib.libname, lib.ver))
             if raw_deps and not _package_in_deps(package_name, raw_deps):
                 pkg_deps.add(raw_deps)
                 continue
 
             # Check dependency in /var/lib/dpkg/info/*.shlibs files
-            raw_deps = self._deb_info_shlibs.get((soname, major))
+            raw_deps = self._deb_info_shlibs.get((lib.libname, lib.ver))
             if raw_deps and not _package_in_deps(package_name, raw_deps):
                 pkg_deps.add(raw_deps)
 
@@ -139,22 +135,6 @@ def _parse_shlibs_files(shlibs_files: Iterator[pathlib.Path]) -> _SonameMap:
                 soname, maj, pkgdeps = _split_shlibs_line(line)
                 libmap[(soname, maj)] = pkgdeps
     return libmap
-
-
-def _get_elf_dependencies(binary: pathlib.Path) -> tuple[set[str], set[str]]:
-    output = subprocess.run(
-        ["readelf", "-d", binary], capture_output=True, text=True, check=True
-    )
-    sonames = set()
-    for line in output.stdout.splitlines():
-        if "Shared library:" in line:
-            lib = line.split("[")[1].split("]")[0]
-            sonames.add(lib)
-
-    # Symbol extraction and verification here.
-    symbols: set[str] = set()
-
-    return sonames, symbols
 
 
 def _split_shlibs_line(line: str) -> tuple[str, str, str]:

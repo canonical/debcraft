@@ -16,9 +16,12 @@
 #
 """ELF file handling."""
 
-from .elf_file import ElfFile, SonameCache
+from .elf_file import ElfFile, ElfLibrary, ElfSymbol
+from .elf_utils import get_elf_files
 
 __all__ = [
     "ElfFile",
-    "SonameCache",
+    "ElfLibrary",
+    "ElfSymbol",
+    "get_elf_files",
 ]
