@@ -27,11 +27,11 @@ from craft_platforms import BuildInfo
 from typing_extensions import Self
 
 from debcraft import models
-from debcraft.helpers import HelperGroup, PackagingHelpers
+from debcraft.helpers import PackagingHelpers
 from debcraft.services.lifecycle import Lifecycle
 
 
-class HelperRunner:
+class PackagingHelpersRunner:
     """Run debcraft helpers for all packages."""
 
     def __init__(
@@ -39,13 +39,12 @@ class HelperRunner:
         project: models.Project,
         build_info: BuildInfo,
         lifecycle: Lifecycle,
-        helpers: HelperGroup,
     ) -> None:
         self._project = project
         self._build_info = build_info
         self._lifecycle = lifecycle
-        self._helpers = helpers
         self._temp_dir = tempfile.TemporaryDirectory()
+        self._helpers = PackagingHelpers()
 
     def __enter__(self) -> Self:
         return self
@@ -114,15 +113,12 @@ class HelperService(AppService, ABC):
     ) -> None:
         super().__init__(app, services)
 
-    def packaging_helpers(self) -> HelperRunner:
+    def packaging_helpers(self) -> PackagingHelpersRunner:
         """Obtain a runner for packaging helpers."""
-        return self._helper_runner(PackagingHelpers())
-
-    def _helper_runner(self, helpers: HelperGroup) -> HelperRunner:
         project = cast(models.Project, self._services.get("project").get())
         build_info = self._services.get("build_plan").plan()[0]
         lifecycle = cast(Lifecycle, self._services.lifecycle)
-        return HelperRunner(project, build_info, lifecycle, helpers)
+        return PackagingHelpersRunner(project, build_info, lifecycle)
 
 
 def _get_architecture(package: models.Package, build_info: BuildInfo) -> str | None:

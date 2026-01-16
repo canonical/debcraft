@@ -20,38 +20,28 @@ from unittest.mock import call
 
 import craft_platforms
 import pytest
-from debcraft import models
-from debcraft.helpers import helpers
+from debcraft import errors, models
+from debcraft.helpers import md5sums
 from debcraft.services import helper
 
 
-class MyHelper(helpers.Helper):
-    def run(self, **kwargs):
-        pass
-
-
-class MyGroup(helpers.HelperGroup):
-    def _register(self):
-        self._register_helper("test", MyHelper)
-
-
-def test_helper_runner(
+def test_packaging_helpers_runner(
     mocker, tmp_path, default_project, project_service, build_plan_service
 ):
-    mock_run = mocker.patch.object(MyHelper, "run")
+    mock_run = mocker.patch.object(md5sums.Md5sums, "run")
     mocker.patch("debcraft.services.helper._get_architecture", return_value="arm64")
     lifecycle = mocker.MagicMock()
     lifecycle.get_prime_dir.return_value = tmp_path
 
-    my_group = MyGroup()
-    my_runner = helper.HelperRunner(
+    my_runner = helper.PackagingHelpersRunner(
         project=default_project,
         build_info=build_plan_service.plan()[0],
         lifecycle=lifecycle,
-        helpers=my_group,
     )
     with my_runner as runner:
-        runner.run("test", arg="foo")
+        runner.run("md5sums", arg="foo")
+        with pytest.raises(errors.DebcraftError, match="is not registered"):
+            runner.run("other")
 
     runner_tmp_path = pathlib.Path(runner._temp_dir.name)
 
