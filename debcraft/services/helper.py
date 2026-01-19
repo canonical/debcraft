@@ -101,6 +101,8 @@ class PackagingHelpersRunner:
             helper_run = getattr(helper, "run", None)
             if callable(helper_run):
                 helper_run(**common_kwargs)
+            else:
+                raise RuntimeError(f"Helper '{helper_name}' is not runnable")  # noqa: TRY004
 
 
 class HelperService(AppService, ABC):
