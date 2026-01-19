@@ -40,10 +40,9 @@ def test_packaging_helpers_runner(
     )
     with my_runner as runner:
         runner.run("md5sums", arg="foo")
+        runner_tmp_path = pathlib.Path(runner._temp_dir.name)
         with pytest.raises(errors.DebcraftError, match="is not registered"):
             runner.run("other")
-
-    runner_tmp_path = pathlib.Path(runner._temp_dir.name)
 
     assert mock_run.mock_calls == [
         call(
