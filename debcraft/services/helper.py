@@ -18,7 +18,6 @@
 
 import pathlib
 import tempfile
-from abc import ABC
 from typing import Any, cast
 
 from craft_application import AppService
@@ -105,7 +104,7 @@ class PackagingHelpersRunner:
                 raise RuntimeError(f"Helper '{helper_name}' is not runnable")  # noqa: TRY004
 
 
-class HelperService(AppService, ABC):
+class HelperService(AppService):
     """Debcraft base helper Service."""
 
     def packaging_helpers(self) -> PackagingHelpersRunner:
