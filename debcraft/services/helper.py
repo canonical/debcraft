@@ -21,7 +21,7 @@ import tempfile
 from abc import ABC
 from typing import Any, cast
 
-from craft_application import AppMetadata, AppService, ServiceFactory
+from craft_application import AppService
 from craft_cli import emit
 from craft_platforms import BuildInfo
 from typing_extensions import Self
@@ -105,13 +105,6 @@ class PackagingHelpersRunner:
 
 class HelperService(AppService, ABC):
     """Debcraft base helper Service."""
-
-    def __init__(  # pylint: disable=too-many-arguments
-        self,
-        app: AppMetadata,
-        services: ServiceFactory,
-    ) -> None:
-        super().__init__(app, services)
 
     def packaging_helpers(self) -> PackagingHelpersRunner:
         """Obtain a runner for packaging helpers."""
