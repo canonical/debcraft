@@ -17,7 +17,6 @@
 """Tests for debcraft's helpers subsystem."""
 
 import pytest
-from debcraft import errors
 from debcraft.helpers import helpers
 
 
@@ -39,5 +38,5 @@ def test_get_helper():
 
 def test_get_helper_error():
     group = MyGroup()
-    with pytest.raises(errors.DebcraftError, match="helper .* is not registered"):
+    with pytest.raises(ValueError, match="helper .* is not registered"):
         group.get_helper("does-not-exist")
