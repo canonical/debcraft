@@ -20,7 +20,7 @@ from unittest.mock import call
 
 import craft_platforms
 import pytest
-from debcraft import errors, models
+from debcraft import models
 from debcraft.helpers import md5sums
 from debcraft.services import helper
 
@@ -41,7 +41,7 @@ def test_packaging_helpers_runner(
     with my_runner as runner:
         runner.run("md5sums", arg="foo")
         runner_tmp_path = pathlib.Path(runner._temp_dir.name)
-        with pytest.raises(errors.DebcraftError, match="is not registered"):
+        with pytest.raises(ValueError, match="is not registered"):
             runner.run("other")
 
     assert mock_run.mock_calls == [
