@@ -18,8 +18,6 @@
 
 from abc import ABC, abstractmethod
 
-from debcraft import errors
-
 
 class Helper:
     """Debcraft helper base class."""
@@ -48,7 +46,7 @@ class HelperGroup(ABC):
         :returns: The instance of the named helper.
         """
         if name not in self._helper_class:
-            raise errors.DebcraftError(f"helper '{name}' is not registered.")
+            raise ValueError(f"helper '{name}' is not registered.")
 
         helper = self._helper.get(name)
         if not helper:
