@@ -21,8 +21,43 @@ from unittest.mock import call
 import craft_platforms
 import pytest
 from debcraft import models
-from debcraft.helpers import md5sums
+from debcraft.helpers import md5sums, strip
 from debcraft.services import helper
+
+
+def test_install_helpers_runner(
+    mocker, tmp_path, default_project, project_service, build_plan_service
+):
+    mock_run = mocker.patch.object(strip.Strip, "run")
+    lifecycle = mocker.MagicMock()
+    lifecycle.get_prime_dir.return_value = tmp_path
+
+    step_info = mocker.MagicMock()
+    step_info.part_build_dir = "build-dir"
+    step_info.part_install_dir = "install-dir"
+    step_info.part_name = "my-part"
+
+    my_runner = helper.InstallHelpersRunner(
+        project=default_project,
+        build_info=build_plan_service.plan()[0],
+        step_info=step_info,
+        lifecycle=lifecycle,
+    )
+    with my_runner as runner:
+        runner.run("strip", arg="foo")
+        with pytest.raises(ValueError, match="is not registered"):
+            runner.run("other")
+
+    assert mock_run.mock_calls == [
+        call(
+            step_info=step_info,
+            build_dir="build-dir",
+            install_dir="install-dir",
+            project=default_project,
+            part_name="my-part",
+            arg="foo",
+        )
+    ]
 
 
 def test_packaging_helpers_runner(
