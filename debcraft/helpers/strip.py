@@ -32,19 +32,19 @@ class Strip(Helper):
     """Debcraft strip helper.
 
     The strip helper will:
-    - Scan prime dir for ELF files
+    - Scan part install dir for ELF files
     - Split debug symbols into separate debug packages (not currently implemented)
     - Call the strip tool on the primed ELF files
     """
 
-    def run(self, *, prime_dir: pathlib.Path, **kwargs: Any) -> None:  # noqa: ARG002
+    def run(self, *, install_dir: pathlib.Path, **kwargs: Any) -> None:  # noqa: ARG002
         """Strip primed files in the given package.
 
         :param prime_dir: the directory containing the files to be stripped.
         """
-        primed_elf_files = elf_utils.get_elf_files(prime_dir)
+        installed_elf_files = elf_utils.get_elf_files(install_dir)
 
-        for elf_file in primed_elf_files:
+        for elf_file in installed_elf_files:
             try:
                 emit.progress(f"Strip binary: {elf_file.path!s}")
                 subprocess.run(["strip", "--strip-unneeded", elf_file.path], check=True)
