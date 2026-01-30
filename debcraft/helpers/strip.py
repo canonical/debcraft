@@ -38,9 +38,9 @@ class Strip(Helper):
     """
 
     def run(self, *, install_dir: pathlib.Path, **kwargs: Any) -> None:  # noqa: ARG002
-        """Strip primed files in the given package.
+        """Strip installed files in the given package.
 
-        :param prime_dir: the directory containing the files to be stripped.
+        :param install_dir: the directory containing the files to be stripped.
         """
         installed_elf_files = elf_utils.get_elf_files(install_dir)
 
