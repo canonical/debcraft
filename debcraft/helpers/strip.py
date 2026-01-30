@@ -34,7 +34,7 @@ class Strip(Helper):
     The strip helper will:
     - Scan part install dir for ELF files
     - Split debug symbols into separate debug packages (not currently implemented)
-    - Call the strip tool on the primed ELF files
+    - Call the strip tool on the installed ELF files
     """
 
     def run(self, *, install_dir: pathlib.Path, **kwargs: Any) -> None:  # noqa: ARG002
