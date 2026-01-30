@@ -4,6 +4,7 @@ description = "Pack up debs with the Crafting Experience"
 dynamic = ["version"]
 dependencies = [
     "craft-application>=5.4.0",
+    "craft-parts@git+https://github.com/cmatsuoka/craft-parts@refactor/mid-step-hooks",
     "zstandard>=0.25.0",
     "pyelftools>=0.32",
 ]

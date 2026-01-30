@@ -25,18 +25,17 @@ from .shlibdeps import Shlibdeps
 from .strip import Strip
 
 
-class BuildHelpers(HelperGroup):
+class InstallHelpers(HelperGroup):
     """Helpers used during build."""
 
     def _register(self) -> None:
-        pass
+        self._register_helper("strip", Strip)
 
 
 class PackagingHelpers(HelperGroup):
     """Helpers used during package creation."""
 
     def _register(self) -> None:
-        self._register_helper("strip", Strip)
         self._register_helper("md5sums", Md5sums)
         self._register_helper("makeshlibs", Makeshlibs)
         self._register_helper("shlibdeps", Shlibdeps)
@@ -45,7 +44,7 @@ class PackagingHelpers(HelperGroup):
 
 
 __all__ = [
-    "BuildHelpers",
     "HelperGroup",
+    "InstallHelpers",
     "PackagingHelpers",
 ]

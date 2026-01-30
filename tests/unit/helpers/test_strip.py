@@ -25,16 +25,16 @@ from debcraft.helpers import strip
 def test_run(mocker, tmp_path):
     fake_subprocess_run = mocker.patch("subprocess.run")
 
-    prime_dir = tmp_path / "prime"
-    prime_dir.mkdir()
+    install_dir = tmp_path / "install"
+    install_dir.mkdir()
     mocker.patch(
         "debcraft.elf.elf_utils.get_elf_files",
-        return_value=[ElfFile(path=prime_dir / "foo")],
+        return_value=[ElfFile(path=install_dir / "foo")],
     )
 
     helper = strip.Strip()
-    helper.run(prime_dir=prime_dir)
+    helper.run(install_dir=install_dir)
 
     assert fake_subprocess_run.mock_calls == [
-        call(["strip", "--strip-unneeded", prime_dir / "foo"], check=True)
+        call(["strip", "--strip-unneeded", install_dir / "foo"], check=True)
     ]
