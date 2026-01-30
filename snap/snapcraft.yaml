@@ -1,0 +1,104 @@
+name: debcraft
+version: git
+base: core24
+summary: A crafted experience for creating debs
+description: Deb creation tool
+confinement: classic
+grade: devel
+license: GPL-3.0
+compression: lzo
+
+platforms:
+  amd64:
+  arm64:
+  armhf:
+  riscv64:
+  s390x:
+  ppc64el:
+
+environment:
+  PATH: "$SNAP/libexec/debcraft:/snap/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+
+apps:
+  debcraft:
+    command: bin/python $SNAP/bin/debcraft
+
+parts:
+  git:
+    plugin: nil
+    stage-packages: [git]
+    build-attributes:
+      - enable-patchelf
+    prime:
+      - "-usr/bin"
+      - "-usr/share/doc"
+      - "-usr/share/man"
+      # perl is part of the core22 / core24
+      - "-usr/share/perl"
+      - "-usr/lib/x86_64-linux-gnu/perl"
+      - "-usr/lib/x86_64-linux-gnu/libperl*"
+      - "-usr/lib/x86_64-linux-gnu/libgdbm*"
+
+  debcraft-scripts:
+    source: snap/local
+    plugin: dump
+    organize:
+      craft.git: libexec/debcraft/craft.git
+      sitecustomize.py: lib/python3.12/site-packages/sitecustomize.py
+
+  debcraft-libs:
+    source: .
+    plugin: nil
+    build-attributes:
+      - enable-patchelf
+    stage-packages:
+      - python3-apt
+    organize:
+      "usr/lib/python3/dist-packages/*": "lib/python3.12/site-packages/"
+
+  debcraft:
+    source: .
+    plugin: python
+    build-attributes:
+      - enable-patchelf
+    stage-packages:
+      - apt
+      - apt-transport-https
+      - apt-utils
+      - libapt-pkg6.0t64
+      - libpython3.12-stdlib
+      - libpython3.12-minimal
+      - python3-minimal
+      - python3.12-minimal
+      - python3.12-venv
+      - libgit2-1.7
+      - libxml2
+      - libxslt1.1
+    build-packages:
+      - python3.12-dev
+      - python3-pip-whl
+      - libffi-dev
+      - pkg-config
+      - git
+      - libgit2-dev
+      - libxml2-dev
+      - libxslt1-dev
+    override-build: |
+      craftctl default
+      sed -i -e '1 s|^#!/.*|#!/snap/debcraft/current/bin/python -E|' $CRAFT_PART_INSTALL/bin/craftctl
+    organize:
+      bin/craftctl: libexec/debcraft/craftctl
+    prime:
+      - -usr/share/man
+      - -usr/share/lintian
+      - -usr/share/doc
+    after: [debcraft-libs]
+
+  debcraft-bytecode:
+    after: [debcraft, debcraft-scripts]
+    source: .
+    plugin: nil
+    override-prime: |
+      # Compile all Python files in the prime directory to bytecode.
+      python3 -m compileall --invalidation-mode checked-hash -j 0 -q "${CRAFT_PRIME}/lib/python3.12/"
+      python3 -m compileall --invalidation-mode checked-hash -j 0 -q "${CRAFT_PRIME}/usr/lib/python3.12/"
