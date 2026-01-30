@@ -20,20 +20,12 @@ from typing import Any, cast
 
 import craft_application
 import debcraft
-import debcraft.services.md5sums
+import debcraft.services.helper
 import debcraft.services.package
 import debcraft.services.project
 import pytest
 from debcraft import models, services
-from debcraft.services import (
-    gencontrol,
-    lifecycle,
-    makedeb,
-    makeshlibs,
-    md5sums,
-    shlibdeps,
-    strip,
-)
+from debcraft.services import lifecycle
 from typing_extensions import override
 
 
@@ -114,8 +106,8 @@ def fake_lifecycle_service_class(tmp_path, host_architecture):
 
 
 @pytest.fixture
-def fake_md5sums_service_class(tmp_path, host_architecture):
-    class FakeMd5sumsService(md5sums.Md5sumsService):
+def fake_helper_service_class(tmp_path, host_architecture):
+    class FakeHelperService(debcraft.services.helper.HelperService):
         def __init__(
             self,
             app: craft_application.AppMetadata,
@@ -123,72 +115,7 @@ def fake_md5sums_service_class(tmp_path, host_architecture):
         ):
             super().__init__(app, services)
 
-    return FakeMd5sumsService
-
-
-@pytest.fixture
-def fake_strip_service_class(tmp_path, host_architecture):
-    class FakeStripService(strip.StripService):
-        def __init__(
-            self,
-            app: craft_application.AppMetadata,
-            services: services.ServiceFactory,
-        ):
-            super().__init__(app, services)
-
-    return FakeStripService
-
-
-@pytest.fixture
-def fake_makeshlibs_service_class(tmp_path, host_architecture):
-    class FakeMakeshlibsService(makeshlibs.MakeshlibsService):
-        def __init__(
-            self,
-            app: craft_application.AppMetadata,
-            services: services.ServiceFactory,
-        ):
-            super().__init__(app, services)
-
-    return FakeMakeshlibsService
-
-
-@pytest.fixture
-def fake_shlibdeps_service_class(tmp_path, host_architecture):
-    class FakeShlibdepsService(shlibdeps.ShlibdepsService):
-        def __init__(
-            self,
-            app: craft_application.AppMetadata,
-            services: services.ServiceFactory,
-        ):
-            super().__init__(app, services)
-
-    return FakeShlibdepsService
-
-
-@pytest.fixture
-def fake_gencontrol_service_class(tmp_path, host_architecture):
-    class FakeGencontrolService(gencontrol.GencontrolService):
-        def __init__(
-            self,
-            app: craft_application.AppMetadata,
-            services: services.ServiceFactory,
-        ):
-            super().__init__(app, services)
-
-    return FakeGencontrolService
-
-
-@pytest.fixture
-def fake_makedeb_service_class(tmp_path, host_architecture):
-    class FakeMakedebService(makedeb.MakedebService):
-        def __init__(
-            self,
-            app: craft_application.AppMetadata,
-            services: services.ServiceFactory,
-        ):
-            super().__init__(app, services)
-
-    return FakeMakedebService
+    return FakeHelperService
 
 
 @pytest.fixture
@@ -196,12 +123,7 @@ def default_factory(
     default_project,
     fake_project_service_class,
     fake_lifecycle_service_class,
-    fake_strip_service_class,
-    fake_md5sums_service_class,
-    fake_makeshlibs_service_class,
-    fake_shlibdeps_service_class,
-    fake_gencontrol_service_class,
-    fake_makedeb_service_class,
+    fake_helper_service_class,
     project_path: pathlib.Path,
 ) -> services.ServiceFactory:
     services.ServiceFactory.register(
@@ -209,12 +131,7 @@ def default_factory(
     )
     services.ServiceFactory.register("project", fake_project_service_class)
     services.ServiceFactory.register("lifecycle", fake_lifecycle_service_class)
-    services.ServiceFactory.register("strip", fake_strip_service_class)
-    services.ServiceFactory.register("md5sums", fake_md5sums_service_class)
-    services.ServiceFactory.register("makeshlibs", fake_makeshlibs_service_class)
-    services.ServiceFactory.register("shlibdeps", fake_shlibdeps_service_class)
-    services.ServiceFactory.register("gencontrol", fake_gencontrol_service_class)
-    services.ServiceFactory.register("makedeb", fake_makedeb_service_class)
+    services.ServiceFactory.register("helper", fake_helper_service_class)
     service_factory = services.ServiceFactory(app=debcraft.METADATA)
     service_factory.update_kwargs("project", project_dir=project_path)
     return service_factory
@@ -236,5 +153,5 @@ def project_service(default_factory) -> debcraft.services.project.Project:
 
 
 @pytest.fixture
-def md5sums_service(default_factory) -> debcraft.services.md5sums.Md5sumsService:
-    return cast(debcraft.services.md5sums.Md5sumsService, default_factory.md5sums)
+def helper_service(default_factory) -> debcraft.services.helper.HelperService:
+    return cast(debcraft.services.helper.HelperService, default_factory.helper)

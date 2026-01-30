@@ -1,6 +1,6 @@
 # This file is part of debcraft.
 #
-# Copyright 2025 Canonical Ltd.
+# Copyright 2025-2026 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify it
 # under the terms of the GNU General Public License version 3, as published
@@ -25,23 +25,10 @@ def register_services() -> None:
     ServiceFactory.register("package", "Package", module="debcraft.services.package")
     ServiceFactory.register("project", "Project", module="debcraft.services.project")
     ServiceFactory.register(
+        "helper", "HelperService", module="debcraft.services.helper"
+    )
+    ServiceFactory.register(
         "lifecycle", "Lifecycle", module="debcraft.services.lifecycle"
-    )
-    ServiceFactory.register("strip", "StripService", module="debcraft.services.strip")
-    ServiceFactory.register(
-        "md5sums", "Md5sumsService", module="debcraft.services.md5sums"
-    )
-    ServiceFactory.register(
-        "makeshlibs", "MakeshlibsService", module="debcraft.services.makeshlibs"
-    )
-    ServiceFactory.register(
-        "shlibdeps", "ShlibdepsService", module="debcraft.services.shlibdeps"
-    )
-    ServiceFactory.register(
-        "gencontrol", "GencontrolService", module="debcraft.services.gencontrol"
-    )
-    ServiceFactory.register(
-        "makedeb", "MakedebService", module="debcraft.services.makedeb"
     )
 
 

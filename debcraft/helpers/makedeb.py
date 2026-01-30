@@ -27,13 +27,13 @@ from craft_cli import emit
 
 from debcraft import models
 
-from .helper import HelperService
+from .helpers import Helper
 
 _ZSTD_COMPRESSION_LEVEL = 3
 
 
-class MakedebService(HelperService):
-    """Debcraft makedeb helper service."""
+class Makedeb(Helper):
+    """Debcraft makedeb helper."""
 
     def run(
         self,
