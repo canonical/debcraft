@@ -64,7 +64,7 @@ class InstallHelpersRunner:
             return
 
         helper = self._helpers.get_helper(helper_name)
-        emit.debug(f"run {helper_name} helper for all packages...")
+        emit.debug(f"Running {helper_name} helper for all packages...")
 
         common_kwargs = {
             "step_info": self._step_info,
