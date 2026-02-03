@@ -17,14 +17,31 @@
 """Debcraft Lifecycle Service."""
 
 from pathlib import Path
+from typing import TYPE_CHECKING, cast
 
 from craft_application import LifecycleService
+from craft_parts import StepInfo, callbacks
+from craft_parts.steps import Step
+from typing_extensions import override
 
-from debcraft import errors
+from debcraft import errors, models
+
+if TYPE_CHECKING:
+    from debcraft.services.helper import HelperService
 
 
 class Lifecycle(LifecycleService):
     """Debcraft specialization of the Lifecycle Service."""
+
+    @override
+    def setup(self) -> None:
+        """Set up the lifecycle service."""
+        callbacks.register_step(
+            self._run_install_helpers,
+            step_list=[Step.BUILD],
+            hook_point=callbacks.HookPoint.PRE_ORGANIZE,
+        )
+        super().setup()
 
     def get_prime_dir(self, package: str | None = None) -> Path:
         """Get the prime directory path for the default prime dir or a package.
@@ -60,3 +77,15 @@ class Lifecycle(LifecycleService):
                 package_prime_dirs[package] = prime_dir
 
         return package_prime_dirs
+
+    def _run_install_helpers(self, step_info: StepInfo) -> bool:
+        project = cast(models.Project, self._services.get("project").get())
+        if not project.parts:
+            return True
+
+        helper_service = cast("HelperService", self._services.helper)
+
+        with helper_service.install_helpers(step_info) as helper:
+            helper.run("strip")
+
+        return True

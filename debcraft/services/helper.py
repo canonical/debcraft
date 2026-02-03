@@ -22,16 +22,71 @@ from typing import Any, cast
 
 from craft_application import AppService
 from craft_cli import emit
+from craft_parts import StepInfo
 from craft_platforms import BuildInfo
 from typing_extensions import Self
 
 from debcraft import models
-from debcraft.helpers import PackagingHelpers
+from debcraft.helpers import InstallHelpers, PackagingHelpers
 from debcraft.services.lifecycle import Lifecycle
 
 
+class InstallHelpersRunner:
+    """Run debcraft install helpers."""
+
+    def __init__(
+        self,
+        project: models.Project,
+        build_info: BuildInfo,
+        step_info: StepInfo,
+        lifecycle: Lifecycle,
+    ) -> None:
+        self._project = project
+        self._build_info = build_info
+        self._step_info = step_info
+        self._lifecycle = lifecycle
+        self._helpers = InstallHelpers()
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, *exc: object) -> None:
+        pass
+
+    def run(self, helper_name: str, **kwargs: Any) -> None:
+        """Run the specified helper.
+
+        :param helper_name: The name of the helper to run.
+        :param kwargs: Optional arguments to the helper.
+        """
+        project = self._project
+        if not project.packages:
+            return
+
+        helper = self._helpers.get_helper(helper_name)
+        emit.debug(f"Running {helper_name} helper for all packages...")
+
+        common_kwargs = {
+            "step_info": self._step_info,
+            "part_name": self._step_info.part_name,
+            "project": project,
+            "build_dir": self._step_info.part_build_dir,
+            "install_dir": self._step_info.part_install_dir,
+        }
+        common_kwargs |= kwargs
+
+        emit.debug(
+            f"Running {helper_name} helper for part '{self._step_info.part_name}'"
+        )
+        helper_run = getattr(helper, "run", None)
+        if callable(helper_run):
+            helper_run(**common_kwargs)
+        else:
+            raise RuntimeError(f"Helper '{helper_name}' is not runnable")  # noqa: TRY004
+
+
 class PackagingHelpersRunner:
-    """Run debcraft helpers for all packages."""
+    """Run debcraft packaging helpers for all packages."""
 
     def __init__(
         self,
@@ -106,6 +161,13 @@ class PackagingHelpersRunner:
 
 class HelperService(AppService):
     """Debcraft base helper Service."""
+
+    def install_helpers(self, step_info: StepInfo) -> InstallHelpersRunner:
+        """Obtain a runner for install helpers."""
+        project = cast(models.Project, self._services.get("project").get())
+        build_info = self._services.get("build_plan").plan()[0]
+        lifecycle = cast(Lifecycle, self._services.lifecycle)
+        return InstallHelpersRunner(project, build_info, step_info, lifecycle)
 
     def packaging_helpers(self) -> PackagingHelpersRunner:
         """Obtain a runner for packaging helpers."""
