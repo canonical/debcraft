@@ -75,7 +75,9 @@ class InstallHelpersRunner:
         }
         common_kwargs |= kwargs
 
-        emit.debug(f"Running {helper_name} helper for part '{self._step_info.part_name}'")
+        emit.debug(
+            f"Running {helper_name} helper for part '{self._step_info.part_name}'"
+        )
         helper_run = getattr(helper, "run", None)
         if callable(helper_run):
             helper_run(**common_kwargs)
