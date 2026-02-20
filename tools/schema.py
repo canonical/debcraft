@@ -20,6 +20,5 @@ import json
 
 from debcraft.models.project import Project
 
-
 if __name__ == "__main__":
     print(json.dumps(Project.model_json_schema(), indent=2))
