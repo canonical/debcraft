@@ -1,0 +1,10 @@
+name: debcraft-explicit-platforms
+maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+version: 0
+
+platforms:
+  amd64:
+  arm64:
+  ppc64el:
+  riscv64:
+  s390x:

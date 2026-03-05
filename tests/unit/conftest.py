@@ -77,7 +77,9 @@ def fake_project_service_class(
         def set(self, value: models.Project) -> None:
             """Set the project model. Only for use during testing!"""
             self._project_model = value
-            self._platform = next(iter(value.platforms))
+            self._platform = next(
+                iter(value.platforms)  # pyright: ignore[reportCallIssue,reportArgumentType]
+            )
             self._build_for = value.platforms[self._platform].build_for[0]  # type: ignore[reportOptionalSubscript]
 
     return FakeProjectService
