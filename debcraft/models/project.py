@@ -77,7 +77,7 @@ class Project(models.Project):
     original_maintainer: str | None = None
     uploaders: list[str] | None = None
 
-    platforms: PlatformsDict | None = pydantic.Field(
+    platforms: PlatformsDict | None = pydantic.Field(  # type: ignore[assignment]
         default=None,
         description="Determines which architectures the project builds and runs on.",
         examples=[
