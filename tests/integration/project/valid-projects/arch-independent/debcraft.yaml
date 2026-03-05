@@ -1,0 +1,8 @@
+name: debcraft-explicit-platforms
+maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+version: 0
+
+platforms:
+  all:
+    # Workaround for https://github.com/canonical/debcraft/issues/92
+    build-on: [amd64, arm64, ppc64el, riscv64, s390x]
