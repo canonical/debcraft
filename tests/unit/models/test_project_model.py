@@ -100,7 +100,7 @@ def test_adopt_info_valid_part_name_error(default_project_raw):
         ),
     ],
 )
-def test_default_package_name(
+def test_default_partition(
     default_project_raw, project_name, extra_packages, partitions
 ):
     default_project_raw["name"] = project_name
