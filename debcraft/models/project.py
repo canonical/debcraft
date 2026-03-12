@@ -138,11 +138,18 @@ class PackagesProject(models.CraftBaseModel, extra="ignore"):
     def get_partitions(self) -> list[str] | None:
         """Get a list of partitions based on the project's packages.
 
-        :returns: A list of packages formatted as ['default', 'package/<name>', ...]
+        :returns: A list of partitions formatted as ['default', 'package/<name>', ...].
+           If a package has the same name as the project, it will use the default
+           partition.
         """
-        partitions = ["default"]
+        if self.packages and self.name in self.packages:
+            partitions = [f"package/{self.name}"]
+        else:
+            partitions = ["default"]
 
         if self.packages:
-            partitions.extend([f"package/{name}" for name in self.packages])
+            partitions.extend(
+                [f"package/{name}" for name in self.packages if name != self.name]
+            )
 
         return partitions
