@@ -139,7 +139,7 @@ class PackagesProject(models.CraftBaseModel, extra="ignore"):
         """Get a list of partitions based on the project's packages.
 
         :returns: A list of partitions formatted as ['default', 'package/<name>', ...].
-           If a package has the same name name as the project, it will use the default
+           If a package has the same name as the project, it will use the default
            partition.
         """
         if self.packages and self.name in self.packages:
