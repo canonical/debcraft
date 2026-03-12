@@ -78,3 +78,33 @@ def test_adopt_info_valid_part_name_error(default_project_raw):
         ValueError, match="'adopt-info' field must refer to the name of a part."
     ):
         project.Project.model_validate(default_project_raw)
+
+
+@pytest.mark.parametrize(
+    ("project_name", "extra_packages", "partitions"),
+    [
+        pytest.param(
+            "myproject", {}, ["default", "package/package-1"], id="no extra package"
+        ),
+        pytest.param(
+            "myproject",
+            {"myproject": {"version": "1"}},
+            ["package/myproject", "package/package-1"],
+            id="package with same name",
+        ),
+        pytest.param(
+            "myproject",
+            {"other": {"version": "1"}},
+            ["default", "package/package-1", "package/other"],
+            id="package with different name",
+        ),
+    ],
+)
+def test_default_partition(
+    default_project_raw, project_name, extra_packages, partitions
+):
+    default_project_raw["name"] = project_name
+    for name, value in extra_packages.items():
+        default_project_raw["packages"][name] = value
+    pprj = project.PackagesProject.unmarshal(default_project_raw)
+    assert pprj.get_partitions() == partitions
