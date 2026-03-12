@@ -13,10 +13,6 @@ original-maintainer: Maintainers of libpng1.6 packages <libpng1.6@packages.debia
 
 section: libs
 
-# to be removed, see https://github.com/canonical/debcraft/issues/52
-platforms:
-  amd64:
-
 packages:
   libpng16-16t64:
     provides:

@@ -60,10 +60,6 @@ class Project(services.ProjectService):
         architecture and then enables all architectures without cross-compilation.
         """
         return {
-            "all": {
-                "build-on": sorted(craft_platforms.DebianArchitecture),
-                "build-for": ["all"],
-            },
             **{
                 architecture.value: {
                     "build-on": [architecture.value],
