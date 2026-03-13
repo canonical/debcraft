@@ -63,3 +63,7 @@ class Package(services.PackageService):
             version=cast(str, project.version),
             architecture=build_plan.build_for,
         )
+
+    @override
+    def write_metadata(self, path: pathlib.Path) -> None:
+        pass

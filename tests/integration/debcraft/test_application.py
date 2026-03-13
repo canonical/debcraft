@@ -18,7 +18,6 @@
 
 import subprocess
 from textwrap import dedent
-from typing import cast
 
 import craft_application
 import craft_parts
@@ -98,22 +97,14 @@ def test_debcraft_pack_clean(monkeypatch, tmp_path, host_architecture: str):
 
     result = app.run()
 
-    project = app.services.get("project").get()
-
     assert result == 0
     assert (tmp_path / "prime").exists()
     assert (tmp_path / "parts").exists()
     assert (tmp_path / "stage").exists()
 
     metadata_file = tmp_path / "prime/metadata.yaml"
-    assert metadata_file.exists()
-    metadata = models.Metadata.from_yaml_file(metadata_file)
-    project = cast(models.Project, app.services.get("project").get())
-    check_metadata(
-        metadata=metadata,
-        project=project,
-        arch=host_architecture,
-    )
+    assert metadata_file.exists() is False
+
     packed_asset = tmp_path / f"package-1_1.23_{host_architecture}.deb"
     assert packed_asset.exists()
 
