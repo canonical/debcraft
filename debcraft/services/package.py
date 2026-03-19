@@ -44,6 +44,7 @@ class Package(services.PackageService):
         debs: list[pathlib.Path] = []
 
         with helper_service.packaging_helpers() as helper:
+            helper.run("compress")
             helper.run("md5sums")
             helper.run("makeshlibs")
             helper.run("shlibdeps")
