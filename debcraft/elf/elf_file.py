@@ -1,6 +1,6 @@
 #  This file is part of debcraft.
 #
-#  Copyright 2016-2025 Canonical Ltd.
+#  Copyright 2016-2026 Canonical Ltd.
 #
 #  This program is free software: you can redistribute it and/or modify it
 #  under the terms of the GNU General Public License version 3, as
@@ -17,6 +17,7 @@
 """Helpers to parse and handle ELF binary files."""
 
 import pathlib
+import subprocess
 from dataclasses import dataclass, field
 
 from elftools.common.exceptions import ELFError
@@ -48,14 +49,6 @@ class ElfLibrary:
         return cls(libname, ver)
 
 
-@dataclass(frozen=True)
-class ElfSymbol:
-    """Representation of an ELF symbol."""
-
-    name: str
-    minver: str
-
-
 @dataclass
 class ElfFile:
     """ELF files."""
@@ -66,7 +59,7 @@ class ElfFile:
     ver: str = ""
     arch: str = ""
     needed: set[ElfLibrary] = field(default_factory=set)
-    symbols: set[ElfSymbol] = field(default_factory=set)
+    symbols: set[str] = field(default_factory=set)
 
     @classmethod
     def is_elf(cls, path: pathlib.Path) -> bool:
@@ -118,6 +111,8 @@ class ElfFile:
                     elf_data.libname = elf_lib.libname
                     elf_data.ver = elf_lib.ver
 
+            elf_data.symbols = _read_undefined_symbols(path)
+
         return elf_data
 
 
@@ -141,3 +136,22 @@ def _get_elf_debian_arch(elf_file: elffile.ELFFile) -> str:
     ei_data = elf_file.header["e_ident"]["EI_DATA"]
 
     return _ELF_ARCH_MAP.get((machine, ei_class, ei_data), "unknown")
+
+
+def _read_undefined_symbols(path: pathlib.Path) -> set[str]:
+    symbols = set()
+
+    try:
+        output = subprocess.run(
+            ["nm", "-uD", path], capture_output=True, text=True, check=True
+        )
+    except subprocess.CalledProcessError as err:
+        raise errors.DebcraftError(f"error running nm on {path}: {err.stderr}")
+
+    for line in output.stdout.splitlines():
+        parts = line.split()
+        if not parts:
+            continue
+        symbols.add(line[-1])
+
+    return symbols
