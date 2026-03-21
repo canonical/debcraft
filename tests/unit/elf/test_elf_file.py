@@ -28,7 +28,7 @@ from debcraft.elf.elf_file import _get_elf_debian_arch
 from elftools.elf import elffile
 
 if platform.machine() == "aarch64":
-    EXTRA_LIBRARY = {ElfLibrary("ld-linux-aarch64", "1")}
+    EXTRA_LIBRARY = {ElfLibrary("ld-linux-aarch64.so.1", "ld-linux-aarch64", "1")}
 else:
     EXTRA_LIBRARY = set()
 
@@ -44,14 +44,14 @@ def _lib_triplet() -> pathlib.Path:
             _lib_triplet() / "libdl.so.2",
             "libdl",
             "2",
-            {ElfLibrary("libc", "6")},
+            {ElfLibrary("libc.so.6", "libc", "6")},
             id="with_library",
         ),
         pytest.param(
             "/bin/gzip",
             "",
             "",
-            {ElfLibrary("libc", "6")} | EXTRA_LIBRARY,
+            {ElfLibrary("libc.so.6", "libc", "6")} | EXTRA_LIBRARY,
             id="with_binary",
         ),
     ],
@@ -65,7 +65,7 @@ def test_elf_file(filename: str, libname: str, ver: str, needed: set[ElfLibrary]
     assert elf_file.arch == get_host_architecture()
     assert elf_file.libname == libname
     assert elf_file.ver == ver
-    assert elf_file.needed == needed
+    assert set(elf_file.needed) == needed
 
 
 def test_elf_file_not_elf():
