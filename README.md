@@ -8,16 +8,30 @@ A _crafted experience_ for creating debs. This _remains_ an experimental project
 
 ## Basic usage
 
-Running `debcraft pack` on a git-ubuntu managed repository will _pack_ a deb and the debsource.
+Debcraft's build configuration is stored in a project file called `debcraft.yaml`. It
+tells Debcraft how to build the upstream source, fill metadata, and package generated
+files in binary deb files.
+
+From the root of the upstream source, Debcraft creates a minimal debcraft.yaml with:
+
+```bash
+debcraft init
+```
+
+Edit the file to add packages, build instructions and metadata information to the
+project file. After that, create binary deb packages with:
+
+```bash
+debcraft pack
+```
 
 ## Installation
 
-> Debcraft is yet to support an installation method, the following shall
-> be valid once it does.
+Install the current development version with:
 
-Any snap supported environment is supported, to install run
-
-    snap install debcraft
+```bash
+snap install debcraft --classic --edge
+```
 
 ## Documentation
 
