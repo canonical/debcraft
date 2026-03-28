@@ -144,7 +144,7 @@ def _read_undefined_symbols(path: pathlib.Path) -> set[str]:
     symbols = set()
 
     try:
-        output = subprocess.run(
+        res = subprocess.run(
             ["nm", "-uD", path], capture_output=True, text=True, check=True
         )
     except subprocess.CalledProcessError as err:
@@ -154,9 +154,9 @@ def _read_undefined_symbols(path: pathlib.Path) -> set[str]:
             "required tool 'nm' not found on PATH; install the 'binutils' package"
         )
 
-    for line in output.stdout.splitlines():
-        parts = line.split()
-        if not parts:
+    for line in res.stdout.splitlines():
+        parts = line.strip().split()
+        if not parts or parts[0] != "U":
             continue
         symbols.add(parts[-1])
 

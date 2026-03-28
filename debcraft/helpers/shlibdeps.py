@@ -69,7 +69,9 @@ class _LibraryMap:
     def _get_soname_to_path() -> dict[str, str]:
         """Run ldconfig -p to obtain the current linker cache."""
         try:
-            out = subprocess.check_output(["ldconfig", "-p"], text=True)
+            res = subprocess.run(
+                ["ldconfig", "-p"], capture_output=True, text=True, check=True
+            )
         except subprocess.CalledProcessError as err:
             raise errors.DebcraftError(
                 f"ldconfig failed with exit code {err.returncode}"
@@ -79,7 +81,7 @@ class _LibraryMap:
 
         mapping: dict[str, str] = {}
 
-        for line in out.splitlines():
+        for line in res.stdout.splitlines():
             parts = line.strip().split(" => ")
             if len(parts) > 1:
                 soname, path = parts[0].split(" ", 1)[0], parts[1]

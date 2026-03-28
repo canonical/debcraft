@@ -23,7 +23,7 @@ import pytest
 import pytest_mock
 from craft_application.util import get_host_architecture
 from debcraft import errors, util
-from debcraft.elf import ElfFile, ElfLibrary
+from debcraft.elf import ElfFile, ElfLibrary, elf_file
 from debcraft.elf.elf_file import _get_elf_debian_arch
 from elftools.elf import elffile
 
@@ -126,3 +126,29 @@ def test_get_elf_debian_arch(
 
     debian_arch = _get_elf_debian_arch(elf_file)
     assert debian_arch == arch
+
+
+@pytest.fixture
+def fake_nm_output() -> str:
+    return (
+        "                 U LZ4_versionString\n"
+        "                 w _ITM_deregisterTMCloneTable\n"
+        "                 w _ITM_registerTMCloneTable\n"
+        "                 U __assert_fail@GLIBC_2.2.5\n"
+        "                 w __cxa_finalize@GLIBC_2.2.5\n"
+    )
+
+
+def test_read_undefined_symbols(mocker, fake_nm_output):
+    mock_res = mocker.MagicMock()
+    mock_res.returncode = 0
+    mock_res.stdout = fake_nm_output
+
+    mock_run = mocker.patch("debcraft.elf.elf_file.subprocess.run")
+    mock_run.return_value = mock_res
+
+    symbols = elf_file._read_undefined_symbols("/some/path")
+    assert sorted(symbols) == [
+        "LZ4_versionString",
+        "__assert_fail@GLIBC_2.2.5",
+    ]

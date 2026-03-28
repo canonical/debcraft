@@ -42,6 +42,43 @@ def fake_library_map(mocker) -> shlibdeps._LibraryMap:
     return libmap
 
 
+@pytest.fixture
+def fake_ldconfig_output() -> str:
+    return (
+        "99 libs found in cache `/etc/ld.so.cache'\n"
+        "\tlibfoo.so.1 (libc6,x86-64) => /usr/lib/x86_64-linux-gnu/libfoo.so.1.0\n"
+        "\tlibbar.so.2 (libc6,x86-64) => /lib/x86_64-linux-gnu/libbar.so.2.0\n"
+        "\tlibbaz.so.3 (libc6,x86-64) => /usr/lib/libbaz.so.3\n"
+    )
+
+
+def test_librarymap(mocker, tmp_path, fake_ldconfig_output):
+    libfoo_list = tmp_path / "libfoo1:amd64.list"
+    libfoo_list.write_text("/usr/lib/x86_64-linux-gnu/libfoo.so.1.0\n")
+
+    libbar_list = tmp_path / "libbar2:amd64.list"
+    libbar_list.write_text("/bin/bar\n/usr/lib/x86_64-linux-gnu/libbar.so.2.0\n")
+
+    libbaz_list = tmp_path / "libbaz3-1t64:amd64.list"
+    libbaz_list.write_text("/usr/lib/libbaz.so.3\n")
+
+    mock_res = mocker.MagicMock()
+    mock_res.returncode = 0
+    mock_res.stdout = fake_ldconfig_output
+
+    mocker.patch("debcraft.helpers.shlibdeps._DPKG_INFO_DIR", tmp_path)
+    mock_run = mocker.patch("debcraft.helpers.shlibdeps.subprocess.run")
+    mock_run.return_value = mock_res
+
+    libmap = shlibdeps._LibraryMap(arch="amd64")
+
+    assert libmap.soname_to_package == {
+        "libfoo.so.1": "libfoo1",
+        "libbar.so.2": "libbar2",
+        "libbaz.so.3": "libbaz3-1t64",
+    }
+
+
 def test_sonamemap_load_packaged_shlibs(mocker, tmp_path, fake_library_map):
     shlibs_file = tmp_path / "libssh2-1t64:amd64.shlibs"
     shlibs_file.write_text(_SHLIBS_CONTENT)
