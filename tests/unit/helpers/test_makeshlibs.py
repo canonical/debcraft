@@ -16,11 +16,19 @@
 
 """Tests for debcraft's makeshlibs helper."""
 
+import pytest
 from debcraft.elf import ElfFile
 from debcraft.helpers import makeshlibs
 
 
-def test_run(mocker, tmp_path, default_project):
+@pytest.mark.parametrize(
+    ("arch", "create_files"),
+    [
+        pytest.param("s390x", True, id="native-arch"),
+        pytest.param("riscv64", False, id="foreign-arch"),
+    ],
+)
+def test_run(mocker, tmp_path, default_project, arch, create_files):
     prime_dir = tmp_path / "prime"
     control_dir = tmp_path / "control"
     state_dir = tmp_path / "state"
@@ -33,7 +41,7 @@ def test_run(mocker, tmp_path, default_project):
         "debcraft.helpers.makeshlibs.get_elf_files",
         return_value=[
             ElfFile(
-                path=prime_dir / "libfoo.so.5", libname="libfoo", ver="5", arch="s390x"
+                path=prime_dir / "libfoo.so.5", libname="libfoo", ver="5", arch=arch
             )
         ],
     )
@@ -48,5 +56,12 @@ def test_run(mocker, tmp_path, default_project):
         package_name="package-1",
     )
 
-    content = (control_dir / "shlibs").read_text()
-    assert content == "libfoo 5 package-1 (>= 2.0)\n"
+    shlibs_file = control_dir / "shlibs"
+    triggers_file = control_dir / "triggers"
+
+    if create_files:
+        assert shlibs_file.read_text() == "libfoo 5 package-1 (>= 2.0)\n"
+        assert triggers_file.read_text() == "activate-noawait ldconfig\n"
+    else:
+        assert not shlibs_file.exists()
+        assert not triggers_file.exists()
