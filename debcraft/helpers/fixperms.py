@@ -21,6 +21,8 @@ import os
 import pathlib
 from typing import Any
 
+from craft_cli import emit
+
 from .helpers import Helper
 
 # Patterns from dh_fixperms
@@ -89,11 +91,16 @@ class Fixperms(Helper):
                 entry.chmod(0o755)
             elif entry.is_file():
                 rel_path = entry.relative_to(prime_dir)
-                mode = _get_file_mode(rel_path)
-                entry.chmod(mode)
+                mode = entry.stat().st_mode & 0o7777
+                new_mode = _get_normalized_file_mode(rel_path)
+                if mode != new_mode:
+                    emit.debug(
+                        f"fixperms: change {rel_path!s} permissions from {mode:0>3o} to {new_mode:0>3o}"
+                    )
+                    entry.chmod(mode)
 
 
-def _get_file_mode(rel_path: pathlib.Path) -> int:
+def _get_normalized_file_mode(rel_path: pathlib.Path) -> int:
     filename = rel_path.name
 
     if any(fnmatch.fnmatch(rel_path.as_posix(), p) for p in _MODE_0755_NODEJS_PATTERNS):
