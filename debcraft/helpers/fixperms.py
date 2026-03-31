@@ -97,7 +97,7 @@ class Fixperms(Helper):
                     emit.debug(
                         f"fixperms: change {rel_path!s} permissions from {mode:0>3o} to {new_mode:0>3o}"
                     )
-                    entry.chmod(mode)
+                    entry.chmod(new_mode)
 
 
 def _get_normalized_file_mode(rel_path: pathlib.Path) -> int:
