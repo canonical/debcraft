@@ -42,6 +42,9 @@ class Md5sums(Helper):
         output_file = control_dir / "md5sums"
         with output_file.open("w") as out:
             for file in prime_dir.rglob("*"):
+                if file.is_symlink():
+                    continue
+
                 if file.is_file():
                     checksum = _md5sum(file)
                     relpath = file.relative_to(prime_dir)
