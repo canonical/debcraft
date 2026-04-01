@@ -8,7 +8,7 @@
 
 ## Basic usage
 
-Debcraft's build configuration is stored in a project file called `debcraft.yaml`. It
+Debcraft stores its build configuration in a project file called `debcraft.yaml`. It
 tells Debcraft how to build the upstream source, fill metadata, and package generated
 files in binary deb files.
 
