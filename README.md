@@ -4,7 +4,7 @@
 
 # Debcraft
 
-A _crafted experience_ for creating debs. This _remains_ an experimental project.
+**Debcraft** is a command-line tool for creating debs, which are the traditional package format for Debian-based Linux distros like Ubuntu. Using the same craft framework and libraries as tools like Snapcraft, Debcraft gives package maintainers auto-created clean build containers and a friendly YAML syntax, among other benefits.
 
 ## Basic usage
 
