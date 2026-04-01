@@ -39,6 +39,9 @@ There is yet to be any documentation for Debcraft as it is in early design.
 
 ## Community and support
 
+Ask your questions about Debcraft and what's on the horizon, and see who's working on
+what in the [Debcraft Matrix channel](https://matrix.to/#/!A7c56rXV6qlYhxp9mZUqzri_eykG1WEWpb035uIGNME).
+
 You can report any issues or bugs on the project's [GitHub
 repository](https://github.com/canonical/debcraft/issues).
 
