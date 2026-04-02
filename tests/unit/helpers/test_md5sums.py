@@ -29,6 +29,9 @@ def test_run(tmp_path):
     primed_file = prime_dir / "foo"
     primed_file.write_text("hello world")
 
+    primed_symlink = prime_dir / "bar"
+    primed_symlink.symlink_to("foo")
+
     helper = md5sums.Md5sums()
     helper.run(prime_dir=prime_dir, control_dir=control_dir)
 
