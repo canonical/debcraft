@@ -147,7 +147,7 @@ def test_read_undefined_symbols(mocker, fake_nm_output):
     mock_run = mocker.patch("debcraft.elf.elf_file.subprocess.run")
     mock_run.return_value = mock_res
 
-    symbols = elf_file._read_undefined_symbols("/some/path")
+    symbols = elf_file._read_undefined_symbols(pathlib.Path("/some/path"))
     assert sorted(symbols) == [
         "LZ4_versionString",
         "__assert_fail@GLIBC_2.2.5",
