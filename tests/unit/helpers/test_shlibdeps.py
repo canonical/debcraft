@@ -176,3 +176,73 @@ def test_run(mocker, tmp_path):
     shlibs_file = tmp_path / "shlibdeps"
     shlibs = shlibs_file.read_text()
     assert shlibs == "libbar1 (>= 1.0.5)\nlibfoo2-1t64 (>= 2.1.0)\n"
+
+
+@pytest.mark.parametrize(
+    ("pkgname", "shlibs", "result", "deps"),
+    [
+        ("name", {"libfoo.so.2": "libfoo2 (>= 2.1)"}, True, {"libfoo2 (>= 2.1)"}),
+        ("name", {"libbar.so.1": "libbar1 (>= 1.0)"}, False, set()),
+        ("libfoo2", {"libfoo.so.2": "libfoo2 (>= 2.1)"}, True, set()),
+    ],
+)
+def test_add_packaged_shlibs_deps(pkgname, shlibs, result, deps):
+    helper = shlibdeps.Shlibdeps()
+    helper._packaged_shlibs = shlibs
+
+    lib = ElfLibrary("libfoo.so.2", "libfoo", "2")
+    pkg_deps: set[str] = set()
+
+    res = helper._add_packaged_shlibs_deps(pkgname, lib, pkg_deps)
+    assert res == result
+    assert pkg_deps == deps
+
+
+@pytest.mark.parametrize(
+    ("pkgname", "shlibs", "deps"),
+    [
+        ("name", {"libfoo.so.2": "libfoo2 (>= 2.1)"}, {"libfoo2 (>= 2.1)"}),
+        ("name", {"libbar.so.1": "libbar1 (>= 1.0)"}, set()),
+        ("libfoo2", {"libfoo.so.2": "libfoo2 (>= 2.1)"}, set()),
+    ],
+)
+def test_add_deb_info_shlibs_deps(pkgname, shlibs, deps):
+    helper = shlibdeps.Shlibdeps()
+    helper._deb_info_shlibs = shlibs
+
+    lib = ElfLibrary("libfoo.so.2", "libfoo", "2")
+    pkg_deps: set[str] = set()
+
+    helper._add_deb_info_shlibs_deps(pkgname, lib, pkg_deps)
+    assert pkg_deps == deps
+
+
+@pytest.mark.parametrize(
+    ("undefined", "libsyms", "versions"),
+    [
+        (
+            {"foo_init", "foo_run"},
+            {
+                ("libfoo.so.2", "foo_init"): ("libfoo2", "2.1"),
+                ("libfoo.so.2", "foo_run"): ("libfoo2", "2.3"),
+            },
+            {"libfoo2": {"2.1", "2.3"}},
+        ),
+        (
+            {"foo_init", "foo_run"},
+            {
+                ("libbar.so.1", "bar_init"): ("libbar2", "1.0"),
+            },
+            {},
+        ),
+    ],
+)
+def test_add_deb_info_symbol_deps(undefined, libsyms, versions):
+    helper = shlibdeps.Shlibdeps()
+    helper._deb_info_symbols = libsyms
+
+    lib = ElfLibrary("libfoo.so.2", "libfoo", "2")
+    pkg_versions: dict[str, set[str]] = {}
+
+    helper._add_deb_info_symbol_deps(lib, undefined, pkg_versions)
+    assert pkg_versions == versions

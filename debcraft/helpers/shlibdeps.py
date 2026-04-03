@@ -316,11 +316,11 @@ class Shlibdeps(Helper):
 
         raw_deps = self._packaged_shlibs.get(lib.soname)  # pyright: ignore[reportOptionalMemberAccess]
         emit.debug(f"shlibdeps: check for {lib.soname} in sibling shlibs: {raw_deps}")
+
         if raw_deps and not _package_in_deps(package_name, raw_deps):
             pkg_deps.add(raw_deps)
-            return True
 
-        return False
+        return bool(raw_deps)
 
     def _add_deb_info_shlibs_deps(
         self, package_name: str, lib: ElfLibrary, pkg_deps: set[str]
