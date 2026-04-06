@@ -86,6 +86,8 @@ class Lifecycle(LifecycleService):
         helper_service = cast("HelperService", self._services.helper)
 
         with helper_service.install_helpers(step_info) as helper:
+            helper.run("installdocs")
+            helper.run("installchangelogs")
             helper.run("strip")
 
         return True

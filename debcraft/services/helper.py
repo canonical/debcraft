@@ -72,6 +72,7 @@ class InstallHelpersRunner:
             "project": project,
             "build_dir": self._step_info.part_build_dir,
             "install_dir": self._step_info.part_install_dir,
+            "install_dirs": self._step_info.part_install_dirs,
         }
         common_kwargs |= kwargs
 
