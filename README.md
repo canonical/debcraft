@@ -10,7 +10,7 @@
 
 Debcraft stores its build configuration in a project file called `debcraft.yaml`. It
 tells Debcraft how to build the upstream source, fill metadata, and package generated
-files in binary deb files.
+files in binary `.deb` files.
 
 From the root of the upstream source, Debcraft creates a minimal debcraft.yaml with:
 
