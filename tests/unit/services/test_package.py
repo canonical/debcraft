@@ -41,11 +41,14 @@ def _list_ar_members(ar_path: Path) -> list[str]:
 
 
 def test_pack(
+    mocker,
     package_service_with_configured_project: package.Package,
     tmp_path,
     default_project: models.Project,
     host_architecture: str,
 ):
+    mocker.patch("debcraft.helpers.fixperms.os.chown")
+
     prime_dir = tmp_path / "work" / "partitions" / "package" / "package-1" / "prime"
     prime_dir.mkdir(exist_ok=True, parents=True)
     (prime_dir / "foo.txt").touch()
