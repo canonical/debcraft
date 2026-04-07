@@ -238,12 +238,12 @@ class Shlibdeps(Helper):
         needed_libs: list[ElfLibrary] = []
         undefined_symbols: set[str] = set()
 
-        # Obtain the list of ELF file dependencies
+        # Obtain the list of dependencies from all primed ELF files.
         for elf_file in primed_elf_files:
             needed_libs += elf_file.needed
             undefined_symbols.update(elf_file.read_symbols())
 
-        # Deduplicate list of needed libraries.
+        # Deduplicate list of needed libraries, keeping the original order.
         unique_needed_libs = list(dict.fromkeys(needed_libs))
 
         self._setup_shlibdeps(arch, state_dir_map)
