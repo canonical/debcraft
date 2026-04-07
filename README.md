@@ -4,22 +4,25 @@
 
 # Debcraft
 
-**Debcraft** is a command-line tool for creating debs, which are the traditional package format for Debian-based Linux distros like Ubuntu. Using the same craft framework and libraries as tools like Snapcraft, Debcraft gives package maintainers auto-created clean build containers and a friendly YAML syntax, among other benefits.
+**Debcraft** is a command-line tool for creating Debian packages, the traditional
+software format for Debian-based Linux distributions. It makes it simpler for
+developers to rapidly build and iterate on packages that comply with Debian
+packaging policies. It has YAML build configuration syntax including expressions
+for multiple architectures, automatically populates Debian manifest files, and manages
+build containers on its own.
 
 ## Basic usage
 
-Debcraft stores its build configuration in a project file called `debcraft.yaml`. It
-tells Debcraft how to build the upstream source, fill metadata, and package generated
-files in binary `.deb` files.
+Debcraft stores its build configuration in a project file called `debcraft.yaml`.
 
-From the root of the upstream source, Debcraft creates a minimal debcraft.yaml with:
+From the root of the upstream source, Debcraft creates a minimal `debcraft.yaml` with:
 
 ```bash
 debcraft init
 ```
 
-Edit the file to add packages, build instructions and metadata information to the
-project file. After that, create binary deb packages with:
+After you add all your project's build and runtime details to the project file, bundle
+your project into a `.deb` file with:
 
 ```bash
 debcraft pack
@@ -27,7 +30,7 @@ debcraft pack
 
 ## Installation
 
-Install the current development version with:
+Install the latest development version with:
 
 ```bash
 snap install debcraft --classic --edge
