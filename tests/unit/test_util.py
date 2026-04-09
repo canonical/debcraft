@@ -55,6 +55,7 @@ def test_get_arch_triplet_error():
         pytest.param({"1.1"}, "1.1", id="single"),
         pytest.param({"1.2", "1.10", "1.9"}, "1.10", id="numeric"),
         pytest.param({"1.0~rc1", "1.0"}, "1.0", id="tilde"),
+        pytest.param({"1.0-1~bp10+1", "1.0-1"}, "1.0-1", id="tilde-plus"),
         pytest.param({"1:0.5", "9.9"}, "1:0.5", id="epoch"),
         pytest.param({"1.0+b1", "1.0+b2", "1.0+a1"}, "1.0+b2", id="letter"),
         pytest.param({"2.4.1-1", "2.4.1-10", "2.4.1-2"}, "2.4.1-10", id="revision"),
