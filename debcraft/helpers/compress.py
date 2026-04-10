@@ -107,7 +107,12 @@ class Compress(Helper):
         _fix_symlinks(all_symlinks, compressed_files, prime_dir)
 
 
-def _compress_group(group: list[Path], prime_dir: Path) -> None:
+def _compress_group(group: list[Path], root: Path) -> None:
+    """Compress a file and update all its links.
+
+    :param group: A list of paths containing links to a file.
+    :param root: The directory containing the root of the package files.
+    """
     primary = group[0]
     primary_gz = primary.with_name(primary.name + ".gz")
 
@@ -116,7 +121,7 @@ def _compress_group(group: list[Path], prime_dir: Path) -> None:
         with gzip.GzipFile(primary_gz, "wb", mtime=0) as f_out:
             shutil.copyfileobj(f_in, f_out)
 
-    emit.progress(f"Compress file: {primary_gz.relative_to(prime_dir)!s}")
+    emit.progress(f"Compress file: {primary_gz.relative_to(root)!s}")
 
     # Copy permissions/attributes (mode, atime, mtime)
     shutil.copystat(primary, primary_gz)
@@ -138,6 +143,15 @@ def _compress_group(group: list[Path], prime_dir: Path) -> None:
 def _fix_symlinks(
     symlinks: list[Path], compressed_files: set[Path], root: Path
 ) -> None:
+    """Recreate symlinks to compressed files.
+
+    If a symlink points to a file that was compressed, recreate
+    the symbolic link to point to the compressed file instead.
+
+    :param symlinks: The list of symlink paths.
+    :param compressed_files: A set of files that have been compressed.
+    :param root: The directory containing the root of the package files.
+    """
     for link in symlinks:
         if not link.is_symlink():
             continue
@@ -166,7 +180,18 @@ def _fix_symlinks(
                 )
 
 
-def _should_compress(path: Path, root: Path) -> bool:
+def _should_compress(path: Path, root: Path) -> bool:  # noqa: PLR0911
+    """Check if a given file should be compressed.
+
+    Verify if a file should be compressed, based on the Debian policy rules.
+    For more information, see the Debian Policy Manual, chapter 12
+    (https://www.debian.org/doc/debian-policy/ch-docs.html), and the
+    dh_compress debhelper sources.
+
+    :param path: The path of the file to verify.
+    :param root: The directory containing the root of the package files.
+    :return: Whether the file should be compressed.
+    """
     rel_path = path.relative_to(root)
 
     if rel_path.is_relative_to("usr/share/man") or rel_path.is_relative_to(
@@ -175,14 +200,19 @@ def _should_compress(path: Path, root: Path) -> bool:
         return not any(fnmatch.fnmatch(path.name, p) for p in _EXCLUDE_INFO_MAN)
 
     if rel_path.is_relative_to("usr/share/doc"):
-        if fnmatch.fnmatch(path.name.lower(), "changelog*") or fnmatch.fnmatch(
-            path.name, "NEWS*"
-        ):
-            return not any(fnmatch.fnmatch(path.name, p) for p in _EXCLUDE_DOC)
+        # Don't recompress files we already compressed.
+        if path.name.endswith(".gz"):
+            return False
 
+        # Always compress files starting with "changelog" or "NEWS".
+        if path.name.startswith(("changelog", "NEWS")):
+            return True
+
+        # Don't compress files smaller than 4Kb.
         if path.stat().st_size <= _COMPRESS_THRESHOLD:
             return False
 
+        # Compress the rest based on exclusion patterns.
         return not any(fnmatch.fnmatch(path.name, p) for p in _EXCLUDE_DOC)
 
     if rel_path.is_relative_to("usr/share/fonts/X11"):

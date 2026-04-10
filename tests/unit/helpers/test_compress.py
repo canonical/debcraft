@@ -207,7 +207,10 @@ def test_fix_symlink_chain(tmp_path):
             "usr/share/doc/pkg/changelog.Debian", 100, True, id="changelog-debian"
         ),
         pytest.param(
-            "usr/share/doc/pkg/CHANGELOG.html", 100, True, id="changelog-uppercase"
+            "usr/share/doc/pkg/changelog.html", 100, True, id="changelog-html"
+        ),
+        pytest.param(
+            "usr/share/doc/pkg/CHANGELOG.html", 5000, False, id="changelog-uppercase"
         ),
         # Documentation size threshold
         pytest.param(
