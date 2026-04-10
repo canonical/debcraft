@@ -226,8 +226,3 @@ def test_should_compress(tmp_path, path_str, size, expected):
         f.truncate(size)
 
     assert compress._should_compress(path, tmp_path) == expected
-
-
-def test_get_mtime(monkeypatch):
-    monkeypatch.setenv("SOURCE_DATE_EPOCH", "1520598896")
-    assert compress._get_mtime(Path("/bin/true")) == 1520598896

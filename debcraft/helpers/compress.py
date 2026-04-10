@@ -110,11 +110,10 @@ class Compress(Helper):
 def _compress_group(group: list[Path], prime_dir: Path) -> None:
     primary = group[0]
     primary_gz = primary.with_name(primary.name + ".gz")
-    mtime = _get_mtime(primary)
 
     # Compress file
     with primary.open("rb") as f_in:
-        with gzip.GzipFile(primary_gz, "wb", mtime=mtime) as f_out:
+        with gzip.GzipFile(primary_gz, "wb", mtime=0) as f_out:
             shutil.copyfileobj(f_in, f_out)
 
     emit.progress(f"Compress file: {primary_gz.relative_to(prime_dir)!s}")
@@ -179,7 +178,7 @@ def _should_compress(path: Path, root: Path) -> bool:
         if fnmatch.fnmatch(path.name.lower(), "changelog*") or fnmatch.fnmatch(
             path.name, "NEWS*"
         ):
-            return True
+            return not any(fnmatch.fnmatch(path.name, p) for p in _EXCLUDE_DOC)
 
         if path.stat().st_size <= _COMPRESS_THRESHOLD:
             return False
@@ -190,14 +189,3 @@ def _should_compress(path: Path, root: Path) -> bool:
         return not any(fnmatch.fnmatch(path.name, p) for p in _EXCLUDE_FONTS_X11)
 
     return False
-
-
-def _get_mtime(file: Path) -> int:
-    source_date_epoch = os.environ.get("SOURCE_DATE_EPOCH")
-    if source_date_epoch:
-        try:
-            return int(source_date_epoch)
-        except ValueError:
-            return int(file.stat().st_mtime)
-
-    return int(file.stat().st_mtime)
