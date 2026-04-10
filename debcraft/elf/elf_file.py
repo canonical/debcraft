@@ -1,6 +1,6 @@
 #  This file is part of debcraft.
 #
-#  Copyright 2016-2025 Canonical Ltd.
+#  Copyright 2016-2026 Canonical Ltd.
 #
 #  This program is free software: you can redistribute it and/or modify it
 #  under the terms of the GNU General Public License version 3, as
@@ -17,6 +17,7 @@
 """Helpers to parse and handle ELF binary files."""
 
 import pathlib
+import subprocess
 from dataclasses import dataclass, field
 
 from elftools.common.exceptions import ELFError
@@ -30,6 +31,7 @@ from debcraft import errors
 class ElfLibrary:
     """Representation of an ELF dynamic library."""
 
+    soname: str
     libname: str
     ver: str
 
@@ -42,18 +44,10 @@ class ElfLibrary:
         :return: A newly created ElfLibrary instance.
         """
         if ".so." not in name:
-            return cls(libname=name, ver="")
+            return cls(soname=name, libname=name, ver="")
 
         libname, ver = name.split(".so.", maxsplit=1)
-        return cls(libname, ver)
-
-
-@dataclass(frozen=True)
-class ElfSymbol:
-    """Representation of an ELF symbol."""
-
-    name: str
-    minver: str
+        return cls(soname=name, libname=libname, ver=ver)
 
 
 @dataclass
@@ -65,8 +59,7 @@ class ElfFile:
     libname: str = ""
     ver: str = ""
     arch: str = ""
-    needed: set[ElfLibrary] = field(default_factory=set)
-    symbols: set[ElfSymbol] = field(default_factory=set)
+    needed: list[ElfLibrary] = field(default_factory=list)
 
     @classmethod
     def is_elf(cls, path: pathlib.Path) -> bool:
@@ -111,7 +104,7 @@ class ElfFile:
                 if tag.entry.d_tag == "DT_NEEDED":
                     needed = tag.needed  # pyright: ignore[reportAttributeAccessIssue]
                     if ".so." in needed:
-                        elf_data.needed.add(ElfLibrary.from_name(needed))
+                        elf_data.needed.append(ElfLibrary.from_name(needed))
                 elif tag.entry.d_tag == "DT_SONAME":
                     soname = tag.soname  # pyright: ignore[reportAttributeAccessIssue]
                     elf_lib = ElfLibrary.from_name(soname)
@@ -119,6 +112,10 @@ class ElfFile:
                     elf_data.ver = elf_lib.ver
 
         return elf_data
+
+    def read_symbols(self) -> set[str]:
+        """Read undefined symbols from this ELF file."""
+        return _read_undefined_symbols(self.path)
 
 
 _ELF_ARCH_MAP = {
@@ -141,3 +138,26 @@ def _get_elf_debian_arch(elf_file: elffile.ELFFile) -> str:
     ei_data = elf_file.header["e_ident"]["EI_DATA"]
 
     return _ELF_ARCH_MAP.get((machine, ei_class, ei_data), "unknown")
+
+
+def _read_undefined_symbols(path: pathlib.Path) -> set[str]:
+    symbols = set()
+
+    try:
+        res = subprocess.run(
+            ["nm", "-uD", path], capture_output=True, text=True, check=True
+        )
+    except subprocess.CalledProcessError as err:
+        raise errors.DebcraftError(f"error running nm on {path}: {err.stderr}")
+    except FileNotFoundError:
+        raise errors.DebcraftError(
+            "required tool 'nm' not found on PATH; install the 'binutils' package"
+        )
+
+    for line in res.stdout.splitlines():
+        parts = line.strip().split()
+        if not parts or parts[0] != "U":
+            continue
+        symbols.add(parts[-1])
+
+    return symbols
