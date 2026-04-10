@@ -68,13 +68,14 @@ class Makeshlibs(Helper):
             emit.debug(f"no primed shlibs in package {package_name}")
             return
 
+        arch_shlibs = [elf for elf in primed_shlibs if elf.arch == arch]
+        if not arch_shlibs:
+            return
+
         # Write shlibs file
         dedup: set[tuple[str, str]] = set()
         with shlibs_file.open("w", encoding="utf-8") as f:
-            for elf in primed_shlibs:
-                if elf.arch != arch:
-                    continue
-
+            for elf in arch_shlibs:
                 # Deduplicate multiple occurrences of the same library
                 if (elf.libname, elf.ver) in dedup:
                     continue
@@ -84,6 +85,9 @@ class Makeshlibs(Helper):
                     f"Shared library in {package_name}: {elf.libname}.so.{elf.ver}"
                 )
                 f.write(f"{elf.libname} {elf.ver} {package_name} (>= {version})\n")
+
+        triggers_file = control_dir / "triggers"
+        triggers_file.write_text("activate-noawait ldconfig\n")
 
         # Copy to helper state
         state_shlibs_file = state_dir / f"{package_name}:{arch}.shlibs"
