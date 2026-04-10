@@ -19,6 +19,8 @@
 import functools
 import platform
 
+import apt_pkg
+
 from debcraft import errors
 
 _ARCH_TRIPLETS = {
@@ -30,6 +32,10 @@ _ARCH_TRIPLETS = {
     "x86_64": "x86_64-linux-gnu",
     "i686": "i386-linux-gnu",
 }
+
+
+# You MUST initialize the system before using the comparison logic
+apt_pkg.init_system()
 
 
 @functools.lru_cache
@@ -49,3 +55,16 @@ def get_arch_triplet(arch: str | None = None) -> str:
         raise errors.DebcraftError(f"arch triplet is not defined for arch {arch!r}")
 
     return arch_triplet
+
+
+def get_max_debian_version(versions: set[str]) -> str | None:
+    """Get the highest version number from the given set.
+
+    :param versions: A set of strings containing Debian package versions.
+
+    :returns: The highest version number, or ``None`` if ``versions`` is empty.
+    """
+    if not versions:
+        return None
+
+    return max(versions, key=functools.cmp_to_key(apt_pkg.version_compare))
