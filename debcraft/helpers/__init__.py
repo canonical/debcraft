@@ -20,6 +20,8 @@ from .compress import Compress
 from .fixperms import Fixperms
 from .gencontrol import Gencontrol
 from .helpers import HelperGroup
+from .installchangelogs import Installchangelogs
+from .installdocs import Installdocs
 from .makedeb import Makedeb
 from .makeshlibs import Makeshlibs
 from .md5sums import Md5sums
@@ -31,6 +33,8 @@ class InstallHelpers(HelperGroup):
     """Helpers used during build."""
 
     def _register(self) -> None:
+        self._register_helper("installdocs", Installdocs)
+        self._register_helper("installchangelogs", Installchangelogs)
         self._register_helper("strip", Strip)
 
 

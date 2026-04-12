@@ -45,10 +45,11 @@ class Strip(Helper):
         installed_elf_files = elf_utils.get_elf_files(install_dir)
 
         for elf_file in installed_elf_files:
+            rel_path = elf_file.path.relative_to(install_dir)
             try:
-                emit.progress(f"Strip binary: {elf_file.path!s}")
+                emit.progress(f"Strip binary: {rel_path!s}")
                 subprocess.run(["strip", "--strip-unneeded", elf_file.path], check=True)
-            except subprocess.CalledProcessError as error:  # noqa: PERF203
+            except subprocess.CalledProcessError as error:
                 raise errors.DebcraftError(
-                    f"cannot strip {str(elf_file.path)}", details=error.stderr
+                    f"cannot strip {rel_path!s}", details=error.stderr
                 )

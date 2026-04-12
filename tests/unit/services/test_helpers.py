@@ -36,6 +36,7 @@ def test_install_helpers_runner(
     step_info.part_build_dir = "build-dir"
     step_info.part_install_dir = "install-dir"
     step_info.part_name = "my-part"
+    step_info.part_install_dirs = {"partition": "install-dir"}
 
     my_runner = helper.InstallHelpersRunner(
         project=default_project,
@@ -53,6 +54,7 @@ def test_install_helpers_runner(
             step_info=step_info,
             build_dir="build-dir",
             install_dir="install-dir",
+            install_dirs={"partition": "install-dir"},
             project=default_project,
             part_name="my-part",
             arg="foo",
