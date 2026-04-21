@@ -45,7 +45,6 @@ class Package(models.CraftBaseModel):
     breaks: list[str] | None = None
     replaces: list[str] | None = None
     conflicts: list[str] | None = None
-    suggests: list[str] | None = None
 
     section: str | None = None
 
