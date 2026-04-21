@@ -47,6 +47,7 @@ class Encoder:
                             self._file.write(f" {line}\n")
                 case list():
                     line = ", ".join(map(str, value))  # pyright: ignore[reportUnknownVariableType,reportUnknownArgumentType]
-                    self._file.write(f"{key}: {line}\n")
+                    if line.strip():
+                        self._file.write(f"{key}: {line}\n")
                 case _:
                     self._file.write(f"{key}: {value}\n")

@@ -33,6 +33,13 @@ def test_run(tmp_path, default_project):
     shlibdeps_file = state_dir / "shlibdeps"
     shlibdeps_file.write_text("libfoo 5 libfoo5 (>= 5.1.2)\n")
 
+    package = default_project.packages["package-1"]
+    package.recommends = []
+    package.provides = ["old-package"]
+    package.breaks = ["package-2", "package-3"]
+    package.replaces = ["package-4"]
+    package.conflicts = ["package-5"]
+
     helper = gencontrol.Gencontrol()
     helper.run(
         project=default_project,
@@ -53,6 +60,10 @@ def test_run(tmp_path, default_project):
         Maintainer: Mike Maintainer <someone@example.com>
         Installed-Size: 0
         Depends: libfoo 5 libfoo5 (>= 5.1.2)
+        Conflicts: package-5
+        Breaks: package-2, package-3
+        Replaces: package-4
+        Provides: old-package
         Section: libs
         Priority: optional
         Description: A package
