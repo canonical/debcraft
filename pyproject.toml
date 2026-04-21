@@ -4,7 +4,9 @@ description = "Pack up debs with the Crafting Experience"
 dynamic = ["version"]
 dependencies = [
     "craft-application>=5.4.0",
-    "craft-parts>=2.31.0",
+    # Pin craft-parts to a version allowing organize from build. Update this to a feature
+    # branch when ready, or to stable releases when all organize from build issues are solved.
+    "craft-parts @ git+https://github.com/canonical/craft-parts@5620314d17432d98f22cb62ee40c1180510e19a9",
     "zstandard>=0.25.0",
     "pyelftools>=0.32",
 ]
