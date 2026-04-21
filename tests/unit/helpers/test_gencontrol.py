@@ -35,8 +35,9 @@ def test_run(tmp_path, default_project):
 
     package = default_project.packages["package-1"]
     package.recommends = []
+    package.suggests = ["other-package"]
     package.provides = ["old-package"]
-    package.breaks = ["package-2", "package-3"]
+    package.breaks = ["package-2 (<= 1.2.0)", "package-3"]
     package.replaces = ["package-4"]
     package.conflicts = ["package-5"]
 
@@ -60,8 +61,9 @@ def test_run(tmp_path, default_project):
         Maintainer: Mike Maintainer <someone@example.com>
         Installed-Size: 0
         Depends: libfoo 5 libfoo5 (>= 5.1.2)
+        Suggests: other-package
         Conflicts: package-5
-        Breaks: package-2, package-3
+        Breaks: package-2 (<= 1.2.0), package-3
         Replaces: package-4
         Provides: old-package
         Section: libs

@@ -73,7 +73,6 @@ class Gencontrol(Helper):
         shlibdeps = _read_shlibdeps(state_dir)
         depends = _filter_dependencies(shlibdeps, package.depends)
 
-        # Change to use package data from the project model
         ctl_data = models.DebianBinaryPackageControl(
             package=package_name,
             source=project.name,
@@ -84,6 +83,7 @@ class Gencontrol(Helper):
             installed_size=int(installed_size / 1024),
             depends=depends,
             recommends=package.recommends,
+            suggests=package.suggests,
             provides=package.provides,
             breaks=package.breaks,
             replaces=package.replaces,

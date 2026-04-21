@@ -103,6 +103,21 @@
           "default": null,
           "title": "Recommends"
         },
+        "suggests": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Suggests"
+        },
         "provides": {
           "anyOf": [
             {
