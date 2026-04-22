@@ -1,0 +1,15 @@
+name: debcraft-multi-arch
+maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+version: 0
+
+packages:
+  pkg0:
+    version: 0
+  pkg1:
+    multi-arch: "no" # Don't forget to quote "no"!
+  pkg2:
+    multi-arch: same
+  pkg3:
+    multi-arch: foreign
+  pkg4:
+    multi-arch: allowed

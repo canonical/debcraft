@@ -1,0 +1,2 @@
+Bad debcraft.yaml content:
+- input should be 'no', 'same', 'foreign' or 'allowed' (in field 'packages.pkg1.multi-arch')
