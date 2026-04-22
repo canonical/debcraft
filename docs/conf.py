@@ -81,3 +81,8 @@ github_repository = "debcraft"
 
 # Client-side page redirects.
 rediraffe_redirects = "redirects.txt"
+
+# Excludes files or directories from processing
+exclude_patterns = [
+    "README.md",
+]
