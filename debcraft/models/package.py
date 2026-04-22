@@ -41,6 +41,7 @@ class Package(models.CraftBaseModel):
     # https://www.debian.org/doc/debian-policy/ch-relationships.html#s-binarydeps
     depends: list[str] | None = None
     recommends: list[str] | None = None
+    suggests: list[str] | None = None
     provides: list[str] | None = None
     breaks: list[str] | None = None
     replaces: list[str] | None = None
