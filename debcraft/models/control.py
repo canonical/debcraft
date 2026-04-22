@@ -54,3 +54,4 @@ class DebianBinaryPackageControl(models.CraftBaseModel):
     description: str
     original_maintainer: str | None = None
     uploaders: list[str] | None = None
+    multi_arch: str | None = None

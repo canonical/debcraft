@@ -94,6 +94,9 @@ class Gencontrol(Helper):
             uploaders=project.uploaders,
         )
 
+        if package.multi_arch != "no":
+            ctl_data.multi_arch = package.multi_arch
+
         emit.progress(f"Create control file for package {package_name}")
         output_file = control_dir / "control"
 

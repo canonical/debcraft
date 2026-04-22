@@ -75,6 +75,55 @@ def test_run(tmp_path, default_project):
 
 
 @pytest.mark.parametrize(
+    ("multi_arch", "control_value"),
+    [
+        ("no", ""),
+        ("same", "Multi-Arch: same\n"),
+        ("foreign", "Multi-Arch: foreign\n"),
+        ("allowed", "Multi-Arch: allowed\n"),
+    ],
+)
+def test_multi_arch(tmp_path, default_project, multi_arch, control_value):
+    prime_dir = tmp_path / "prime"
+    control_dir = tmp_path / "control"
+    state_dir = tmp_path / "state"
+
+    prime_dir.mkdir()
+    control_dir.mkdir()
+    state_dir.mkdir()
+
+    package = default_project.packages["package-1"]
+    package.multi_arch = multi_arch
+
+    helper = gencontrol.Gencontrol()
+    helper.run(
+        project=default_project,
+        package_name="package-1",
+        arch="arm64",
+        prime_dir=prime_dir,
+        control_dir=control_dir,
+        state_dir=state_dir,
+    )
+
+    content = (control_dir / "control").read_text()
+    assert content == textwrap.dedent(
+        """\
+        Package: package-1
+        Source: fake-project
+        Version: 2.0
+        Architecture: arm64
+        Maintainer: Mike Maintainer <someone@example.com>
+        Installed-Size: 0
+        Section: libs
+        Priority: optional
+        Description: A package
+         Really a package
+        """
+        + control_value
+    )
+
+
+@pytest.mark.parametrize(
     ("deps", "user_deps", "result"),
     [
         pytest.param([], [], [], id="empty"),

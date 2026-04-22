@@ -48,6 +48,7 @@ class Package(models.CraftBaseModel):
     conflicts: list[str] | None = None
 
     section: str | None = None
+    multi_arch: Literal["no", "same", "foreign", "allowed"] = "no"
 
     passthrough: dict[str, str] = pydantic.Field(default_factory=dict)
     """Values that are passed directly into the control stanza for this package.
