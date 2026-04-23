@@ -5,6 +5,7 @@ Canonical('s)?
 Charmcraft
 cjk
 cryptographically
+Debcraft
 docstrings?
 dvipng
 fonts
