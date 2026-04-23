@@ -1,10 +1,10 @@
 # Contributing
 
-Starbase has a community from all over the world, and the Starbase team welcomes all
+Debcraft has a community from all over the world, and the Debcraft team welcomes all
 contributions.
 
 Contributing offers an opportunity to polish your technical skills, develop as a
-professional, and get involved in the growing open source community. Starbase
+professional, and get involved in the growing open source community. Debcraft
 contributors are also recognized in any releases that they work on.
 
 All contributors should become familiar with this guide. It outlines the expectations
@@ -12,10 +12,10 @@ and practices for participating in the project.
 
 ## Review the project expectations
 
-The Starcraft team at Canonical sets the direction and priorities of Starbase. They
+The Debcraft team at Canonical sets the direction and priorities of Debcraft. They
 take responsibility for its stewardship and health.
 
-Before you start work on Starbase, there are three documents for you to digest.
+Before you start work on Debcraft, there are three documents for you to digest.
 
 ### Ubuntu Code of Conduct
 
@@ -34,23 +34,23 @@ incorporated into the repository.
 
 <Ensure that the link text matches your project's license.>
 
-Starbase is licensed under [LGPL-3.0](LICENSE).
+Debcraft is licensed under [LGPL-3.0](LICENSE).
 
 ## Report an issue or open a request
 
-If you find a bug or feature gap in Starbase, look for it in the [project's GitHub
-issues](https://github.com/canonical/starbase/issues) first. If you have fresh input,
+If you find a bug or feature gap in Debcraft, look for it in the [project's GitHub
+issues](https://github.com/canonical/debcraft/issues) first. If you have fresh input,
 add your voice to the issue.
 
 If the bug or feature doesn't have an issue, we invite you to [open
-one](https://github.com/canonical/starbase/issues/new/choose).
+one](https://github.com/canonical/debcraft/issues/new/choose).
 
 <Cut the following section if your project doesn't have bounties.>
 
 ## Apply for a bounty
 
-Starbase has a parallel stream of materially-rewarding work in the form of bounties. At
-the Starcraft team's discretion, high-value GitHub issues are allocated monetary
+Debcraft has a parallel stream of materially-rewarding work in the form of bounties. At
+the Debcraft team's discretion, high-value GitHub issues are allocated monetary
 bounties. A bounty is paid when the solution is merged into the codebase and its
 implementation meets all business and technical specifications outlined in the issue. To
 keep things fair, you can work on only one bounty at a time.
@@ -59,17 +59,17 @@ If you're interested in bounties, enroll in the [GitHub Sponsors
 program](https://docs.github.com/en/sponsors/getting-started-with-github-sponsors/about-github-sponsors).
 
 To show interest in a bounty, provide a rough solution plan for it in a comment on its
-GitHub issue. The Starbase maintainers review all proposals for technical soundness. If
+GitHub issue. The Debcraft maintainers review all proposals for technical soundness. If
 your proposal is accepted, they will assign you the bounty, after which you can begin
 work.
 
 ## Set up for development
 
-Starbase uses a forking, feature-based workflow. Most work on Starbase occurs on
+Debcraft uses a forking, feature-based workflow. Most work on Debcraft occurs on
 people's local systems, and is heavily terminal-dependent. Remote testing and building
 is provided on GitHub for continuous integration and delivery.
 
-Start by [creating a personal fork](https://github.com/canonical/starbase/fork) of the
+Start by [creating a personal fork](https://github.com/canonical/debcraft/fork) of the
 repository on GitHub.
 
 Next, on your host system, clone your fork and sync it with the upstream repository.
@@ -79,9 +79,9 @@ If you authenticate your GitHub account with
 run:
 
 ```bash
-git clone git@github.com:<username>/starbase --recurse-submodules
-cd starbase
-git remote add upstream git@github.com:canonical/starbase
+git clone git@github.com:<username>/debcraft --recurse-submodules
+cd debcraft
+git remote add upstream git@github.com:canonical/debcraft
 git fetch upstream
 ```
 
@@ -90,9 +90,9 @@ If you don't authenticate with SSH, clone with
 instead:
 
 ```bash
-git clone https://github.com/<username>/starbase --recurse-submodules
-cd starbase
-git remote add upstream https://github.com/canonical/starbase
+git clone https://github.com/<username>/debcraft --recurse-submodules
+cd debcraft
+git remote add upstream https://github.com/canonical/debcraft
 git fetch upstream
 ```
 
@@ -110,14 +110,14 @@ If all linting and testing completes without errors, your local environment is r
 ## Contribute a change
 
 With the prerequisites out of the way, let's walk through how to make a contribution to
-Starbase.
+Debcraft.
 
 ### Research the topic
 
-All significant work in Starbase should be tied to an existing issue or ticket.
+All significant work in Debcraft should be tied to an existing issue or ticket.
 
 Once you find an issue that you'd like to work on, it's best to reach out so that a
-Starbase maintainer can assign the ticket to you before starting. This process varies
+Debcraft maintainer can assign the ticket to you before starting. This process varies
 depending on the issue's complexity and scope.
 
 #### Minor changes
@@ -125,32 +125,32 @@ depending on the issue's complexity and scope.
 If you'd like to add a small feature or fix, check the project's GitHub issues to see if
 others have reported it. If they have, look into the current status of the topic. If no
 one else is working on it, add a comment stating that you'd like to take it on, and a
-Starbase maintainer will assign it to you.
+Debcraft maintainer will assign it to you.
 
 If you don't find a related issue, [open
-one](https://github.com/canonical/starbase/issues/new/choose) and indicate that you're
+one](https://github.com/canonical/debcraft/issues/new/choose) and indicate that you're
 interested in taking it on. When creating the issue, be sure to add any relevant labels.
-A Starbase maintainer will then review the issue and assign it to you.
+A Debcraft maintainer will then review the issue and assign it to you.
 
 #### Major changes
 
 <Update the link to point to your project's Matrix channel.>
 
 If there's a large feature or fix you'd like to work on, contact us and the rest of the
-community in the [Starcraft Development Matrix
-space](https://matrix.to/#/#starcraft-development:ubuntu.com). It's possible that work
+community in the [Debcraft Development Matrix
+space](https://matrix.to/#/#debcraft-development:ubuntu.com). It's possible that work
 on it has been started, or that it fits into an existing plan. Often, you will save time
 and effort by checking for prior work.
 
 <If your project has a forum, link it here. If not, remove this paragraph.>
 
 For changes that require coordination with the the broader community, create a post on
-the [Starbase forum](https://forum.example.com), the hub for users and developers.
+the [Debcraft forum](https://forum.example.com), the hub for users and developers.
 
 Once you've found or created an issue you'd like to take on, propose your solution in
 the issue's thread. In your proposal, describe a plan for the change, its tests, and its
 documentation. If the feature warrants a new page in the documentation, propose a
-[Diátaxis](https://diataxis.fr) category for the page. A Starbase maintainer will
+[Diátaxis](https://diataxis.fr) category for the page. A Debcraft maintainer will
 review your proposal and, if everything looks complete, assign the issue to you.
 
 Certain high-value issues are allocated monetary bounties. If you're interested in
@@ -244,7 +244,7 @@ All nontrivial code changes should be accompanied by a reasonable set of tests.
 
 <Update the next sentence to accurately describe your project's test suite.>
 
-Starbase's test suite includes unit, integration, and
+Debcraft's test suite includes unit, integration, and
 [Spread](https://github.com/canonical/spread/blob/master/README.md) tests. If you're not
 sure which tests you should add, go with your best judgement – additional tests can be
 added during the review process.
@@ -285,7 +285,7 @@ them.
 ### Document the change
 
 Before you start documenting your changes, take a moment to familiarize yourself with
-the four categories of [Diátaxis](https://diataxis.fr), the framework that Starbase's
+the four categories of [Diátaxis](https://diataxis.fr), the framework that Debcraft's
 documentation is built around.
 
 Most small changes call for updates to the existing pages that describe the current
@@ -321,8 +321,8 @@ Once your work is committed to your branch, push it to your fork:
 git push -u origin <branch-name>
 ```
 
-On GitHub, [open a PR](https://github.com/canonical/starbase/compare) for your branch in
-Starbase.
+On GitHub, [open a PR](https://github.com/canonical/debcraft/compare) for your branch in
+Debcraft.
 
 Format the PR title as a conventional commit. If your branch has only one commit, GitHub
 handles this automatically. If your branch has multiple commits, copy the title of the
@@ -332,7 +332,7 @@ Once open, reviewers are assigned automatically to your work.
 
 ### Follow up for the review
 
-The Starbase maintainers try to review every PR in a timely manner, typically within a
+The Debcraft maintainers try to review every PR in a timely manner, typically within a
 week for contributions that resolve an approved issue. While they can't guarantee
 immediate feedback, they aim to ensure that all contributions are reviewed thoroughly
 and thoughtfully.
