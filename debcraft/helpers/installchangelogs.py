@@ -38,6 +38,7 @@ class Installchangelogs(Helper):
         project: models.Project,
         build_dir: pathlib.Path,
         install_dirs: dict[str, pathlib.Path],
+        is_native: bool,
         **kwargs: Any,  # noqa: ARG002
     ) -> None:
         """Install changelog files.
@@ -47,9 +48,6 @@ class Installchangelogs(Helper):
         """
         if not project.packages:
             return
-
-        # Pending: add support to handle native/non-native packages
-        is_native = False
 
         changelog_name = "changelog" if is_native else "changelog.Debian"
 

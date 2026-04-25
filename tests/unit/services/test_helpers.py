@@ -37,6 +37,7 @@ def test_install_helpers_runner(
     step_info.part_install_dir = "install-dir"
     step_info.part_name = "my-part"
     step_info.part_install_dirs = {"partition": "install-dir"}
+    step_info.is_native = False
 
     my_runner = helper.InstallHelpersRunner(
         project=default_project,
@@ -57,6 +58,7 @@ def test_install_helpers_runner(
             install_dirs={"partition": "install-dir"},
             project=default_project,
             part_name="my-part",
+            is_native=False,
             arg="foo",
         )
     ]
