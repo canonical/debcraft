@@ -19,6 +19,8 @@
 from craft_application import models
 from pydantic import ConfigDict
 
+from debcraft.models.package import DebianMultiArch
+
 
 def _field_alias(field_name: str) -> str:
     parts = field_name.replace("_", "-").split("-")
@@ -54,3 +56,4 @@ class DebianBinaryPackageControl(models.CraftBaseModel):
     description: str
     original_maintainer: str | None = None
     uploaders: list[str] | None = None
+    multi_arch: DebianMultiArch | None = None

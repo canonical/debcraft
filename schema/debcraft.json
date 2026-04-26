@@ -190,6 +190,17 @@
           "default": null,
           "title": "Section"
         },
+        "multi-arch": {
+          "default": "no",
+          "enum": [
+            "no",
+            "same",
+            "foreign",
+            "allowed"
+          ],
+          "title": "Multi-Arch",
+          "type": "string"
+        },
         "passthrough": {
           "additionalProperties": {
             "type": "string"

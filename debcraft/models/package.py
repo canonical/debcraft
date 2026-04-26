@@ -21,6 +21,8 @@ import pydantic
 from craft_application import models
 from craft_platforms import DebianArchitecture
 
+DebianMultiArch = Literal["no", "same", "foreign", "allowed"]
+
 
 class Package(models.CraftBaseModel):
     """A single binary package.
@@ -48,6 +50,7 @@ class Package(models.CraftBaseModel):
     conflicts: list[str] | None = None
 
     section: str | None = None
+    multi_arch: DebianMultiArch = "no"
 
     passthrough: dict[str, str] = pydantic.Field(default_factory=dict)
     """Values that are passed directly into the control stanza for this package.
