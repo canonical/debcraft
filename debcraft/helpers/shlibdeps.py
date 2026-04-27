@@ -247,6 +247,8 @@ class Shlibdeps(Helper):
         unique_needed_libs = list(dict.fromkeys(needed_libs))
 
         self._setup_shlibdeps(arch, state_dir_map)
+        assert self._deb_info_shlibs is not None  # noqa: S101 Type narrowing
+        assert self._deb_info_symbols is not None  # noqa: S101 Type narrowing
 
         # Mapping of package name to a set of symbol versions, used to
         # determine the minimum package version containing all symbols.
@@ -254,9 +256,7 @@ class Shlibdeps(Helper):
         pkg_deps: set[str] = set()
 
         for lib in unique_needed_libs:
-            assert self._deb_info_shlibs is not None  # noqa: S101 Type narrowing
             self._deb_info_shlibs.load_deb_info_shlibs(lib.soname, arch)
-            assert self._deb_info_symbols is not None  # noqa: S101 Type narrowing
             self._deb_info_symbols.load_deb_info_symbols(lib.soname, arch)
 
             # Check symbols
