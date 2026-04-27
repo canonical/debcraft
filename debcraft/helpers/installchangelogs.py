@@ -38,18 +38,18 @@ class Installchangelogs(Helper):
         project: models.Project,
         build_dir: pathlib.Path,
         install_dirs: dict[str, pathlib.Path],
+        is_native: bool,
         **kwargs: Any,  # noqa: ARG002
     ) -> None:
         """Install changelog files.
 
+        :param project: the project model.
         :param build_dir: the directory containing the project being built.
         :param install_dirs: mapping of partitions to install directories.
+        :param is_native: whether the source package is Debian native.
         """
         if not project.packages:
             return
-
-        # Pending: add support to handle native/non-native packages
-        is_native = False
 
         changelog_name = "changelog" if is_native else "changelog.Debian"
 

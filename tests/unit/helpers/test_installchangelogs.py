@@ -24,16 +24,27 @@ from debcraft.helpers import installchangelogs
 
 @pytest.mark.parametrize("debian_dir", ["debcraft", "debian"])
 @pytest.mark.parametrize(
-    ("packages", "files", "docs"),
+    ("packages", "files", "is_native", "docs"),
     [
-        pytest.param(["pkg1"], ["not-changelog"], [], id="other"),
-        pytest.param(["pkg1", "pkg2"], ["NEWS"], ["NEWS.Debian.gz"], id="NEWS"),
+        pytest.param(["pkg1"], ["not-changelog"], False, [], id="other"),
+        pytest.param(["pkg1", "pkg2"], ["NEWS"], False, ["NEWS.Debian.gz"], id="NEWS"),
         pytest.param(
-            ["pkg1", "pkg2"], ["changelog"], ["changelog.Debian.gz"], id="changelog"
+            ["pkg1", "pkg2"],
+            ["changelog"],
+            False,
+            ["changelog.Debian.gz"],
+            id="changelog",
+        ),
+        pytest.param(
+            ["pkg1", "pkg2"],
+            ["changelog"],
+            True,
+            ["changelog.gz"],
+            id="changelog-native",
         ),
     ],
 )
-def test_run(tmp_path, default_project, debian_dir, packages, files, docs):
+def test_run(tmp_path, default_project, debian_dir, packages, files, is_native, docs):
     build_dir = tmp_path / "build"
     build_dir.mkdir()
 
@@ -49,7 +60,12 @@ def test_run(tmp_path, default_project, debian_dir, packages, files, docs):
         file_path.write_text("content")
 
     helper = installchangelogs.Installchangelogs()
-    helper.run(build_dir=build_dir, install_dirs=install_dirs, project=default_project)
+    helper.run(
+        build_dir=build_dir,
+        install_dirs=install_dirs,
+        is_native=is_native,
+        project=default_project,
+    )
 
     for package in packages:
         partition = f"package/{package}"

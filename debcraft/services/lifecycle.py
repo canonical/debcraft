@@ -20,6 +20,8 @@ from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
 from craft_application import LifecycleService
+from craft_application.models import VersionStr
+from craft_cli import emit
 from craft_parts import StepInfo, callbacks
 from craft_parts.steps import Step
 from typing_extensions import override
@@ -37,10 +39,20 @@ class Lifecycle(LifecycleService):
     def setup(self) -> None:
         """Set up the lifecycle service."""
         callbacks.register_step(
+            self._check_package_format,
+            step_list=[Step.BUILD],
+            hook_point=callbacks.HookPoint.PRE_ORGANIZE,
+        )
+        callbacks.register_step(
             self._run_install_helpers,
             step_list=[Step.BUILD],
             hook_point=callbacks.HookPoint.PRE_ORGANIZE,
         )
+
+        self._manager_kwargs.update(
+            is_native=None,
+        )
+
         super().setup()
 
     def get_prime_dir(self, package: str | None = None) -> Path:
@@ -91,3 +103,56 @@ class Lifecycle(LifecycleService):
             helper.run("strip")
 
         return True
+
+    def _check_package_format(self, step_info: StepInfo) -> bool:
+        if step_info.is_native is None:
+            step_info.is_native = _is_native_package(  # type: ignore[attr-defined] # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
+                build_dir=step_info.part_build_dir,
+                version=step_info.project_vars.get("version").value,
+            )
+
+        return True
+
+
+def _is_native_package(build_dir: Path, version: VersionStr | None) -> bool:
+    """Determine whether a package is native or non-native.
+
+    Look for the package format definition in the ``debian/source/format`` file
+    and check if it's consistent with the presence of a revision in the package
+    version number. Assume the package is non-native if the format can't be detected
+    from the format file or version number.
+
+    :param build_dir: The path to the package being built
+    :param version: The package version number
+    :return: Whether this package is a native Debian package.
+    """
+    format_file = build_dir / "debian" / "source" / "format"
+    is_native = None
+
+    # Check debian/source/format
+    if format_file.exists():
+        fmt = format_file.read_text().strip()
+        emit.progress(f"Source format is {fmt}")
+        if "native" in fmt:
+            is_native = True
+        elif "quilt" in fmt:
+            is_native = False
+
+    # Check project version
+    if version is not None:
+        emit.progress(f"Project version is {version}")
+        version_is_native = "-" not in version
+
+        if is_native is None:
+            is_native = version_is_native
+        elif is_native != version_is_native:
+            raise errors.DebcraftError(
+                "Mismatch in source format and version format.",
+                details="Ensure the version is consistent with the declared package format.",
+            )
+
+    # Assume the package is not native if we can't detect the format.
+    if is_native is None:
+        is_native = False
+
+    return is_native
