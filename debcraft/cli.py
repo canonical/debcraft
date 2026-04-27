@@ -38,8 +38,8 @@ def _create_app() -> debcraft.Application:
 def get_app_info() -> tuple[Dispatcher, dict[str, Any]]:
     """Retrieve application info. Used by craft-cli's completion module."""
     app = _create_app()
-    app._load_plugins()  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
-    dispatcher = app._create_dispatcher()  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+    app._load_plugins()  # noqa: SLF001
+    dispatcher = app._create_dispatcher()  # noqa: SLF001
 
     return dispatcher, app.app_config
 
