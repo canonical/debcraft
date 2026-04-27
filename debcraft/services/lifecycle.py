@@ -106,7 +106,7 @@ class Lifecycle(LifecycleService):
 
     def _check_package_format(self, step_info: StepInfo) -> bool:
         if step_info.is_native is None:
-            step_info.is_native = _is_native_package(  # type: ignore[attr-defined,unresolved-attribute] # pyright: ignore[reportAttributeAccessIssue]
+            step_info.is_native = _is_native_package(  # type: ignore[attr-defined] # pyright: ignore[reportAttributeAccessIssue] # ty: ignore[unresolved-attribute]
                 build_dir=step_info.part_build_dir,
                 version=step_info.project_vars.get("version").value,
             )
