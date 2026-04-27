@@ -43,8 +43,10 @@ class Installchangelogs(Helper):
     ) -> None:
         """Install changelog files.
 
+        :param project: the project model.
         :param build_dir: the directory containing the project being built.
         :param install_dirs: mapping of partitions to install directories.
+        :param is_native: whether the source package is Debian native.
         """
         if not project.packages:
             return
