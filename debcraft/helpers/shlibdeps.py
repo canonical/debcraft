@@ -254,8 +254,8 @@ class Shlibdeps(Helper):
         pkg_deps: set[str] = set()
 
         for lib in unique_needed_libs:
-            self._deb_info_shlibs.load_deb_info_shlibs(lib.soname, arch)  # type: ignore[union-attr] # pyright: ignore[reportOptionalMemberAccess]
-            self._deb_info_symbols.load_deb_info_symbols(lib.soname, arch)  # type: ignore[union-attr] # pyright: ignore[reportOptionalMemberAccess]
+            self._deb_info_shlibs.load_deb_info_shlibs(lib.soname, arch)  # type: ignore[union-attr,ty:unresolved-attribute] # pyright: ignore[reportOptionalMemberAccess]
+            self._deb_info_symbols.load_deb_info_symbols(lib.soname, arch)  # type: ignore[union-attr,ty:unresolved-attribute] # pyright: ignore[reportOptionalMemberAccess]
 
             # Check symbols
             emit.debug(f"shlibdeps: check library: {lib}")
@@ -292,7 +292,7 @@ class Shlibdeps(Helper):
         found_symbols: set[str] = set()
 
         for symbol in undefined_symbols:
-            pkg, ver = self._deb_info_symbols.get((lib.soname, symbol), ("", ""))  # type: ignore[union-attr] # pyright: ignore[reportOptionalMemberAccess]
+            pkg, ver = self._deb_info_symbols.get((lib.soname, symbol), ("", ""))  # type: ignore[union-attr,ty:unresolved-attribute] # pyright: ignore[reportOptionalMemberAccess]
             if pkg and ver:
                 if pkg not in pkg_versions:
                     pkg_versions[pkg] = set()
@@ -326,7 +326,7 @@ class Shlibdeps(Helper):
         self, package_name: str, lib: ElfLibrary, pkg_deps: set[str]
     ) -> None:
         """Check dependency in /var/lib/dpkg/info/*.shlibs files."""
-        raw_deps = self._deb_info_shlibs.get(lib.soname)  # type: ignore[union-attr]
+        raw_deps = self._deb_info_shlibs.get(lib.soname)  # type: ignore[union-attr,ty:unresolved-attribute] # pyright: ignore[reportOptionalMemberAccess]
         emit.debug(f"shlibdeps: check for {lib.soname} in system shlibs: {raw_deps}")
         if raw_deps and not _package_in_deps(package_name, raw_deps):
             pkg_deps.add(raw_deps)
