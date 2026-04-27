@@ -254,8 +254,10 @@ class Shlibdeps(Helper):
         pkg_deps: set[str] = set()
 
         for lib in unique_needed_libs:
-            self._deb_info_shlibs.load_deb_info_shlibs(lib.soname, arch)  # type: ignore[union-attr,ty:unresolved-attribute]
-            self._deb_info_symbols.load_deb_info_symbols(lib.soname, arch)  # type: ignore[union-attr,ty:unresolved-attribute]
+            assert self._deb_info_shlibs is not None  # noqa: S101 Type narrowing
+            self._deb_info_shlibs.load_deb_info_shlibs(lib.soname, arch)
+            assert self._deb_info_symbols is not None  # noqa: S101 Type narrowing
+            self._deb_info_symbols.load_deb_info_symbols(lib.soname, arch)
 
             # Check symbols
             emit.debug(f"shlibdeps: check library: {lib}")
@@ -292,7 +294,8 @@ class Shlibdeps(Helper):
         found_symbols: set[str] = set()
 
         for symbol in undefined_symbols:
-            pkg, ver = self._deb_info_symbols.get((lib.soname, symbol), ("", ""))  # type: ignore[union-attr,ty:unresolved-attribute]
+            assert self._deb_info_symbols is not None  # noqa: S101 Type narrowing
+            pkg, ver = self._deb_info_symbols.get((lib.soname, symbol), ("", ""))
             if pkg and ver:
                 if pkg not in pkg_versions:
                     pkg_versions[pkg] = set()

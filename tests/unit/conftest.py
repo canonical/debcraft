@@ -67,7 +67,7 @@ def fake_project_service_class(
 ) -> type[debcraft.services.project.Project]:
     class FakeProjectService(debcraft.services.project.Project):
         @override
-        def _load_raw_project(self) -> dict[str, Any]:  # type: ignore[reportIncompatibleMethodOverride,ty:override-of-final-method]
+        def _load_raw_project(self) -> dict[str, Any]:  # type: ignore[ty:override-of-final-method]
             return default_project_raw
 
         @override
@@ -80,7 +80,7 @@ def fake_project_service_class(
             self._platform = next(
                 iter(value.platforms)  # ty: ignore[no-matching-overload]
             )
-            self._build_for = value.platforms[self._platform].build_for[0]  # type: ignore[reportOptionalSubscript,ty:not-subscriptable]
+            self._build_for = value.platforms[self._platform].build_for[0]  # type: ignore[ty:not-subscriptable]
 
     return FakeProjectService
 
