@@ -20,13 +20,21 @@ from unittest.mock import call
 
 import craft_platforms
 import pytest
+from craft_parts import ProjectInfo
 from debcraft import models
 from debcraft.helpers import md5sums, strip
 from debcraft.services import helper
 
 
+@pytest.fixture
+def project_info(tmp_path) -> ProjectInfo:
+    return ProjectInfo(
+        application_name="test", cache_dir=tmp_path, partitions=["partition"]
+    )
+
+
 def test_install_helpers_runner(
-    mocker, tmp_path, default_project, project_service, build_plan_service
+    mocker, tmp_path, default_project, project_info, project_service, build_plan_service
 ):
     mock_run = mocker.patch.object(strip.Strip, "run")
     lifecycle = mocker.MagicMock()
@@ -41,6 +49,7 @@ def test_install_helpers_runner(
 
     my_runner = helper.InstallHelpersRunner(
         project=default_project,
+        project_info=project_info,
         build_info=build_plan_service.plan()[0],
         step_info=step_info,
         lifecycle=lifecycle,
@@ -57,6 +66,7 @@ def test_install_helpers_runner(
             install_dir="install-dir",
             install_dirs={"partition": "install-dir"},
             project=default_project,
+            project_info=project_info,
             part_name="my-part",
             is_native=False,
             arg="foo",
@@ -65,7 +75,7 @@ def test_install_helpers_runner(
 
 
 def test_packaging_helpers_runner(
-    mocker, tmp_path, default_project, project_service, build_plan_service
+    mocker, tmp_path, default_project, project_info, project_service, build_plan_service
 ):
     mock_run = mocker.patch.object(md5sums.Md5sums, "run")
     mocker.patch("debcraft.services.helper._get_architecture", return_value="arm64")
@@ -74,6 +84,7 @@ def test_packaging_helpers_runner(
 
     my_runner = helper.PackagingHelpersRunner(
         project=default_project,
+        project_info=project_info,
         build_info=build_plan_service.plan()[0],
         lifecycle=lifecycle,
     )
@@ -87,7 +98,7 @@ def test_packaging_helpers_runner(
         call(
             prime_dir=tmp_path,
             arch="arm64",
-            control_dir=runner_tmp_path / "package-1" / "control",
+            control_dir=project_info.partition_dir / "package/package-1" / "control",
             state_dir=runner_tmp_path / "package-1" / "state",
             deb_dir=runner_tmp_path / "package-1" / "deb",
             project=default_project,
