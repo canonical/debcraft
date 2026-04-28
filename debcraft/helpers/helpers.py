@@ -73,7 +73,7 @@ def install_to_package_data(
     """Install package-specific files from the debian directory.
 
     Read files named ``<package-name>.<name>`` from the ``debcraft/`` or
-    ``debian/`` directories in the source  copy them to the specified
+    ``debian/`` directories in the source package and copy them to the
     destination path in the corresponding package, with the suffix
     removed.
 
