@@ -35,7 +35,7 @@ class Lintian(Helper):
         install_dirs: dict[str, pathlib.Path],
         **kwargs: Any,  # noqa: ARG002
     ) -> None:
-        """Install copyright file.
+        """Install lintian-overrides files.
 
         :param build_dir: the directory containing the project being built.
         :param install_dirs: mapping of partitions to install directories.

@@ -69,7 +69,7 @@ def test_build_file_map(tmp_path, files, expected):
         debian_dir.mkdir()
         for filename in files:
             (debian_dir / filename).write_text("content")
-    result = helpers._build_file_map("docs", "myproject", debian_dir)
+    result = helpers._build_file_map("docs", "myproject", [debian_dir])
     assert result == {k: debian_dir / v for k, v in expected.items()}
 
 
@@ -242,7 +242,7 @@ def test_install_to_package_control(
         install_dirs=install_dirs,
     )
 
-    expected = partition_dir / "package" / package / "triggers" / "control"
+    expected = partition_dir / "package" / package / "control" / "triggers"
     assert expected.exists()
     assert expected.read_text() == expected_content
     assert oct(expected.stat().st_mode)[-3:] == "644"

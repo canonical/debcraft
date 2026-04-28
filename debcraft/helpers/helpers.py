@@ -84,31 +84,27 @@ def install_to_package_data(
     :param install_dirs: The map to the part install directory in
         each partition.
     """
-    for debian_dir_name in ("debcraft", "debian"):
-        file_map = _build_file_map(
-            name, project_name=project.name, debian_dir=build_dir / debian_dir_name
-        )
+    file_map = _build_file_map(
+        name,
+        project_name=project.name,
+        debian_dirs=[build_dir / "debian", build_dir / "debcraft"],
+    )
 
-        installed_file = False
-        for partition, install_dir in install_dirs.items():
-            if partition in ("default", "build"):
-                continue
+    for partition, install_dir in install_dirs.items():
+        if partition in ("default", "build"):
+            continue
 
-            package = partition.removeprefix("package/")
-            pfile = file_map.get(package)
-            if not pfile:
-                continue
+        package = partition.removeprefix("package/")
+        pfile = file_map.get(package)
+        if not pfile:
+            continue
 
-            file_path = Path(dest_dir) / package
-            dest = install_dir / file_path
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy(pfile, dest)
-            dest.chmod(0o644)
-            emit.progress(f"Install {name} file: {file_path}")
-            installed_file = True
-
-        if installed_file:
-            return
+        file_path = Path(dest_dir) / package
+        dest = install_dir / file_path
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(pfile, dest)
+        dest.chmod(0o644)
+        emit.progress(f"Install {name} file: {file_path}")
 
 
 def install_to_package_control(
@@ -132,43 +128,42 @@ def install_to_package_control(
     :param install_dirs: The map to the part install directory in
         each partition.
     """
-    for debian_dir_name in ("debcraft", "debian"):
-        file_map = _build_file_map(
-            name, project_name=project.name, debian_dir=build_dir / debian_dir_name
-        )
+    file_map = _build_file_map(
+        name,
+        project_name=project.name,
+        debian_dirs=[build_dir / "debian", build_dir / "debcraft"],
+    )
 
-        installed_file = False
-        for partition in install_dirs:
-            if partition in ("default", "build"):
-                continue
+    for partition in install_dirs:
+        if partition in ("default", "build"):
+            continue
 
-            package = partition.removeprefix("package/")
-            pfile = file_map.get(package)
-            if not pfile:
-                continue
+        package = partition.removeprefix("package/")
+        pfile = file_map.get(package)
+        if not pfile:
+            continue
 
-            dest = partition_dir / "package" / package / name / "control"
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy(pfile, dest)
-            dest.chmod(0o644)
-            emit.progress(f"Install {name} to package {package} control file")
-            installed_file = True
-
-        if installed_file:
-            return
+        dest = partition_dir / "package" / package / "control" / name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copy(pfile, dest)
+        dest.chmod(0o644)
+        emit.progress(f"Install {name} to package {package} control file")
 
 
-def _build_file_map(name: str, project_name: str, debian_dir: Path) -> dict[str, Path]:
+def _build_file_map(
+    name: str, project_name: str, debian_dirs: list[Path]
+) -> dict[str, Path]:
     file_map: dict[str, Path] = {}
 
-    default_file = debian_dir / name
-    if default_file.is_file():
-        file_map[project_name] = default_file
+    for debian_dir in debian_dirs:
+        default_file = debian_dir / name
+        if default_file.is_file():
+            file_map[project_name] = default_file
 
-    package_files = debian_dir.glob(f"*.{name}")
-    for pfile in package_files:
-        if pfile.is_file():
-            package_name = pfile.name.removesuffix(f".{name}")
-            file_map[package_name] = pfile
+        package_files = debian_dir.glob(f"*.{name}")
+        for pfile in package_files:
+            if pfile.is_file():
+                package_name = pfile.name.removesuffix(f".{name}")
+                file_map[package_name] = pfile
 
     return file_map
