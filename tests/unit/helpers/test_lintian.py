@@ -27,7 +27,9 @@ from debcraft.helpers import lintian
         pytest.param(["fake-project"], ["lintian-overrides"], id="default"),
         pytest.param(["pkg1", "pkg2"], ["pkg1.lintian-overrides"], id="single"),
         pytest.param(
-            ["pkg1", "pkg2"], ["pkg1.lintian-overrides", "pkg2.lintian"], id="both"
+            ["pkg1", "pkg2"],
+            ["pkg1.lintian-overrides", "pkg2.lintian-overrides"],
+            id="both",
         ),
     ],
 )
@@ -55,7 +57,7 @@ def test_run(tmp_path, default_project, debian_dir, packages, files):
 
         for lintian_file in files:
             if lintian_file == "lintian-overrides":
-                package_from_lintian_file = "fake-project"
+                package_from_lintian_file = default_project.name
             else:
                 package_from_lintian_file = lintian_file.removesuffix(
                     ".lintian-overrides"
