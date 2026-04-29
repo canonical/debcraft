@@ -74,46 +74,47 @@ def test_build_file_map(tmp_path, files, expected):
 
 
 @pytest.mark.parametrize(
-    ("source_files", "package", "expected_content"),
+    ("source_files", "packages_expected"),
     [
         pytest.param(
             {"debcraft/docs": "content"},
-            "fake-project",
-            "content",
+            {"fake-project": "content"},
             id="debcraft-default",
         ),
         pytest.param(
             {"debian/docs": "content"},
-            "fake-project",
-            "content",
+            {"fake-project": "content"},
             id="debian-default",
         ),
         pytest.param(
             {"debcraft/package-1.docs": "content"},
-            "package-1",
-            "content",
+            {"package-1": "content"},
             id="debcraft-package",
         ),
         pytest.param(
             {"debian/package-1.docs": "content"},
-            "package-1",
-            "content",
+            {"package-1": "content"},
             id="debian-package",
         ),
         pytest.param(
             {"debcraft/docs": "debcraft content", "debian/docs": "debian content"},
-            "fake-project",
-            "debcraft content",
+            {"fake-project": "debcraft content"},
             id="debcraft-priority",
+        ),
+        pytest.param(
+            {
+                "debcraft/package-1.docs": "debcraft content",
+                "debian/package-2.docs": "debian content",
+            },
+            {"package-1": "debcraft content", "package-2": "debian content"},
+            id="mixed-per-package-directories",
         ),
     ],
 )
 def test_install_package_data(
-    tmp_path, default_project, source_files, package, expected_content
+    tmp_path, default_project, source_files, packages_expected
 ):
     build_dir = tmp_path / "build"
-    install_dir = tmp_path / "install"
-    install_dir.mkdir(parents=True)
     dest_dir = Path("usr/share/doc")
 
     for rel_path, content in source_files.items():
@@ -121,7 +122,11 @@ def test_install_package_data(
         source_file.parent.mkdir(parents=True, exist_ok=True)
         source_file.write_text(content)
 
-    install_dirs = {f"package/{package}": install_dir}
+    install_dirs = {}
+    for package in packages_expected:
+        install_dir = tmp_path / package
+        install_dir.mkdir(parents=True, exist_ok=True)
+        install_dirs[f"package/{package}"] = install_dir
 
     helpers.install_package_data(
         name="docs",
@@ -131,10 +136,11 @@ def test_install_package_data(
         install_dirs=install_dirs,
     )
 
-    expected = install_dir / dest_dir / package
-    assert expected.exists()
-    assert expected.read_text() == expected_content
-    assert oct(expected.stat().st_mode)[-3:] == "644"
+    for package, expected_content in packages_expected.items():
+        expected = install_dirs[f"package/{package}"] / dest_dir / package
+        assert expected.exists()
+        assert expected.read_text() == expected_content
+        assert oct(expected.stat().st_mode)[-3:] == "644"
 
 
 @pytest.mark.parametrize(
@@ -182,30 +188,26 @@ def test_install_package_data_nothing_installed(
 
 
 @pytest.mark.parametrize(
-    ("source_files", "package", "expected_content"),
+    ("source_files", "packages_expected"),
     [
         pytest.param(
             {"debcraft/triggers": "content"},
-            "fake-project",
-            "content",
+            {"fake-project": "content"},
             id="debcraft-default",
         ),
         pytest.param(
             {"debian/triggers": "content"},
-            "fake-project",
-            "content",
+            {"fake-project": "content"},
             id="debian-default",
         ),
         pytest.param(
             {"debcraft/package-1.triggers": "content"},
-            "package-1",
-            "content",
+            {"package-1": "content"},
             id="debcraft-package",
         ),
         pytest.param(
             {"debian/package-1.triggers": "content"},
-            "package-1",
-            "content",
+            {"package-1": "content"},
             id="debian-package",
         ),
         pytest.param(
@@ -213,26 +215,33 @@ def test_install_package_data_nothing_installed(
                 "debcraft/triggers": "debcraft content",
                 "debian/triggers": "debian content",
             },
-            "fake-project",
-            "debcraft content",
+            {"fake-project": "debcraft content"},
             id="debcraft-priority",
+        ),
+        pytest.param(
+            {
+                "debcraft/package-1.triggers": "debcraft content",
+                "debian/package-2.triggers": "debian content",
+            },
+            {"package-1": "debcraft content", "package-2": "debian content"},
+            id="mixed-per-package-directories",
         ),
     ],
 )
 def test_install_package_control(
-    tmp_path, default_project, source_files, package, expected_content
+    tmp_path, default_project, source_files, packages_expected
 ):
     build_dir = tmp_path / "build"
     partition_dir = tmp_path / "partitions"
-    install_dir = tmp_path / "install"
-    install_dir.mkdir(parents=True)
 
     for rel_path, content in source_files.items():
         source_file = build_dir / rel_path
         source_file.parent.mkdir(parents=True, exist_ok=True)
         source_file.write_text(content)
 
-    install_dirs = {f"package/{package}": install_dir}
+    install_dirs = {
+        f"package/{package}": tmp_path / package for package in packages_expected
+    }
 
     helpers.install_package_control(
         name="triggers",
@@ -242,10 +251,11 @@ def test_install_package_control(
         install_dirs=install_dirs,
     )
 
-    expected = partition_dir / "package" / package / "debcraft_control" / "triggers"
-    assert expected.exists()
-    assert expected.read_text() == expected_content
-    assert oct(expected.stat().st_mode)[-3:] == "644"
+    for package, expected_content in packages_expected.items():
+        expected = partition_dir / "package" / package / "debcraft_control" / "triggers"
+        assert expected.exists()
+        assert expected.read_text() == expected_content
+        assert oct(expected.stat().st_mode)[-3:] == "644"
 
 
 @pytest.mark.parametrize(
