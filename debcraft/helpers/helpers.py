@@ -123,7 +123,10 @@ def install_package_control(
 
     Read files named ``<package-name>.<name>`` from the ``debcraft/`` or
     ``debian/`` directories in the source package and add them to the
-    control tarball of the corresponding package.
+    control tarball of the corresponding package. A file named ``<name>``
+    is also supported and is treated as applying to ``project.name``.
+    If matching files exist in both directories for the same package,
+    the file from ``debcraft/`` takes precedence over the one from ``debian/``.
 
     :param name: The name used as the file suffix.
     :param project: The project model.
