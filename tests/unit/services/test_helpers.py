@@ -109,6 +109,33 @@ def test_packaging_helpers_runner(
     ]
 
 
+def test_install_helpers_control_files(
+    mocker, tmp_path, default_project, project_info, project_service, build_plan_service
+):
+    mocker.patch.object(md5sums.Md5sums, "run")
+    mocker.patch("debcraft.services.helper._get_architecture", return_value="arm64")
+    lifecycle = mocker.MagicMock()
+    lifecycle.get_prime_dir.return_value = tmp_path
+
+    partition_control_dir = (
+        project_info.partition_dir / "package" / "package-1" / "debcraft_control"
+    )
+    partition_control_dir.mkdir(parents=True, exist_ok=True)
+    (partition_control_dir / "triggers").write_text("trigger content")
+
+    my_runner = helper.PackagingHelpersRunner(
+        project=default_project,
+        project_info=project_info,
+        build_info=build_plan_service.plan()[0],
+        lifecycle=lifecycle,
+    )
+    with my_runner as runner:
+        runner.run("md5sums")
+        control_dir = pathlib.Path(runner._temp_dir.name) / "package-1" / "control"
+        assert (control_dir / "triggers").exists()
+        assert (control_dir / "triggers").read_text() == "trigger content"
+
+
 @pytest.mark.parametrize(
     ("source_archs", "binary_arch"),
     [
