@@ -70,12 +70,15 @@ def install_package_data(
     build_dir: Path,
     install_dirs: dict[str, Path],
 ) -> None:
-    """Install package-specific files from the debian directory.
+    """Install package-specific files from the packaging directories.
 
-    Read files named ``<package-name>.<name>`` from the ``debcraft/`` or
-    ``debian/`` directories in the source package and copy them to the
+    Read files named ``<package-name>.<name>`` from the ``debian/`` or
+    ``debcraft/`` directories in the source package and copy them to the
     destination path in the corresponding package, with the suffix
-    removed.
+    removed. A default file named ``<name>`` is also supported and is
+    treated as applying to ``project.name``. If matching files exist in
+    both directories for the same package, the file from ``debcraft/``
+    takes precedence over the one from ``debian/``.
 
     :param name: The name used as the file suffix.
     :param project: The project model.
