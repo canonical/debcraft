@@ -17,6 +17,7 @@
 """Debcraft base helper service."""
 
 import pathlib
+import shutil
 import tempfile
 from typing import Any, cast
 
@@ -134,13 +135,21 @@ class PackagingHelpersRunner:
                 continue
 
             package_dir = pathlib.Path(self._temp_dir.name) / package_name
-            control_dir = partition_dir / "package" / package_name / "debcraft_control"
+            control_dir = package_dir / "control"
             deb_dir = package_dir / "deb"
             state_dir = package_dir / "state"
 
             control_dir.mkdir(parents=True, exist_ok=True)
             deb_dir.mkdir(parents=True, exist_ok=True)
             state_dir.mkdir(parents=True, exist_ok=True)
+
+            partition_control_dir = (
+                partition_dir / "package" / package_name / "debcraft_control"
+            )
+            if partition_control_dir.is_dir():
+                for file in partition_control_dir.iterdir():
+                    if file.is_file():
+                        shutil.copy2(file, control_dir)
 
             state_dir_map = {
                 name: pathlib.Path(self._temp_dir.name) / name / "state"

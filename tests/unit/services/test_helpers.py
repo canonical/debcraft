@@ -94,15 +94,11 @@ def test_packaging_helpers_runner(
         with pytest.raises(ValueError, match="is not registered"):
             runner.run("other")
 
-    control_dir = (
-        project_info.partition_dir / "package/package-1" / "debcraft_control",
-    )
-
     assert mock_run.mock_calls == [
         call(
             prime_dir=tmp_path,
             arch="arm64",
-            control_dir=control_dir,
+            control_dir=runner_tmp_path / "package-1" / "control",
             state_dir=runner_tmp_path / "package-1" / "state",
             deb_dir=runner_tmp_path / "package-1" / "deb",
             project=default_project,
