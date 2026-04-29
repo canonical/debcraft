@@ -62,7 +62,7 @@ class HelperGroup(ABC):
         return helper
 
 
-def install_to_package_data(
+def install_package_data(
     *,
     name: str,
     project: models.Project,
@@ -107,7 +107,7 @@ def install_to_package_data(
         emit.progress(f"Install {name} file: {file_path}")
 
 
-def install_to_package_control(
+def install_package_control(
     *,
     name: str,
     project: models.Project,
@@ -143,7 +143,7 @@ def install_to_package_control(
         if not pfile:
             continue
 
-        dest = partition_dir / "package" / package / "control" / name
+        dest = partition_dir / "package" / package / "debcraft_control" / name
         dest.parent.mkdir(parents=True, exist_ok=True)
         shutil.copy(pfile, dest)
         dest.chmod(0o644)

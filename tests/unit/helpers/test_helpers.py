@@ -108,7 +108,7 @@ def test_build_file_map(tmp_path, files, expected):
         ),
     ],
 )
-def test_install_to_package_data(
+def test_install_package_data(
     tmp_path, default_project, source_files, package, expected_content
 ):
     build_dir = tmp_path / "build"
@@ -123,7 +123,7 @@ def test_install_to_package_data(
 
     install_dirs = {f"package/{package}": install_dir}
 
-    helpers.install_to_package_data(
+    helpers.install_package_data(
         name="docs",
         project=default_project,
         dest_dir=dest_dir,
@@ -152,7 +152,7 @@ def test_install_to_package_data(
         ),
     ],
 )
-def test_install_to_package_data_nothing_installed(
+def test_install_package_data_nothing_installed(
     tmp_path, default_project, install_dirs_keys, source_files
 ):
     build_dir = tmp_path / "build"
@@ -169,7 +169,7 @@ def test_install_to_package_data_nothing_installed(
         install_dir.mkdir(parents=True, exist_ok=True)
         install_dirs[key] = install_dir
 
-    helpers.install_to_package_data(
+    helpers.install_package_data(
         name="docs",
         project=default_project,
         dest_dir=dest_dir,
@@ -219,7 +219,7 @@ def test_install_to_package_data_nothing_installed(
         ),
     ],
 )
-def test_install_to_package_control(
+def test_install_package_control(
     tmp_path, default_project, source_files, package, expected_content
 ):
     build_dir = tmp_path / "build"
@@ -234,7 +234,7 @@ def test_install_to_package_control(
 
     install_dirs = {f"package/{package}": install_dir}
 
-    helpers.install_to_package_control(
+    helpers.install_package_control(
         name="triggers",
         project=default_project,
         build_dir=build_dir,
@@ -242,7 +242,7 @@ def test_install_to_package_control(
         install_dirs=install_dirs,
     )
 
-    expected = partition_dir / "package" / package / "control" / "triggers"
+    expected = partition_dir / "package" / package / "debcraft_control" / "triggers"
     assert expected.exists()
     assert expected.read_text() == expected_content
     assert oct(expected.stat().st_mode)[-3:] == "644"
@@ -263,7 +263,7 @@ def test_install_to_package_control(
         ),
     ],
 )
-def test_install_to_package_control_nothing_installed(
+def test_install_package_control_nothing_installed(
     tmp_path, default_project, install_dirs_keys, source_files
 ):
     build_dir = tmp_path / "build"
@@ -280,7 +280,7 @@ def test_install_to_package_control_nothing_installed(
         install_dir.mkdir(parents=True, exist_ok=True)
         install_dirs[key] = install_dir
 
-    helpers.install_to_package_control(
+    helpers.install_package_control(
         name="triggers",
         project=default_project,
         build_dir=build_dir,

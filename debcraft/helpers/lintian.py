@@ -21,7 +21,7 @@ from typing import Any
 
 from debcraft import models
 
-from .helpers import Helper, install_to_package_data
+from .helpers import Helper, install_package_data
 
 
 class Lintian(Helper):
@@ -44,7 +44,7 @@ class Lintian(Helper):
             return
 
         # Map package names to lintian files in the debian directory.
-        install_to_package_data(
+        install_package_data(
             name="lintian-overrides",
             dest_dir=pathlib.Path("usr/share/lintian/overrides"),
             project=project,

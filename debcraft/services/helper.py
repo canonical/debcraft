@@ -127,15 +127,14 @@ class PackagingHelpersRunner:
         emit.debug(f"run {helper_name} helper for all packages...")
 
         for package_name, package in project.packages.items():
+            partition_dir = self._project_info.partition_dir
             prime_dir = self._lifecycle.get_prime_dir(package_name)
             arch = _get_architecture(package, self._build_info)
             if not arch:
                 continue
 
             package_dir = pathlib.Path(self._temp_dir.name) / package_name
-            control_dir = (
-                self._project_info.partition_dir / "package" / package_name / "control"
-            )
+            control_dir = partition_dir / "package" / package_name / "debcraft_control"
             deb_dir = package_dir / "deb"
             state_dir = package_dir / "state"
 
