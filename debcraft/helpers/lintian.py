@@ -43,7 +43,8 @@ class Lintian(Helper):
         if not project.packages:
             return
 
-        # Map package names to lintian files in the debian directory.
+        # Map package names to lintian files from debcraft/ or debian/,
+        # with debcraft/ taking precedence.
         install_package_data(
             name="lintian-overrides",
             dest_dir=pathlib.Path("usr/share/lintian/overrides"),
