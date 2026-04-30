@@ -106,8 +106,12 @@ def install_package_data(
         dest = install_dir / file_path
         dest.parent.mkdir(parents=True, exist_ok=True)
         # Add this to a state file to be able to properly clean installed files.
-        shutil.copy(pfile, dest)
-        dest.chmod(0o644)
+        if pfile.is_symlink():
+            dest.unlink(missing_ok=True)
+            dest.symlink_to(pfile.readlink())
+        else:
+            shutil.copy(pfile, dest)
+            dest.chmod(0o644)
         emit.progress(f"Install {name} file: {file_path}")
 
 
@@ -153,8 +157,11 @@ def install_package_control(
         dest = partition_dir / "package" / package / "debcraft_control" / name
         dest.parent.mkdir(parents=True, exist_ok=True)
         # Add this to a state file to be able to properly clean installed files.
-        shutil.copy(pfile, dest)
-        dest.chmod(0o644)
+        if pfile.is_symlink():
+            dest.symlink_to(pfile.readlink())
+        else:
+            shutil.copy(pfile, dest)
+            dest.chmod(0o644)
         emit.progress(f"Install {name} to package {package} control file")
 
 
