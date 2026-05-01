@@ -17,12 +17,13 @@
 """Debcraft base helper service."""
 
 import pathlib
+import shutil
 import tempfile
 from typing import Any, cast
 
 from craft_application import AppService
 from craft_cli import emit
-from craft_parts import StepInfo
+from craft_parts import ProjectInfo, StepInfo
 from craft_platforms import BuildInfo
 from typing_extensions import Self
 
@@ -37,11 +38,13 @@ class InstallHelpersRunner:
     def __init__(
         self,
         project: models.Project,
+        project_info: ProjectInfo,
         build_info: BuildInfo,
         step_info: StepInfo,
         lifecycle: Lifecycle,
     ) -> None:
         self._project = project
+        self._project_info = project_info
         self._build_info = build_info
         self._step_info = step_info
         self._lifecycle = lifecycle
@@ -70,6 +73,7 @@ class InstallHelpersRunner:
             "step_info": self._step_info,
             "part_name": self._step_info.part_name,
             "project": project,
+            "project_info": self._project_info,
             "build_dir": self._step_info.part_build_dir,
             "install_dir": self._step_info.part_install_dir,
             "install_dirs": self._step_info.part_install_dirs,
@@ -93,10 +97,12 @@ class PackagingHelpersRunner:
     def __init__(
         self,
         project: models.Project,
+        project_info: ProjectInfo,
         build_info: BuildInfo,
         lifecycle: Lifecycle,
     ) -> None:
         self._project = project
+        self._project_info = project_info
         self._build_info = build_info
         self._lifecycle = lifecycle
         self._temp_dir = tempfile.TemporaryDirectory()
@@ -122,6 +128,7 @@ class PackagingHelpersRunner:
         emit.debug(f"run {helper_name} helper for all packages...")
 
         for package_name, package in project.packages.items():
+            partition_dir = self._project_info.partition_dir
             prime_dir = self._lifecycle.get_prime_dir(package_name)
             arch = _get_architecture(package, self._build_info)
             if not arch:
@@ -135,6 +142,14 @@ class PackagingHelpersRunner:
             control_dir.mkdir(parents=True, exist_ok=True)
             deb_dir.mkdir(parents=True, exist_ok=True)
             state_dir.mkdir(parents=True, exist_ok=True)
+
+            partition_control_dir = (
+                partition_dir / "package" / package_name / "debcraft_control"
+            )
+            if partition_control_dir.is_dir():
+                for file in partition_control_dir.iterdir():
+                    if file.is_file():
+                        shutil.copy2(file, control_dir)
 
             state_dir_map = {
                 name: pathlib.Path(self._temp_dir.name) / name / "state"
@@ -167,16 +182,20 @@ class HelperService(AppService):
     def install_helpers(self, step_info: StepInfo) -> InstallHelpersRunner:
         """Obtain a runner for install helpers."""
         project = cast(models.Project, self._services.get("project").get())
+        project_info = self._services.get("lifecycle").project_info
         build_info = self._services.get("build_plan").plan()[0]
         lifecycle = cast(Lifecycle, self._services.lifecycle)
-        return InstallHelpersRunner(project, build_info, step_info, lifecycle)
+        return InstallHelpersRunner(
+            project, project_info, build_info, step_info, lifecycle
+        )
 
     def packaging_helpers(self) -> PackagingHelpersRunner:
         """Obtain a runner for packaging helpers."""
         project = cast(models.Project, self._services.get("project").get())
+        project_info = self._services.get("lifecycle").project_info
         build_info = self._services.get("build_plan").plan()[0]
         lifecycle = cast(Lifecycle, self._services.lifecycle)
-        return PackagingHelpersRunner(project, build_info, lifecycle)
+        return PackagingHelpersRunner(project, project_info, build_info, lifecycle)
 
 
 def _get_architecture(package: models.Package, build_info: BuildInfo) -> str | None:
