@@ -172,12 +172,12 @@ def _build_file_map(
 
     for debian_dir in debian_dirs:
         default_file = debian_dir / name
-        if default_file.is_file():
+        if default_file.is_file() or default_file.is_symlink():
             file_map[project_name] = default_file
 
         package_files = debian_dir.glob(f"*.{name}")
         for pfile in package_files:
-            if pfile.is_file():
+            if pfile.is_file() or pfile.is_symlink():
                 package_name = pfile.name.removesuffix(f".{name}")
                 file_map[package_name] = pfile
 
