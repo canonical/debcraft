@@ -16,7 +16,13 @@
 
 """Debcraft helpers base."""
 
+import shutil
 from abc import ABC, abstractmethod
+from pathlib import Path
+
+from craft_cli import emit
+
+from debcraft import models
 
 
 class Helper:
@@ -54,3 +60,125 @@ class HelperGroup(ABC):
             self._helper[name] = helper
 
         return helper
+
+
+def install_package_data(
+    *,
+    name: str,
+    project: models.Project,
+    dest_dir: Path,
+    build_dir: Path,
+    install_dirs: dict[str, Path],
+) -> None:
+    """Install package-specific files from the packaging directories.
+
+    Read files named ``<package-name>.<name>`` from the ``debian/`` or
+    ``debcraft/`` directories in the source package and copy them to the
+    destination path in the corresponding package, with the suffix
+    removed. A default file named ``<name>`` is also supported and is
+    treated as applying to ``project.name``. If matching files exist in
+    both directories for the same package, the file from ``debcraft/``
+    takes precedence over the one from ``debian/``.
+
+    :param name: The name used as the file suffix.
+    :param project: The project model.
+    :param dest_dir: The destination path in the binary package.
+    :param build_dir: The path to the sources being built.
+    :param install_dirs: The map to the part install directory in
+        each partition.
+    """
+    file_map = _build_file_map(
+        name,
+        project_name=project.name,
+        debian_dirs=[build_dir / "debian", build_dir / "debcraft"],
+    )
+
+    for partition, install_dir in install_dirs.items():
+        if partition in ("default", "build"):
+            continue
+
+        package = partition.removeprefix("package/")
+        pfile = file_map.get(package)
+        if not pfile:
+            continue
+
+        file_path = Path(dest_dir) / package
+        dest = install_dir / file_path
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        # Add this to a state file to be able to properly clean installed files.
+        if pfile.is_symlink():
+            dest.unlink(missing_ok=True)
+            dest.symlink_to(pfile.readlink())
+        else:
+            shutil.copy(pfile, dest)
+            dest.chmod(0o644)
+        emit.progress(f"Install {name} file: {file_path}")
+
+
+def install_package_control(
+    *,
+    name: str,
+    project: models.Project,
+    build_dir: Path,
+    partition_dir: Path,
+    install_dirs: dict[str, Path],
+) -> None:
+    """Install package-specific files from the debian directory.
+
+    Read files named ``<package-name>.<name>`` from the ``debcraft/`` or
+    ``debian/`` directories in the source package and add them to the
+    control tarball of the corresponding package. A file named ``<name>``
+    is also supported and is treated as applying to ``project.name``.
+    If matching files exist in both directories for the same package,
+    the file from ``debcraft/`` takes precedence over the one from ``debian/``.
+
+    :param name: The name used as the file suffix.
+    :param project: The project model.
+    :param build_dir: The path to the sources being built.
+    :param partition_dir: The path to the project partitions.
+    :param install_dirs: The map to the part install directory in
+        each partition.
+    """
+    file_map = _build_file_map(
+        name,
+        project_name=project.name,
+        debian_dirs=[build_dir / "debian", build_dir / "debcraft"],
+    )
+
+    for partition in install_dirs:
+        if partition in ("default", "build"):
+            continue
+
+        package = partition.removeprefix("package/")
+        pfile = file_map.get(package)
+        if not pfile:
+            continue
+
+        dest = partition_dir / "package" / package / "debcraft_control" / name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        # Add this to a state file to be able to properly clean installed files.
+        if pfile.is_symlink():
+            dest.symlink_to(pfile.readlink())
+        else:
+            shutil.copy(pfile, dest)
+            dest.chmod(0o644)
+        emit.progress(f"Install {name} to package {package} control file")
+
+
+def _build_file_map(
+    name: str, project_name: str, debian_dirs: list[Path]
+) -> dict[str, Path]:
+    file_map: dict[str, Path] = {}
+
+    for debian_dir in debian_dirs:
+        default_file = debian_dir / name
+        if default_file.is_file() or default_file.is_symlink():
+            file_map[project_name] = default_file
+
+        package_files = debian_dir.glob(f"*.{name}")
+        for pfile in package_files:
+            if pfile.is_file() or pfile.is_symlink():
+                package_name = pfile.name.removesuffix(f".{name}")
+                file_map[package_name] = pfile
+
+    return file_map
