@@ -329,7 +329,7 @@ class Shlibdeps(Helper):
         self, package_name: str, lib: ElfLibrary, pkg_deps: set[str]
     ) -> None:
         """Check dependency in /var/lib/dpkg/info/*.shlibs files."""
-        raw_deps = self._deb_info_shlibs.get(lib.soname)  # type: ignore[union-attr,ty:unresolved-attribute]
+        raw_deps = self._deb_info_shlibs.get(lib.soname)  # ty: ignore[unresolved-attribute]
         emit.debug(f"shlibdeps: check for {lib.soname} in system shlibs: {raw_deps}")
         if raw_deps and not _package_in_deps(package_name, raw_deps):
             pkg_deps.add(raw_deps)
