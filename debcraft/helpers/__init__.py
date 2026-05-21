@@ -21,6 +21,7 @@ from .fixperms import Fixperms
 from .gencontrol import Gencontrol
 from .helpers import HelperGroup
 from .installchangelogs import Installchangelogs
+from .installdebconf import Installdebconf
 from .installdocs import Installdocs
 from .lintian import Lintian
 from .makedeb import Makedeb
@@ -36,6 +37,7 @@ class InstallHelpers(HelperGroup):
     def _register(self) -> None:
         self._register_helper("lintian", Lintian)
         self._register_helper("installdocs", Installdocs)
+        self._register_helper("installdebconf", Installdebconf)
         self._register_helper("installchangelogs", Installchangelogs)
         self._register_helper("strip", Strip)
 

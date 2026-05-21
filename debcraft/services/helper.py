@@ -78,6 +78,7 @@ class InstallHelpersRunner:
             "install_dir": self._step_info.part_install_dir,
             "install_dirs": self._step_info.part_install_dirs,
             "is_native": self._step_info.is_native,
+            "partition_dir": self._project_info.partition_dir,
         }
         common_kwargs |= kwargs
 
