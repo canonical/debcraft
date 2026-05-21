@@ -66,6 +66,7 @@ class ElfFile:
         """Determine whether the given file is an ELF file.
 
         :param path: Path to the file to be verified.
+        :returns: True if the file is an ELF file, False otherwise.
         """
         if not path.is_file():
             return False
@@ -114,7 +115,10 @@ class ElfFile:
         return elf_data
 
     def read_symbols(self) -> set[str]:
-        """Read undefined symbols from this ELF file."""
+        """Read undefined symbols from this ELF file.
+
+        :returns: A set of undefined symbol names.
+        """
         return _read_undefined_symbols(self.path)
 
 

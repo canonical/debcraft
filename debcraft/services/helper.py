@@ -180,7 +180,11 @@ class HelperService(AppService):
     """Debcraft base helper Service."""
 
     def install_helpers(self, step_info: StepInfo) -> InstallHelpersRunner:
-        """Obtain a runner for install helpers."""
+        """Obtain a runner for install helpers.
+
+        :param step_info: Information about the current build step.
+        :returns: A context manager for running install helpers.
+        """
         project = cast(models.Project, self._services.get("project").get())
         project_info = self._services.get("lifecycle").project_info
         build_info = self._services.get("build_plan").plan()[0]
@@ -190,7 +194,10 @@ class HelperService(AppService):
         )
 
     def packaging_helpers(self) -> PackagingHelpersRunner:
-        """Obtain a runner for packaging helpers."""
+        """Obtain a runner for packaging helpers.
+
+        :returns: A context manager for running packaging helpers.
+        """
         project = cast(models.Project, self._services.get("project").get())
         project_info = self._services.get("lifecycle").project_info
         build_info = self._services.get("build_plan").plan()[0]

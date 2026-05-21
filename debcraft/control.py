@@ -28,7 +28,10 @@ class Encoder:
         self._file = f
 
     def encode(self, model: models.DebianBinaryPackageControl) -> None:
-        """Encode the model."""
+        """Encode the model into the control file.
+
+        :param model: The binary package control model to encode.
+        """
         for name, field in model.__class__.model_fields.items():
             value = getattr(model, name)
             if value is None:
