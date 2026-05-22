@@ -34,7 +34,7 @@ incorporated into the repository.
 
 <Ensure that the link text matches your project's license.>
 
-Debcraft is licensed under [LGPL-3.0](LICENSE).
+Debcraft is licensed under [GPL-3.0](LICENSE).
 
 ## Report an issue or open a request
 
