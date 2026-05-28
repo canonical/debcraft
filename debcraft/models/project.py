@@ -118,7 +118,13 @@ class Project(models.Project):
         return self
 
     def get_package(self, name: str) -> Package:
-        """Obtain the package definition for the given package name."""
+        """Obtain the package definition for the given package name.
+
+        :param name: The name of the package to retrieve.
+        :returns: The package definition.
+        :raises DebcraftError: If no packages are defined or the package
+            is not found.
+        """
         if not self.packages:
             raise errors.DebcraftError("no packages defined")
 
