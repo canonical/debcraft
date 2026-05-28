@@ -69,6 +69,7 @@ def test_install_helpers_runner(
             project_info=project_info,
             part_name="my-part",
             is_native=False,
+            partition_dir=project_info.partition_dir,
             arg="foo",
         )
     ]

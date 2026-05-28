@@ -101,6 +101,7 @@ class Lifecycle(LifecycleService):
             helper.run("lintian")
             helper.run("installdocs")
             helper.run("installchangelogs")
+            helper.run("installdebconf")
             helper.run("strip")
 
         return True
