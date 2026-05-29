@@ -18,9 +18,10 @@
 
 import craft_application
 import craft_parts
+from craft_parts.plugins.plugins import PluginType
 from typing_extensions import override
 
-from debcraft import models
+from debcraft import models, plugins
 
 METADATA = craft_application.AppMetadata(
     name="debcraft",
@@ -32,6 +33,14 @@ METADATA = craft_application.AppMetadata(
 
 class Application(craft_application.Application):
     """Debcraft application definition."""
+
+    @override
+    def _get_app_plugins(self) -> dict[str, PluginType]:
+        """Get the plugins for this application.
+
+        Should be overridden by applications that need to register plugins at startup.
+        """
+        return plugins.get_plugins()
 
     @override
     def _enable_craft_parts_features(self) -> None:
