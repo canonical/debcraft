@@ -70,4 +70,5 @@ class Installdebconf(Helper):
             build_dir=build_dir,
             partition_dir=partition_dir,
             install_dirs=install_dirs,
+            template_mapping=template_mapping,
         )
