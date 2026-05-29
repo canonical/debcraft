@@ -20,6 +20,7 @@ from pathlib import Path
 
 import pytest
 from debcraft.helpers import helpers
+from debcraft.helpers.helpers import _DebianTemplater
 
 
 class MyHelper(helpers.Helper):
@@ -366,3 +367,62 @@ def test_install_package_control_nothing_installed(
     )
 
     assert not (partition_dir / "package").exists()
+
+
+@pytest.mark.parametrize(
+    ("contents", "mapping", "expected"),
+    [
+        pytest.param("#one#", {"one": "hakuna"}, "hakuna", id="simple"),
+        pytest.param(
+            "#one# #two#",
+            {"one": "hakuna", "two": "matata"},
+            "hakuna matata",
+            id="it-means-no-worries",
+        ),
+        pytest.param(
+            "##let-me-live",
+            {"let-me-live": "no"},
+            "#let-me-live",
+            id="escape-delimiter",
+        ),
+    ],
+)
+def test_debian_templater(
+    contents: str, mapping: dict[str, str], expected: str
+) -> None:
+    assert _DebianTemplater(contents).substitute(mapping) == expected
+
+
+@pytest.mark.parametrize(
+    ("env", "contents", "expected"),
+    [
+        pytest.param(
+            {"one": "hakuna"}, "#ENV.one#", {"ENV.one": "hakuna"}, id="simple"
+        ),
+        pytest.param(
+            {"one": "hakuna", "two": "matata"},
+            "#ENV.one# #ENV.two#",
+            {"ENV.one": "hakuna", "ENV.two": "matata"},
+            id="multi",
+        ),
+        pytest.param(
+            {"one": "hakuna", "two": "matata"},
+            "#ENV.one#",
+            {"ENV.one": "hakuna"},
+            id="only-specified",
+        ),
+        pytest.param({}, "#ENV.one#", {"ENV.one": ""}, id="empty"),
+    ],
+)
+def test_debian_templater_dynamic_values_env(
+    monkeypatch: pytest.MonkeyPatch,
+    env: dict[str, str],
+    contents: str,
+    expected: dict[str, str],
+) -> None:
+    for k, v in env.items():
+        monkeypatch.setenv(k, v)
+
+    result = _DebianTemplater.get_dynamic_values(contents)
+
+    assert result == expected

@@ -17,6 +17,7 @@
 """Tests for debcraft's installdebconf helper."""
 
 import pytest
+from craft_parts import ProjectInfo
 from debcraft.helpers import installdebconf
 
 
@@ -46,7 +47,14 @@ def test_run(tmp_path, default_project, debian_dir, packages, files):
     for file in files:
         file_path = build_dir / debian_dir / file
         file_path.parent.mkdir(parents=True, exist_ok=True)
-        file_path.write_text("content")
+        file_path.write_text("#DEB_HOST_NAME#")
+
+    project_info = ProjectInfo(
+        application_name="project",
+        cache_dir=tmp_path / "cache",
+        arch="amd64",
+        partitions=["partition"],
+    )
 
     helper = installdebconf.Installdebconf()
     helper.run(
@@ -54,6 +62,7 @@ def test_run(tmp_path, default_project, debian_dir, packages, files):
         partition_dir=tmp_path,
         project=default_project,
         install_dirs=install_dirs,
+        project_info=project_info,
     )
 
     for package in packages:
@@ -78,6 +87,6 @@ def test_run(tmp_path, default_project, debian_dir, packages, files):
             installed_conf_file = conf_dir / "debcraft_control" / file_type
             if file_type in file_types_for_package:
                 assert installed_conf_file.exists()
-                assert installed_conf_file.read_bytes() == b"content"
+                assert installed_conf_file.read_bytes() == b"amd64"
             else:
                 assert not installed_conf_file.exists()

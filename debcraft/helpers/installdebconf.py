@@ -19,6 +19,8 @@
 import pathlib
 from typing import Any
 
+from craft_parts import ProjectInfo
+
 from debcraft import models
 
 from .helpers import Helper, install_package_control
@@ -31,6 +33,7 @@ class Installdebconf(Helper):
         self,
         *,
         project: models.Project,
+        project_info: ProjectInfo,
         build_dir: pathlib.Path,
         partition_dir: pathlib.Path,
         install_dirs: dict[str, pathlib.Path],
@@ -46,12 +49,19 @@ class Installdebconf(Helper):
         if not project.packages:
             return
 
+        template_mapping = {
+            "DEB_HOST_NAME": project_info.arch_build_for,
+            "DEB_BUILD_NAME": project_info.arch_build_on,
+            "DEB_TARGET_NAME": project_info.arch_build_for,
+        }
+
         install_package_control(
             name="config",
             project=project,
             build_dir=build_dir,
             partition_dir=partition_dir,
             install_dirs=install_dirs,
+            template_mapping=template_mapping,
         )
 
         install_package_control(
@@ -60,4 +70,5 @@ class Installdebconf(Helper):
             build_dir=build_dir,
             partition_dir=partition_dir,
             install_dirs=install_dirs,
+            template_mapping=template_mapping,
         )

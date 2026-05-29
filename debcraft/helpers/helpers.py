@@ -16,9 +16,12 @@
 
 """Debcraft helpers base."""
 
+import os
+import re
 import shutil
 from abc import ABC, abstractmethod
 from pathlib import Path
+from string import Template
 
 from craft_cli import emit
 
@@ -122,6 +125,7 @@ def install_package_control(
     build_dir: Path,
     partition_dir: Path,
     install_dirs: dict[str, Path],
+    template_mapping: dict[str, str] | None = None,
 ) -> None:
     """Install package-specific files from the debian directory.
 
@@ -138,6 +142,10 @@ def install_package_control(
     :param partition_dir: The path to the project partitions.
     :param install_dirs: The map to the part install directory in
         each partition.
+    :param template_mapping: A mapping of strings to substitute into the file.
+        If set to None, no substitutions are performed. If set to any dict,
+        even an empty one, special template keys such as "ENV." will be filled
+        in anyways.
     """
     file_map = _build_file_map(
         name,
@@ -160,8 +168,18 @@ def install_package_control(
         if pfile.is_symlink():
             dest.symlink_to(pfile.readlink())
         else:
-            shutil.copy(pfile, dest)
+            if template_mapping is None:
+                shutil.copy(pfile, dest)
+            else:
+                contents = pfile.read_text()
+                template_mapping |= _DebianTemplater.get_dynamic_values(contents)
+                # Common substitution that can vary by the package being built
+                template_mapping["PACKAGE"] = package
+                contents = _DebianTemplater(contents).substitute(template_mapping)
+                dest.write_text(contents)
+
             dest.chmod(0o644)
+
         emit.progress(f"Install {name} to package {package} control file")
 
 
@@ -182,3 +200,50 @@ def _build_file_map(
                 file_map[package_name] = pfile
 
     return file_map
+
+
+_VALID_CONFIG_TEMPLATE_REGEX = "[A-Za-z0-9_.+]+"
+
+
+class _DebianTemplater(Template):
+    """A templating structure to fill in token templates in debian config files."""
+
+    # https://docs.python.org/3/library/string.html#template-strings-strings
+    #
+    # \#                                                     The first character to look for to begin replacement
+    #   (?:                                                  Non-capturing group that must come after the #
+    #     (?<escaped>\#)                              |      What it looks like when the user wants to escape the
+    #                                                 |      template sequence. In this case, ## becomes a literal
+    #                                                 |      '#' in the final output.
+    #     (?P<named>{_VALID_CONFIG_TEMPLATE_REGEX})   |      Match a valid key that would go between #'s.
+    #                                              \# |      Enforce a closing '#' for the template string.
+    #     (?P<braced>(?!))                            |      Unused, never matches
+    #     (?P<invalid>{_VALID_CONFIG_TEMPLATE_REGEX}(?!\#))  What an invalid match looks like -- in this case, an
+    #                                                        identifier that isn't terminated by a '#'.
+    #   )                                                    End
+    pattern = rf"""
+        \#(?:
+            (?P<escaped>\#)                             |
+            (?P<named>{_VALID_CONFIG_TEMPLATE_REGEX})\# |
+            (?P<braced>(?!))                            |
+            (?P<invalid>{_VALID_CONFIG_TEMPLATE_REGEX}(?!\#))
+        )
+    """
+    delimiter = "#"
+
+    @classmethod
+    def get_dynamic_values(cls, contents: str) -> dict[str, str]:
+        mapping = {}
+
+        for needle in re.finditer(cls.pattern, contents):
+            key = needle.group("named")
+            if not key:
+                continue
+
+            # Populate "ENV." values
+            if key.startswith("ENV."):
+                _, name = key.split(".", maxsplit=1)
+                # Default to an empty string to stay bashy
+                mapping[key] = os.getenv(name, "")
+
+        return mapping
