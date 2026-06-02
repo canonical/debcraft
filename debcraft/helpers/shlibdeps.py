@@ -231,7 +231,14 @@ class Shlibdeps(Helper):
         state_dir_map: dict[str, pathlib.Path],
         **kwargs: Any,  # noqa: ARG002
     ) -> None:
-        """Find shared library dependencies."""
+        """Find shared library dependencies.
+
+        :param package_name: The name of the package being processed.
+        :param arch: The target architecture.
+        :param prime_dir: Directory containing the primed package files.
+        :param state_dir: Directory for storing helper state files.
+        :param state_dir_map: Mapping of package names to their state directories.
+        """
         primed_elf_files = get_elf_files(prime_dir)
 
         # Needed libraries and undefined symbols in primed ELF files.

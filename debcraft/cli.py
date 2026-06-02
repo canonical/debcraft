@@ -34,7 +34,10 @@ def _create_app() -> debcraft.Application:
 
 
 def get_app_info() -> tuple[Dispatcher, dict[str, Any]]:
-    """Retrieve application info. Used by craft-cli's completion module."""
+    """Retrieve application info. Used by craft-cli's completion module.
+
+    :returns: A tuple containing the dispatcher and application configuration.
+    """
     app = _create_app()
     app._load_plugins()  # noqa: SLF001
     dispatcher = app._create_dispatcher()  # noqa: SLF001
@@ -43,6 +46,9 @@ def get_app_info() -> tuple[Dispatcher, dict[str, Any]]:
 
 
 def main() -> int:
-    """Start up and run Debcraft."""
+    """Start up and run Debcraft.
+
+    :returns: The exit code from the application run.
+    """
     app = _create_app()
     return app.run()
