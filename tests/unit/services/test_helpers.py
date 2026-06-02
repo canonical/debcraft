@@ -20,7 +20,7 @@ from unittest.mock import call
 
 import craft_platforms
 import pytest
-from craft_parts import ProjectInfo
+from craft_parts import ProjectDirs, ProjectInfo
 from debcraft import models
 from debcraft.helpers import md5sums, strip
 from debcraft.services import helper
@@ -28,8 +28,12 @@ from debcraft.services import helper
 
 @pytest.fixture
 def project_info(tmp_path) -> ProjectInfo:
+    dirs = ProjectDirs(partitions=["partition"], work_dir=tmp_path)
     return ProjectInfo(
-        application_name="test", cache_dir=tmp_path, partitions=["partition"]
+        application_name="test",
+        cache_dir=tmp_path / "cache",
+        partitions=["partition"],
+        project_dirs=dirs,
     )
 
 
