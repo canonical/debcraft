@@ -423,6 +423,7 @@ def test_debian_templater_dynamic_values_env(
     for k, v in env.items():
         monkeypatch.setenv(k, v)
 
-    result = _DebianTemplater.get_dynamic_values(contents)
+    templater = _DebianTemplater(contents)
+    result = templater.get_dynamic_values()
 
     assert result == expected

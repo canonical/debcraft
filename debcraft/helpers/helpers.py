@@ -16,6 +16,7 @@
 
 """Debcraft helpers base."""
 
+import copy
 import os
 import re
 import shutil
@@ -166,16 +167,22 @@ def install_package_control(
         dest.parent.mkdir(parents=True, exist_ok=True)
         # Add this to a state file to be able to properly clean installed files.
         if pfile.is_symlink():
+            # Substitution is not performed for symlinks, as this would mean modifying
+            # source files through the link instead of modifying a copy
             dest.symlink_to(pfile.readlink())
         else:
             if template_mapping is None:
                 shutil.copy(pfile, dest)
             else:
                 contents = pfile.read_text()
-                template_mapping |= _DebianTemplater.get_dynamic_values(contents)
+                templater = _DebianTemplater(contents)
+                mapping = copy.deepcopy(template_mapping)
+                # Dynamic values can depend on the contents of the file being installed,
+                # and so must be determined here when we know what file is being read
+                mapping |= templater.get_dynamic_values()
                 # Common substitution that can vary by the package being built
-                template_mapping["PACKAGE"] = package
-                contents = _DebianTemplater(contents).substitute(template_mapping)
+                mapping["PACKAGE"] = package
+                contents = _DebianTemplater(contents).substitute(mapping)
                 dest.write_text(contents)
 
             dest.chmod(0o644)
@@ -202,7 +209,7 @@ def _build_file_map(
     return file_map
 
 
-_VALID_CONFIG_TEMPLATE_REGEX = "[A-Za-z0-9_.+]+"
+_VALID_CONFIG_TEMPLATE_REGEX = r"[A-Za-z0-9_\.+]+"
 
 
 class _DebianTemplater(Template):
@@ -213,9 +220,9 @@ class _DebianTemplater(Template):
     # \#                                                     The first character to look for to begin replacement
     #   (?:                                                  Non-capturing group that must come after the #
     #     (?<escaped>\#)                              |      What it looks like when the user wants to escape the
-    #                                                 |      template sequence. In this case, ## becomes a literal
-    #                                                 |      '#' in the final output.
-    #     (?P<named>{_VALID_CONFIG_TEMPLATE_REGEX})   |      Match a valid key that would go between #'s.
+    #                                                        template sequence. In this case, ## becomes a literal
+    #                                                        '#' in the final output.
+    #     (?P<named>{_VALID_CONFIG_TEMPLATE_REGEX})          Match a valid key that would go between #'s.
     #                                              \# |      Enforce a closing '#' for the template string.
     #     (?P<braced>(?!))                            |      Unused, never matches
     #     (?P<invalid>{_VALID_CONFIG_TEMPLATE_REGEX}(?!\#))  What an invalid match looks like -- in this case, an
@@ -231,11 +238,10 @@ class _DebianTemplater(Template):
     """
     delimiter = "#"
 
-    @classmethod
-    def get_dynamic_values(cls, contents: str) -> dict[str, str]:
+    def get_dynamic_values(self) -> dict[str, str]:
         mapping = {}
 
-        for needle in re.finditer(cls.pattern, contents):
+        for needle in re.finditer(self.pattern, self.template):
             key = needle.group("named")
             if not key:
                 continue
