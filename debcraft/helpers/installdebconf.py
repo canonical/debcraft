@@ -14,55 +14,60 @@
 #  You should have received a copy of the GNU General Public License along
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Debcraft installdocs helper."""
+"""Debcraft installdebconf helper."""
 
 import pathlib
-import shutil
 from typing import Any
 
-from craft_cli import emit
+from craft_parts import ProjectInfo
 
 from debcraft import models
 
-from .helpers import Helper
+from .helpers import Helper, install_package_control
 
 
-class Installdocs(Helper):
-    """Debcraft installdocs helper."""
+class Installdebconf(Helper):
+    """Debcraft installdebconf helper."""
 
     def run(
         self,
         *,
         project: models.Project,
+        project_info: ProjectInfo,
         build_dir: pathlib.Path,
+        partition_dir: pathlib.Path,
         install_dirs: dict[str, pathlib.Path],
         **kwargs: Any,  # noqa: ARG002
     ) -> None:
-        """Install copyright file.
+        """Install debconf files.
 
         :param project: the project model.
         :param build_dir: the directory containing the project being built.
+        :param partition_dir: the work directory for partition data.
         :param install_dirs: mapping of partitions to install directories.
         """
         if not project.packages:
             return
 
-        # Install copyright file in all packages
-        for debian_dir in ("debcraft", "debian"):
-            cfile = build_dir / debian_dir / "copyright"
-            if not cfile.is_file():
-                continue
+        template_mapping = {
+            "DEB_HOST_NAME": project_info.arch_build_for,
+            "DEB_BUILD_NAME": project_info.arch_build_on,
+            "DEB_TARGET_NAME": project_info.arch_build_for,
+        }
 
-            for partition, install_dir in install_dirs.items():
-                if partition in ("default", "build"):
-                    continue
+        install_package_control(
+            name="config",
+            project=project,
+            build_dir=build_dir,
+            partition_dir=partition_dir,
+            install_dirs=install_dirs,
+            template_mapping=template_mapping,
+        )
 
-                package = partition.removeprefix("package/")
-                copyright_file = f"usr/share/doc/{package}/copyright"
-                dest = install_dir / copyright_file
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy(cfile, dest)
-                dest.chmod(0o644)
-                emit.progress(f"Install copyright: {copyright_file}")
-
-            break
+        install_package_control(
+            name="templates",
+            project=project,
+            build_dir=build_dir,
+            partition_dir=partition_dir,
+            install_dirs=install_dirs,
+        )
