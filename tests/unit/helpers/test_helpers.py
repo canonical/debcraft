@@ -385,12 +385,18 @@ def test_install_package_control_nothing_installed(
             "#let-me-live",
             id="escape-delimiter",
         ),
+        pytest.param(
+            "#leave_me_alone#",
+            {},
+            "#leave_me_alone#",
+            id="ignore-unknown",
+        ),
     ],
 )
 def test_debian_templater(
     contents: str, mapping: dict[str, str], expected: str
 ) -> None:
-    assert _DebianTemplater(contents).substitute(mapping) == expected
+    assert _DebianTemplater(contents).safe_substitute(mapping) == expected
 
 
 @pytest.mark.parametrize(

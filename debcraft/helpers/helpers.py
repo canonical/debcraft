@@ -182,7 +182,7 @@ def install_package_control(
                 mapping |= templater.get_dynamic_values()
                 # Common substitution that can vary by the package being built
                 mapping["PACKAGE"] = package
-                contents = _DebianTemplater(contents).substitute(mapping)
+                contents = _DebianTemplater(contents).safe_substitute(mapping)
                 dest.write_text(contents)
 
             dest.chmod(0o644)

@@ -113,7 +113,7 @@ def test_run_substitutions(
         for package in packages:
             file = (build_dir / "debian" / package).with_suffix(suffix)
             file.parent.mkdir(parents=True, exist_ok=True)
-            file.write_text("#PACKAGE# #DEB_HOST_NAME# #ENV.FOO#")
+            file.write_text("#PACKAGE# #DEB_HOST_NAME# #ENV.FOO# #IGNORE_ME#")
 
     project_info = ProjectInfo(
         application_name="project",
@@ -135,10 +135,10 @@ def test_run_substitutions(
         # Do not substitute content in templates files
         conf_dir = tmp_path / "package" / package / "debcraft_control"
         template = conf_dir / "templates"
-        assert template.read_text() == "#PACKAGE# #DEB_HOST_NAME# #ENV.FOO#"
+        assert template.read_text() == "#PACKAGE# #DEB_HOST_NAME# #ENV.FOO# #IGNORE_ME#"
 
         # Substitute contents in config files
         # The environment should be read and the #PACKAGE# variable should change
         # per-package being built
         config = conf_dir / "config"
-        assert config.read_text() == f"{package} amd64 bar"
+        assert config.read_text() == f"{package} amd64 bar #IGNORE_ME#"
