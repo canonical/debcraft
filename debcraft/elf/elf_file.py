@@ -66,6 +66,7 @@ class ElfFile:
         """Determine whether the given file is an ELF file.
 
         :param path: Path to the file to be verified.
+        :return: True if the file is an ELF file, False otherwise.
         """
         if not path.is_file():
             return False
@@ -102,11 +103,11 @@ class ElfFile:
             elf_data.is_dynamic = True
             for tag in dynamic_section.iter_tags():
                 if tag.entry.d_tag == "DT_NEEDED":
-                    needed = tag.needed  # pyright: ignore[reportAttributeAccessIssue]
+                    needed = tag.needed
                     if ".so." in needed:
                         elf_data.needed.append(ElfLibrary.from_name(needed))
                 elif tag.entry.d_tag == "DT_SONAME":
-                    soname = tag.soname  # pyright: ignore[reportAttributeAccessIssue]
+                    soname = tag.soname
                     elf_lib = ElfLibrary.from_name(soname)
                     elf_data.libname = elf_lib.libname
                     elf_data.ver = elf_lib.ver
@@ -114,7 +115,10 @@ class ElfFile:
         return elf_data
 
     def read_symbols(self) -> set[str]:
-        """Read undefined symbols from this ELF file."""
+        """Read undefined symbols from this ELF file.
+
+        :return: A set of undefined symbol names.
+        """
         return _read_undefined_symbols(self.path)
 
 

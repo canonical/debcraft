@@ -14,21 +14,18 @@
 #  You should have received a copy of the GNU General Public License along
 #  with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-"""Debcraft installdocs helper."""
+"""Debcraft lintian helper."""
 
 import pathlib
-import shutil
 from typing import Any
-
-from craft_cli import emit
 
 from debcraft import models
 
-from .helpers import Helper
+from .helpers import Helper, install_package_data
 
 
-class Installdocs(Helper):
-    """Debcraft installdocs helper."""
+class Lintian(Helper):
+    """Debcraft lintian helper."""
 
     def run(
         self,
@@ -38,7 +35,7 @@ class Installdocs(Helper):
         install_dirs: dict[str, pathlib.Path],
         **kwargs: Any,  # noqa: ARG002
     ) -> None:
-        """Install copyright file.
+        """Install lintian-overrides files.
 
         :param project: the project model.
         :param build_dir: the directory containing the project being built.
@@ -47,22 +44,12 @@ class Installdocs(Helper):
         if not project.packages:
             return
 
-        # Install copyright file in all packages
-        for debian_dir in ("debcraft", "debian"):
-            cfile = build_dir / debian_dir / "copyright"
-            if not cfile.is_file():
-                continue
-
-            for partition, install_dir in install_dirs.items():
-                if partition in ("default", "build"):
-                    continue
-
-                package = partition.removeprefix("package/")
-                copyright_file = f"usr/share/doc/{package}/copyright"
-                dest = install_dir / copyright_file
-                dest.parent.mkdir(parents=True, exist_ok=True)
-                shutil.copy(cfile, dest)
-                dest.chmod(0o644)
-                emit.progress(f"Install copyright: {copyright_file}")
-
-            break
+        # Map package names to lintian files from debcraft/ or debian/,
+        # with debcraft/ taking precedence.
+        install_package_data(
+            name="lintian-overrides",
+            dest_dir=pathlib.Path("usr/share/lintian/overrides"),
+            project=project,
+            build_dir=build_dir,
+            install_dirs=install_dirs,
+        )

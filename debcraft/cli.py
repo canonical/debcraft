@@ -28,23 +28,27 @@ from debcraft import services
 def _create_app() -> debcraft.Application:
     """Create a Debcraft application instance."""
     services.register_services()
-    app_services = craft_application.ServiceFactory(
-        app=debcraft.METADATA  # type: ignore[call-arg]
-    )
+    app_services = craft_application.ServiceFactory(app=debcraft.METADATA)
 
     return debcraft.Application(app=debcraft.METADATA, services=app_services)
 
 
 def get_app_info() -> tuple[Dispatcher, dict[str, Any]]:
-    """Retrieve application info. Used by craft-cli's completion module."""
+    """Retrieve application info. Used by craft-cli's completion module.
+
+    :returns: A tuple containing the dispatcher and application configuration.
+    """
     app = _create_app()
-    app._load_plugins()  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
-    dispatcher = app._create_dispatcher()  # pyright: ignore[reportPrivateUsage]  # noqa: SLF001
+    app._load_plugins()  # noqa: SLF001
+    dispatcher = app._create_dispatcher()  # noqa: SLF001
 
     return dispatcher, app.app_config
 
 
 def main() -> int:
-    """Start up and run Debcraft."""
+    """Start up and run Debcraft.
+
+    :returns: The exit code from the application run.
+    """
     app = _create_app()
     return app.run()

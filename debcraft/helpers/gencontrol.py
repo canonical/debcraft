@@ -47,6 +47,7 @@ class Gencontrol(Helper):
         :param arch: The deb control architecture.
         :param prime_dir: Directory containing the package payload files.
         :param control_dir: Directory where the control file will be created.
+        :param state_dir: Directory for reading helper state files.
         """
         package = project.get_package(package_name)
         installed_size = _get_dir_size(prime_dir)

@@ -48,7 +48,17 @@ class Makedeb(Helper):
         deb_list: list[pathlib.Path],
         **kwargs: Any,  # noqa: ARG002
     ) -> None:
-        """Create deb package."""
+        """Create a .deb package from the control and data tarballs.
+
+        :param project: The project model.
+        :param package_name: The name of the package to create.
+        :param arch: The target architecture.
+        :param prime_dir: Directory containing the primed package files.
+        :param control_dir: Directory containing the generated control file.
+        :param deb_dir: Temporary directory for building deb components.
+        :param output_dir: Directory where the .deb file will be written.
+        :param deb_list: List to append the output .deb file path to.
+        """
         package = project.get_package(package_name)
         version = cast(str, package.version or project.version)
         deb_name = f"{package_name}_{version}_{arch}.deb"

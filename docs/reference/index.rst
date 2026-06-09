@@ -9,5 +9,9 @@ Reference
 Indices and tables
 ------------------
 
+.. vale off
+
 * :ref:`genindex`
 * :ref:`modindex`
+
+.. vale of

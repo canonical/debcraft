@@ -16,7 +16,17 @@
 
 """Debcraft helpers base."""
 
+import copy
+import os
+import re
+import shutil
 from abc import ABC, abstractmethod
+from pathlib import Path
+from string import Template
+
+from craft_cli import emit
+
+from debcraft import models
 
 
 class Helper:
@@ -54,3 +64,192 @@ class HelperGroup(ABC):
             self._helper[name] = helper
 
         return helper
+
+
+def install_package_data(
+    *,
+    name: str,
+    project: models.Project,
+    dest_dir: Path,
+    build_dir: Path,
+    install_dirs: dict[str, Path],
+) -> None:
+    """Install package-specific files from the packaging directories.
+
+    Read files named ``<package-name>.<name>`` from the ``debian/`` or
+    ``debcraft/`` directories in the source package and copy them to the
+    destination path in the corresponding package, with the suffix
+    removed. A default file named ``<name>`` is also supported and is
+    treated as applying to ``project.name``. If matching files exist in
+    both directories for the same package, the file from ``debcraft/``
+    takes precedence over the one from ``debian/``.
+
+    :param name: The name used as the file suffix.
+    :param project: The project model.
+    :param dest_dir: The destination path in the binary package.
+    :param build_dir: The path to the sources being built.
+    :param install_dirs: The map to the part install directory in
+        each partition.
+    """
+    file_map = _build_file_map(
+        name,
+        project_name=project.name,
+        debian_dirs=[build_dir / "debian", build_dir / "debcraft"],
+    )
+
+    for partition, install_dir in install_dirs.items():
+        if partition in ("default", "build"):
+            continue
+
+        package = partition.removeprefix("package/")
+        pfile = file_map.get(package)
+        if not pfile:
+            continue
+
+        file_path = Path(dest_dir) / package
+        dest = install_dir / file_path
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        # Add this to a state file to be able to properly clean installed files.
+        if pfile.is_symlink():
+            dest.unlink(missing_ok=True)
+            dest.symlink_to(pfile.readlink())
+        else:
+            shutil.copy(pfile, dest)
+            dest.chmod(0o644)
+        emit.progress(f"Install {name} file: {file_path}")
+
+
+def install_package_control(
+    *,
+    name: str,
+    project: models.Project,
+    build_dir: Path,
+    partition_dir: Path,
+    install_dirs: dict[str, Path],
+    template_mapping: dict[str, str] | None = None,
+) -> None:
+    """Install package-specific files from the debian directory.
+
+    Read files named ``<package-name>.<name>`` from the ``debcraft/`` or
+    ``debian/`` directories in the source package and add them to the
+    control tarball of the corresponding package. A file named ``<name>``
+    is also supported and is treated as applying to ``project.name``.
+    If matching files exist in both directories for the same package,
+    the file from ``debcraft/`` takes precedence over the one from ``debian/``.
+
+    :param name: The name used as the file suffix.
+    :param project: The project model.
+    :param build_dir: The path to the sources being built.
+    :param partition_dir: The path to the project partitions.
+    :param install_dirs: The map to the part install directory in
+        each partition.
+    :param template_mapping: A mapping of strings to substitute into the file.
+        If set to None, no substitutions are performed. If set to any dict,
+        even an empty one, special template keys such as "ENV." will be filled
+        in anyways.
+    """
+    file_map = _build_file_map(
+        name,
+        project_name=project.name,
+        debian_dirs=[build_dir / "debian", build_dir / "debcraft"],
+    )
+
+    for partition in install_dirs:
+        if partition in ("default", "build"):
+            continue
+
+        package = partition.removeprefix("package/")
+        pfile = file_map.get(package)
+        if not pfile:
+            continue
+
+        dest = partition_dir / "package" / package / "debcraft_control" / name
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        # Add this to a state file to be able to properly clean installed files.
+        if pfile.is_symlink():
+            # Substitution is not performed for symlinks, as this would mean modifying
+            # source files through the link instead of modifying a copy
+            dest.symlink_to(pfile.readlink())
+        else:
+            if template_mapping is None:
+                shutil.copy(pfile, dest)
+            else:
+                contents = pfile.read_text()
+                templater = _DebianTemplater(contents)
+                mapping = copy.deepcopy(template_mapping)
+                # Dynamic values can depend on the contents of the file being installed,
+                # and so must be determined here when we know what file is being read
+                mapping |= templater.get_dynamic_values()
+                # Common substitution that can vary by the package being built
+                mapping["PACKAGE"] = package
+                contents = _DebianTemplater(contents).safe_substitute(mapping)
+                dest.write_text(contents)
+
+            dest.chmod(0o644)
+
+        emit.progress(f"Install {name} to package {package} control file")
+
+
+def _build_file_map(
+    name: str, project_name: str, debian_dirs: list[Path]
+) -> dict[str, Path]:
+    file_map: dict[str, Path] = {}
+
+    for debian_dir in debian_dirs:
+        default_file = debian_dir / name
+        if default_file.is_file() or default_file.is_symlink():
+            file_map[project_name] = default_file
+
+        package_files = debian_dir.glob(f"*.{name}")
+        for pfile in package_files:
+            if pfile.is_file() or pfile.is_symlink():
+                package_name = pfile.name.removesuffix(f".{name}")
+                file_map[package_name] = pfile
+
+    return file_map
+
+
+_VALID_CONFIG_TEMPLATE_REGEX = r"[A-Za-z0-9_\.+]+"
+
+
+class _DebianTemplater(Template):
+    """A templating structure to fill in token templates in debian config files."""
+
+    # https://docs.python.org/3/library/string.html#template-strings-strings
+    #
+    # \#                                                     The first character to look for to begin replacement
+    #   (?:                                                  Non-capturing group that must come after the #
+    #     (?<escaped>\#)                              |      What it looks like when the user wants to escape the
+    #                                                        template sequence. In this case, ## becomes a literal
+    #                                                        '#' in the final output.
+    #     (?P<named>{_VALID_CONFIG_TEMPLATE_REGEX})          Match a valid key that would go between #'s.
+    #                                              \# |      Enforce a closing '#' for the template string.
+    #     (?P<braced>(?!))                            |      Unused, never matches
+    #     (?P<invalid>{_VALID_CONFIG_TEMPLATE_REGEX}(?!\#))  What an invalid match looks like -- in this case, an
+    #                                                        identifier that isn't terminated by a '#'.
+    #   )                                                    End
+    pattern = rf"""
+        \#(?:
+            (?P<escaped>\#)                             |
+            (?P<named>{_VALID_CONFIG_TEMPLATE_REGEX})\# |
+            (?P<braced>(?!))                            |
+            (?P<invalid>{_VALID_CONFIG_TEMPLATE_REGEX}(?!\#))
+        )
+    """
+    delimiter = "#"
+
+    def get_dynamic_values(self) -> dict[str, str]:
+        mapping = {}
+
+        for needle in re.finditer(self.pattern, self.template):
+            key = needle.group("named")
+            if not key:
+                continue
+
+            # Populate "ENV." values
+            if key.startswith("ENV."):
+                _, name = key.split(".", maxsplit=1)
+                # Default to an empty string to stay bashy
+                mapping[key] = os.getenv(name, "")
+
+        return mapping

@@ -20,13 +20,25 @@ from unittest.mock import call
 
 import craft_platforms
 import pytest
+from craft_parts import ProjectDirs, ProjectInfo
 from debcraft import models
 from debcraft.helpers import md5sums, strip
 from debcraft.services import helper
 
 
+@pytest.fixture
+def project_info(tmp_path) -> ProjectInfo:
+    dirs = ProjectDirs(partitions=["partition"], work_dir=tmp_path)
+    return ProjectInfo(
+        application_name="test",
+        cache_dir=tmp_path / "cache",
+        partitions=["partition"],
+        project_dirs=dirs,
+    )
+
+
 def test_install_helpers_runner(
-    mocker, tmp_path, default_project, project_service, build_plan_service
+    mocker, tmp_path, default_project, project_info, project_service, build_plan_service
 ):
     mock_run = mocker.patch.object(strip.Strip, "run")
     lifecycle = mocker.MagicMock()
@@ -37,9 +49,11 @@ def test_install_helpers_runner(
     step_info.part_install_dir = "install-dir"
     step_info.part_name = "my-part"
     step_info.part_install_dirs = {"partition": "install-dir"}
+    step_info.is_native = False
 
     my_runner = helper.InstallHelpersRunner(
         project=default_project,
+        project_info=project_info,
         build_info=build_plan_service.plan()[0],
         step_info=step_info,
         lifecycle=lifecycle,
@@ -56,14 +70,17 @@ def test_install_helpers_runner(
             install_dir="install-dir",
             install_dirs={"partition": "install-dir"},
             project=default_project,
+            project_info=project_info,
             part_name="my-part",
+            is_native=False,
+            partition_dir=project_info.partition_dir,
             arg="foo",
         )
     ]
 
 
 def test_packaging_helpers_runner(
-    mocker, tmp_path, default_project, project_service, build_plan_service
+    mocker, tmp_path, default_project, project_info, project_service, build_plan_service
 ):
     mock_run = mocker.patch.object(md5sums.Md5sums, "run")
     mocker.patch("debcraft.services.helper._get_architecture", return_value="arm64")
@@ -72,6 +89,7 @@ def test_packaging_helpers_runner(
 
     my_runner = helper.PackagingHelpersRunner(
         project=default_project,
+        project_info=project_info,
         build_info=build_plan_service.plan()[0],
         lifecycle=lifecycle,
     )
@@ -94,6 +112,33 @@ def test_packaging_helpers_runner(
             arg="foo",
         )
     ]
+
+
+def test_install_helpers_control_files(
+    mocker, tmp_path, default_project, project_info, project_service, build_plan_service
+):
+    mocker.patch.object(md5sums.Md5sums, "run")
+    mocker.patch("debcraft.services.helper._get_architecture", return_value="arm64")
+    lifecycle = mocker.MagicMock()
+    lifecycle.get_prime_dir.return_value = tmp_path
+
+    partition_control_dir = (
+        project_info.partition_dir / "package" / "package-1" / "debcraft_control"
+    )
+    partition_control_dir.mkdir(parents=True, exist_ok=True)
+    (partition_control_dir / "triggers").write_text("trigger content")
+
+    my_runner = helper.PackagingHelpersRunner(
+        project=default_project,
+        project_info=project_info,
+        build_info=build_plan_service.plan()[0],
+        lifecycle=lifecycle,
+    )
+    with my_runner as runner:
+        runner.run("md5sums")
+        control_dir = pathlib.Path(runner._temp_dir.name) / "package-1" / "control"
+        assert (control_dir / "triggers").exists()
+        assert (control_dir / "triggers").read_text() == "trigger content"
 
 
 @pytest.mark.parametrize(

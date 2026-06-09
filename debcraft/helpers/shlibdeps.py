@@ -231,7 +231,14 @@ class Shlibdeps(Helper):
         state_dir_map: dict[str, pathlib.Path],
         **kwargs: Any,  # noqa: ARG002
     ) -> None:
-        """Find shared library dependencies."""
+        """Find shared library dependencies.
+
+        :param package_name: The name of the package being processed.
+        :param arch: The target architecture.
+        :param prime_dir: Directory containing the primed package files.
+        :param state_dir: Directory for storing helper state files.
+        :param state_dir_map: Mapping of package names to their state directories.
+        """
         primed_elf_files = get_elf_files(prime_dir)
 
         # Needed libraries and undefined symbols in primed ELF files.
@@ -247,6 +254,8 @@ class Shlibdeps(Helper):
         unique_needed_libs = list(dict.fromkeys(needed_libs))
 
         self._setup_shlibdeps(arch, state_dir_map)
+        assert self._deb_info_shlibs is not None  # noqa: S101 Type narrowing
+        assert self._deb_info_symbols is not None  # noqa: S101 Type narrowing
 
         # Mapping of package name to a set of symbol versions, used to
         # determine the minimum package version containing all symbols.
@@ -254,8 +263,8 @@ class Shlibdeps(Helper):
         pkg_deps: set[str] = set()
 
         for lib in unique_needed_libs:
-            self._deb_info_shlibs.load_deb_info_shlibs(lib.soname, arch)  # type: ignore[union-attr] # pyright: ignore[reportOptionalMemberAccess]
-            self._deb_info_symbols.load_deb_info_symbols(lib.soname, arch)  # type: ignore[union-attr] # pyright: ignore[reportOptionalMemberAccess]
+            self._deb_info_shlibs.load_deb_info_shlibs(lib.soname, arch)
+            self._deb_info_symbols.load_deb_info_symbols(lib.soname, arch)
 
             # Check symbols
             emit.debug(f"shlibdeps: check library: {lib}")
@@ -292,7 +301,8 @@ class Shlibdeps(Helper):
         found_symbols: set[str] = set()
 
         for symbol in undefined_symbols:
-            pkg, ver = self._deb_info_symbols.get((lib.soname, symbol), ("", ""))  # type: ignore[union-attr] # pyright: ignore[reportOptionalMemberAccess]
+            assert self._deb_info_symbols is not None  # noqa: S101 Type narrowing
+            pkg, ver = self._deb_info_symbols.get((lib.soname, symbol), ("", ""))
             if pkg and ver:
                 if pkg not in pkg_versions:
                     pkg_versions[pkg] = set()
@@ -314,7 +324,7 @@ class Shlibdeps(Helper):
         if self._packaged_shlibs is None:
             return False
 
-        raw_deps = self._packaged_shlibs.get(lib.soname)  # pyright: ignore[reportOptionalMemberAccess]
+        raw_deps = self._packaged_shlibs.get(lib.soname)
         emit.debug(f"shlibdeps: check for {lib.soname} in sibling shlibs: {raw_deps}")
 
         if raw_deps and not _package_in_deps(package_name, raw_deps):
@@ -326,7 +336,7 @@ class Shlibdeps(Helper):
         self, package_name: str, lib: ElfLibrary, pkg_deps: set[str]
     ) -> None:
         """Check dependency in /var/lib/dpkg/info/*.shlibs files."""
-        raw_deps = self._deb_info_shlibs.get(lib.soname)  # type: ignore[union-attr]
+        raw_deps = self._deb_info_shlibs.get(lib.soname)  # ty: ignore[unresolved-attribute]
         emit.debug(f"shlibdeps: check for {lib.soname} in system shlibs: {raw_deps}")
         if raw_deps and not _package_in_deps(package_name, raw_deps):
             pkg_deps.add(raw_deps)

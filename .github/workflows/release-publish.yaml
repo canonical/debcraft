@@ -14,7 +14,9 @@ jobs:
     runs-on: [self-hosted]
     steps:
       - name: Install uv
-        run: sudo snap install --classic astral-uv
+        run: |
+          sudo snap install --classic astral-uv
+          sudo apt --yes install python3-venv
       - name: Checkout
         uses: actions/checkout@v6
       - name: Fetch tag annotations
