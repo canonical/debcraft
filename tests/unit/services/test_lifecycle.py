@@ -65,9 +65,6 @@ def test_is_native_package(
             lifecycle._is_native_package(tmp_path, version)
 
 
-pytest.mark.usefixtures("default_project", "extra_project_params")
-
-
 def test_build_environment(mocker, default_factory):
     mock_lifecycle = mocker.patch.object(
         LifecycleManager, "__init__", return_value=None
