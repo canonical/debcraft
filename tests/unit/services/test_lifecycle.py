@@ -17,6 +17,7 @@
 
 import pytest
 from craft_application.models import VersionStr
+from craft_parts import LifecycleManager
 from debcraft import errors
 from debcraft.services import lifecycle
 
@@ -62,3 +63,29 @@ def test_is_native_package(
     else:
         with pytest.raises(errors.DebcraftError, match="Mismatch"):
             lifecycle._is_native_package(tmp_path, version)
+
+
+pytest.mark.usefixtures("default_project", "extra_project_params")
+
+
+def test_build_environment(mocker, default_factory):
+    mock_lifecycle = mocker.patch.object(
+        LifecycleManager, "__init__", return_value=None
+    )
+    mock_result = mocker.Mock()
+    mock_result.stdout = (
+        "export CFLAGS='-O2 -g'\n"
+        "export CXXFLAGS='-O2 -g'\n"
+        "export LDFLAGS='-Wl,-Bsymbolic-functions'\n"
+    )
+    mocker.patch("debcraft.services.lifecycle.subprocess.run", return_value=mock_result)
+
+    default_factory.get("project").configure(platform=None, build_for=None)
+    default_factory.get("lifecycle")
+
+    call = mock_lifecycle.mock_calls[0]
+    assert list(call.kwargs["build_environment"]) == [
+        "CFLAGS='-O2 -g'",
+        "CXXFLAGS='-O2 -g'",
+        "LDFLAGS='-Wl,-Bsymbolic-functions'",
+    ]

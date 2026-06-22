@@ -16,6 +16,8 @@
 #
 """Debcraft Lifecycle Service."""
 
+import subprocess
+from collections.abc import Generator
 from pathlib import Path
 from typing import TYPE_CHECKING, cast
 
@@ -50,6 +52,7 @@ class Lifecycle(LifecycleService):
         )
 
         self._manager_kwargs.update(
+            build_environment=_get_dpkg_buildflags(),
             is_native=None,
         )
 
@@ -158,3 +161,22 @@ def _is_native_package(build_dir: Path, version: VersionStr | None) -> bool:
         is_native = False
 
     return is_native
+
+
+def _get_dpkg_buildflags() -> Generator[str]:
+    try:
+        res = subprocess.run(
+            ["dpkg-buildflags", "--export=sh"],
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+    except subprocess.CalledProcessError as err:
+        raise errors.DebcraftError(f"error obtaining build flags: {err.stderr}")
+    except FileNotFoundError:
+        raise errors.DebcraftError(
+            "required tool 'dpkg-buildflags' not found on PATH; install the 'dpkg-dev' package"
+        )
+
+    for line in res.stdout.splitlines():
+        yield line.removeprefix("export ")
