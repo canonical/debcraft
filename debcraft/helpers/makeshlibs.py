@@ -108,7 +108,7 @@ class Makeshlibs(Helper):
         if not sep or rev.endswith("~"):
             return version
         emit.debug(
-            f"Stripping revision '-{rev}' from package version {upstream!r} for shlibs"
+            f"Stripping revision '-{rev}' from package version {version!r} for shlibs"
         )
         return upstream
 
