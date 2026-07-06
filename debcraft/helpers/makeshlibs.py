@@ -52,7 +52,8 @@ class Makeshlibs(Helper):
         """Create a list of shared libraries present in this package."""
         shlibs_file = control_dir / "shlibs"
         package = project.get_package(package_name)
-        version = cast(str, package.version or project.version)
+        version_raw = cast(str, package.version or project.version)
+        version = self._get_shlibs_friendly_version(version_raw)
         arch_triplet = util.get_arch_triplet()
         lib_dirs = _get_lib_dirs(arch_triplet)
 
@@ -92,6 +93,24 @@ class Makeshlibs(Helper):
         # Copy to helper state
         state_shlibs_file = state_dir / f"{package_name}:{arch}.shlibs"
         shutil.copy(shlibs_file, state_shlibs_file)
+
+    @staticmethod
+    def _get_shlibs_friendly_version(version: str) -> str:
+        """Strip any revision values from a package version.
+
+        See Debian Policy 8.6.4 for the source of this logic. But in short,
+
+        - shlib files should not contain revisions, and instead prefer the upstream version
+        - the "revision" is separated from the version by the _final_ hyphen
+        - if the version string ends with a tilde, prefer the revision despite previous points
+        """
+        upstream, sep, rev = version.rpartition("-")
+        if not sep or rev.endswith("~"):
+            return version
+        emit.debug(
+            f"Stripping revision '-{rev}' from package version {upstream!r} for shlibs"
+        )
+        return upstream
 
 
 @functools.lru_cache
