@@ -1,3 +1,4 @@
 # Ignore auto-generated schema files
 schema/
 docs/.sphinx
+docs/_dev

@@ -3,17 +3,6 @@
 Debcraft
 =========
 
-.. toctree::
-   :maxdepth: 1
-   :hidden:
-
-   tutorials/index
-   how-to-guides/index
-   reference/index
-   explanation/index
-   release-notes/index
-
-
 .. list-table::
 
     * - | :ref:`Tutorial <tutorials>`
@@ -36,3 +25,16 @@ and constructive feedback.
 * `Ubuntu Code of Conduct <https://ubuntu.com/community/code-of-conduct>`_.
 * `Canonical contributor licenses agreement
   <https://ubuntu.com/legal/contributors>`_.
+
+.. toctree::
+    :hidden:
+
+    tutorials/index
+    how-to/index
+    reference/index
+    explanation/index
+
+.. toctree::
+    :hidden:
+
+    release-notes/index
