@@ -1,0 +1,5 @@
+copilot:
+  version: "v0.13.0"
+  collections:
+    - starcraft-docs
+    - common-python
