@@ -9,9 +9,14 @@ on:
 
 jobs:
   policy:
+    permissions:
+      contents: read
+      security-events: write
     uses: canonical/starflow/.github/workflows/policy.yaml@main
   python-scans:
     name: Security scan
     uses: canonical/starflow/.github/workflows/scan-python.yaml@main
     with:
-      requirements-find-args: "! -path '*/tests/integration/*'"
+      osv-exclude-paths: |
+        tests/integration/
+        docs/
