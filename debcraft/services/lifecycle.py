@@ -52,7 +52,7 @@ class Lifecycle(LifecycleService):
         )
 
         self._manager_kwargs.update(
-            build_environment=_get_dpkg_buildflags(),
+            build_environment=_gen_dpkg_buildflags(),
             is_native=None,
         )
 
