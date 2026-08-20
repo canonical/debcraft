@@ -256,7 +256,6 @@
           "examples": [
             "amd64",
             [
-              "arm64",
               "riscv64"
             ]
           ],
@@ -339,7 +338,7 @@
     "summary": {
       "anyOf": [
         {
-          "description": "A short description of the project.",
+          "description": "A short description of the project. Maximum length 78 characters.",
           "examples": [
             "Linux for Human Beings",
             "The cross-platform desktop application for JupyterLab",
@@ -369,23 +368,28 @@
         }
       ],
       "default": null,
+      "description": "The full description of the project.",
       "title": "Description"
     },
     "base": {
-      "anyOf": [
-        {
-          "type": "string"
-        },
-        {
-          "type": "null"
-        }
+      "enum": [
+        "ubuntu@22.04",
+        "ubuntu@24.04",
+        "ubuntu@26.04",
+        "ubuntu@26.10"
       ],
-      "default": null,
-      "title": "Base"
+      "title": "Base",
+      "type": "string"
     },
     "build-base": {
       "anyOf": [
         {
+          "enum": [
+            "ubuntu@22.04",
+            "ubuntu@24.04",
+            "ubuntu@26.04",
+            "devel"
+          ],
           "type": "string"
         },
         {
@@ -446,6 +450,19 @@
               ]
             }
           },
+          "propertyNames": {
+            "description": "The name of this platform. May not contain '/'",
+            "examples": [
+              "riscv64",
+              "my-special-platform"
+            ],
+            "not": {
+              "enum": [
+                "*",
+                "any"
+              ]
+            }
+          },
           "type": "object"
         },
         {
@@ -476,6 +493,10 @@
         }
       ],
       "default": null,
+      "description": "The author's contact links and email addresses.",
+      "examples": [
+        "[contact@example.com, https://example.com/contact]"
+      ],
       "title": "Contact"
     },
     "issues": {
@@ -495,6 +516,10 @@
         }
       ],
       "default": null,
+      "description": "The links and email addresses for submitting issues, bugs, and feature requests.",
+      "examples": [
+        "[issues@example.com, https://example.com/issues]"
+      ],
       "title": "Issues"
     },
     "source-code": {
@@ -509,6 +534,10 @@
         }
       ],
       "default": null,
+      "description": "The links to the source code of the project.",
+      "examples": [
+        "[https://github.com/canonical/craft-application]"
+      ],
       "title": "Source-Code"
     },
     "license": {
@@ -521,6 +550,11 @@
         }
       ],
       "default": null,
+      "description": "The project's license as an SPDX expression",
+      "examples": [
+        "GPL-3.0+",
+        "Apache-2.0"
+      ],
       "title": "License"
     },
     "adopt-info": {
@@ -533,6 +567,10 @@
         }
       ],
       "default": null,
+      "description": "Selects a part to inherit metadata from.",
+      "examples": [
+        "foo-part"
+      ],
       "title": "Adopt-Info"
     },
     "parts": {
@@ -540,6 +578,10 @@
         "additionalProperties": true,
         "type": "object"
       },
+      "description": "The self-contained software pieces needed to create the final artifact.",
+      "examples": [
+        "{cloud-init:                 {plugin: python,                 source-type: git,                 source: https://git.launchpad.net/cloud-init}}"
+      ],
       "title": "Parts",
       "type": "object"
     },
@@ -557,6 +599,10 @@
         }
       ],
       "default": null,
+      "description": "The package repositories to use for build and stage packages.",
+      "examples": [
+        "[{type: apt,                components: [main],                suites: [xenial],                key-id: 78E1918602959B9C59103100F1831DDAFC42E99D,                url: http://ppa.launchpad.net/snappy-dev/snapcraft-daily/ubuntu}]"
+      ],
       "title": "Package-Repositories"
     },
     "priority": {
@@ -636,6 +682,7 @@
   },
   "required": [
     "name",
+    "base",
     "parts",
     "maintainer"
   ],

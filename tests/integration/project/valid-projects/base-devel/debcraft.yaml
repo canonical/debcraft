@@ -1,0 +1,11 @@
+name: base-devel
+version: "0.1"
+summary: A project using build-base devel
+description: A description
+base: ubuntu@26.10
+build-base: devel
+maintainer: Name of the Maintainer <email@example.com>
+
+parts:
+  my-part:
+    plugin: nil

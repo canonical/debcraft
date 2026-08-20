@@ -18,12 +18,17 @@
 
 import enum
 import re
-from typing import Annotated
+from collections.abc import Iterable
+from typing import Annotated, Literal
 
 import pydantic
 from craft_application import models
 from craft_application.models import PlatformsDict
-from typing_extensions import Self
+from craft_application.models.project import DevelBaseInfo
+from craft_providers import bases
+from craft_providers.bases import BuilddBaseAlias
+from craft_providers.errors import BaseConfigurationError
+from typing_extensions import Self, override
 
 from debcraft import errors
 from debcraft.models.package import Package
@@ -34,6 +39,22 @@ DEBIAN_PACKAGE_NAME_REGEX = r"^[a-z0-9][a-z0-9.+-]+$"
 Based on the rules provided at:
 https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-source
 """
+
+BaseT = Literal[
+    "ubuntu@22.04",
+    "ubuntu@24.04",
+    "ubuntu@26.04",
+    "ubuntu@26.10",
+]
+BuildBaseT = Annotated[
+    Literal[
+        "ubuntu@22.04",
+        "ubuntu@24.04",
+        "ubuntu@26.04",
+        "devel",
+    ],
+    pydantic.Field(validate_default=True),
+]
 
 
 def _validate_debian_package_name(name: str) -> str:
@@ -76,6 +97,8 @@ class Project(models.Project):
     maintainer: str
     original_maintainer: str | None = None
     uploaders: list[str] | None = None
+    base: BaseT
+    build_base: BuildBaseT | None = None
 
     platforms: PlatformsDict | None = pydantic.Field(
         default=None,
@@ -117,6 +140,25 @@ class Project(models.Project):
             raise ValueError("'adopt-info' field must refer to the name of a part.")
         return self
 
+    @override
+    @classmethod
+    def _providers_base(cls, base: str) -> bases.BaseAlias | None:
+        """Get a BaseAlias from Debcraft's base.
+
+        :param base: The base name.
+
+        :returns: The BaseAlias for the base or None for bare bases.
+        :raises ValueError: If the project's base cannot be determined.
+        """
+        if base == "devel":
+            return bases.get_base_alias(("ubuntu", "devel"))
+
+        try:
+            name, channel = base.split("@")
+            return bases.get_base_alias(bases.BaseName(name, channel))
+        except (ValueError, BaseConfigurationError) as err:
+            raise ValueError(f"Unknown base {base!r}") from err
+
     def get_package(self, name: str) -> Package:
         """Obtain the package definition for the given package name.
 
@@ -133,6 +175,16 @@ class Project(models.Project):
             raise errors.DebcraftError(f"package {name} is not defined")
 
         return package
+
+    @classmethod
+    @override
+    def _get_devel_bases(cls) -> Iterable[DevelBaseInfo]:
+        return [
+            DevelBaseInfo(
+                current_devel_base=BuilddBaseAlias.STONKING,
+                devel_base=BuilddBaseAlias.DEVEL,
+            )
+        ]
 
 
 class PackagesProject(models.CraftBaseModel, extra="ignore"):

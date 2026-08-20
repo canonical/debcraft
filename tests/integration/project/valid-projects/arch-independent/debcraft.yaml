@@ -1,4 +1,7 @@
-name: debcraft-explicit-platforms
+name: debcraft-arch-independed
+summary: Test platform all
+description: A description
+base: ubuntu@24.04
 maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 version: 0
 

@@ -1,3 +1,6 @@
 name: debcraft-minimal
+summary: A minimal debcraft project
+description: A description
+base: ubuntu@24.04
 maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 version: 0

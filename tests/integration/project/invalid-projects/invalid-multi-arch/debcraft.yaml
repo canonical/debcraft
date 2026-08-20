@@ -1,5 +1,7 @@
 name: debcraft-multi-arch
 summary: A debcraft project with an invalid multi-arch value.
+description: A description
+base: ubuntu@24.04
 maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 version: 0
 
