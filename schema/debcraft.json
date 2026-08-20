@@ -394,6 +394,7 @@
           "type": "null"
         }
       ],
+      "default": null,
       "title": "Build-Base"
     },
     "platforms": {
@@ -680,7 +681,6 @@
   "required": [
     "name",
     "base",
-    "build-base",
     "parts",
     "maintainer"
   ],
