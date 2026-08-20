@@ -621,7 +621,7 @@ types = [
 
 [package.metadata]
 requires-dist = [
-    { name = "craft-application", specifier = ">=5.4.0" },
+    { name = "craft-application", specifier = ">=7.1.0" },
     { name = "craft-parts", specifier = ">=2.35.0" },
     { name = "pyelftools", specifier = ">=0.32" },
     { name = "zstandard", specifier = ">=0.25.0" },
