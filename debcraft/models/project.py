@@ -142,7 +142,7 @@ class Project(models.Project):
     @override
     @classmethod
     def _providers_base(cls, base: str) -> bases.BaseAlias | None:
-        """Get a BaseAlias from rockcraft's base.
+        """Get a BaseAlias from Debcraft's base.
 
         :param base: The base name.
 
