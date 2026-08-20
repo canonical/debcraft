@@ -16,6 +16,7 @@
 """Unit tests for the debcraft project model."""
 
 import pytest
+from craft_providers import bases
 from debcraft.models import project
 
 
@@ -108,3 +109,51 @@ def test_default_partition(
         default_project_raw["packages"][name] = value
     pprj = project.PackagesProject.unmarshal(default_project_raw)
     assert pprj.get_partitions() == partitions
+
+
+@pytest.mark.parametrize("base", ["ubuntu@24.04", "ubuntu@26.04", "ubuntu@26.10"])
+def test_project_base_valid(default_project_raw, base: str):
+    default_project_raw["base"] = base
+    project.Project.model_validate(default_project_raw)
+
+
+def test_project_base_invalid(default_project_raw):
+    default_project_raw["base"] = "ubuntu@22.04"
+    with pytest.raises(ValueError, match="base"):
+        project.Project.model_validate(default_project_raw)
+
+
+@pytest.mark.parametrize("build_base", [None, "ubuntu@24.04", "ubuntu@26.04", "devel"])
+def test_project_build_base_valid(default_project_raw, build_base):
+    default_project_raw["build-base"] = build_base
+    project.Project.model_validate(default_project_raw)
+
+
+def test_project_build_base_invalid(default_project_raw):
+    default_project_raw["build-base"] = "ubuntu@26.10"
+    with pytest.raises(ValueError, match="build-base"):
+        project.Project.model_validate(default_project_raw)
+
+
+@pytest.mark.parametrize(
+    ("base", "expected"),
+    [
+        ("devel", bases.get_base_alias(("ubuntu", "devel"))),
+        ("ubuntu@24.04", bases.get_base_alias(("ubuntu", "24.04"))),
+    ],
+)
+def test_providers_base_success(base: str, expected):
+    assert project.Project._providers_base(base) == expected
+
+
+def test_providers_base_error():
+    with pytest.raises(ValueError, match="Unknown base"):
+        project.Project._providers_base("not-a-base")
+
+
+def test_get_devel_bases():
+    devel_bases = list(project.Project._get_devel_bases())
+
+    assert len(devel_bases) == 1
+    assert devel_bases[0].current_devel_base is project.BuilddBaseAlias.STONKING
+    assert devel_bases[0].devel_base is project.BuilddBaseAlias.DEVEL
