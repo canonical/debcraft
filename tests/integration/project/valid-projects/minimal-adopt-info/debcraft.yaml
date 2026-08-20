@@ -1,4 +1,7 @@
-name: debcraft-minimal
+name: debcraft-adopt-info
+summary: A debcraft project using adopt-info
+description: A description
+base: ubuntu@24.04
 maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 
 adopt-info: yolo

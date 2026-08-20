@@ -1,6 +1,9 @@
 name: debcraft-explicit-platforms
+summary: A debcraft project with explicitly listed platforms
+description: A description
 maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
 version: 0
+base: ubuntu@24.04
 
 platforms:
   amd64:
