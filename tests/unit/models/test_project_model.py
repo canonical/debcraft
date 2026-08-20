@@ -111,14 +111,16 @@ def test_default_partition(
     assert pprj.get_partitions() == partitions
 
 
-@pytest.mark.parametrize("base", ["ubuntu@24.04", "ubuntu@26.04", "ubuntu@26.10"])
+@pytest.mark.parametrize(
+    "base", ["ubuntu@22.04", "ubuntu@24.04", "ubuntu@26.04", "ubuntu@26.10"]
+)
 def test_project_base_valid(default_project_raw, base: str):
     default_project_raw["base"] = base
     project.Project.model_validate(default_project_raw)
 
 
 def test_project_base_invalid(default_project_raw):
-    default_project_raw["base"] = "ubuntu@22.04"
+    default_project_raw["base"] = "ubuntu@20.04"
     with pytest.raises(ValueError, match="base"):
         project.Project.model_validate(default_project_raw)
 
