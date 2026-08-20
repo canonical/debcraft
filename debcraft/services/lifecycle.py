@@ -163,7 +163,7 @@ def _is_native_package(build_dir: Path, version: VersionStr | None) -> bool:
     return is_native
 
 
-def _get_dpkg_buildflags() -> Generator[str, None, None]:
+def _gen_dpkg_buildflags() -> Generator[str, None, None]:
     try:
         res = subprocess.run(
             ["dpkg-buildflags", "--export=sh"],
