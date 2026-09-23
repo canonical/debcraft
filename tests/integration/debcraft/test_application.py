@@ -33,6 +33,7 @@ debian_like_only = pytest.mark.skipif(
     reason="host OS must be debian-like",
 )
 
+
 def check_metadata(
     *,
     metadata: models.Metadata,
