@@ -34,6 +34,10 @@ debian_like_only = pytest.mark.skipif(
 )
 
 
+def test_application_disallows_spread_yaml():
+    assert debcraft.Application.allow_spread_yaml is False
+
+
 def check_metadata(
     *,
     metadata: models.Metadata,
