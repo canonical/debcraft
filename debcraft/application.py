@@ -33,6 +33,8 @@ METADATA = craft_application.AppMetadata(
 class Application(craft_application.Application):
     """Debcraft application definition."""
 
+    allow_spread_yaml = False
+
     @override
     def _enable_craft_parts_features(self) -> None:
         """Enable partitions for packages."""
