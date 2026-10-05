@@ -52,7 +52,8 @@ BuildBaseT = Annotated[
         "ubuntu@24.04",
         "ubuntu@26.04",
         "devel",
-    ],
+    ]
+    | None,
     pydantic.Field(validate_default=True),
 ]
 
@@ -98,7 +99,7 @@ class Project(models.Project):
     original_maintainer: str | None = None
     uploaders: list[str] | None = None
     base: BaseT
-    build_base: BuildBaseT | None = None
+    build_base: BuildBaseT = None
 
     platforms: PlatformsDict | None = pydantic.Field(
         default=None,
