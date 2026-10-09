@@ -111,6 +111,7 @@ celerybeat.pid
 .direnv
 .env
 .venv
+.venv-docs
 env/
 venv/
 ENV/

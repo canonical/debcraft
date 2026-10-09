@@ -1,4 +1,7 @@
 PROJECT=debcraft
+# Install docs dependencies into a separate venv from the main uv project venv,
+# kept outside docs/ so Sphinx does not read the venv as source files
+export DOCS_VENVDIR ?= ../.venv-docs
 # Define when more than the main package tree requires coverage
 # like is the case for snapcraft (snapcraft and snapcraft_legacy):
 # COVERAGE_SOURCE="debcraft"
@@ -21,10 +24,13 @@ endif
 include common.mk
 
 .PHONY: format
-format: format-ruff format-codespell format-prettier format-pre-commit  ## Run all automatic formatters
+format: format-ruff format-codespell format-prettier format-shfmt format-tombi format-pre-commit  ## Run all automatic formatters
 
 .PHONY: lint
-lint: lint-ruff lint-ty lint-codespell lint-prettier lint-shellcheck lint-docs lint-twine lint-uv-lockfile lint-actions  ## Run all linters
+lint: lint-code lint-docs lint-twine lint-uv-lockfile lint-actions  ## Run all linters
+
+.PHONY: lint-code
+lint-code: lint-ruff lint-ty lint-codespell lint-prettier lint-shfmt lint-shellcheck lint-tombi  ## Run code-specific linters
 
 .PHONY: pack
 pack: pack-pip  ## Build all packages
