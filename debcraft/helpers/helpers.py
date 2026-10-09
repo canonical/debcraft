@@ -235,7 +235,7 @@ class _DebianTemplater(Template):
             (?P<braced>(?!))                            |
             (?P<invalid>{_VALID_CONFIG_TEMPLATE_REGEX}(?!\#))
         )
-    """
+    """  # ty: ignore[invalid-assignment]
     delimiter = "#"
 
     def get_dynamic_values(self) -> dict[str, str]:
