@@ -228,14 +228,17 @@ class _DebianTemplater(Template):
     #     (?P<invalid>{_VALID_CONFIG_TEMPLATE_REGEX}(?!\#))  What an invalid match looks like -- in this case, an
     #                                                        identifier that isn't terminated by a '#'.
     #   )                                                    End
-    pattern = re.compile(rf"""
+    # Note: `pattern` should actually be a Pattern object using `re.compile()`, but
+    # Python 3.12 incorrectly errors when it's something other than a string.
+    # Once we drop support for 3.12, the ty ignore can be removed.
+    pattern = rf"""
         \#(?:
             (?P<escaped>\#)                             |
             (?P<named>{_VALID_CONFIG_TEMPLATE_REGEX})\# |
             (?P<braced>(?!))                            |
             (?P<invalid>{_VALID_CONFIG_TEMPLATE_REGEX}(?!\#))
         )
-    """)
+    """  # ty: ignore[invalid-assignment]
     delimiter = "#"
 
     def get_dynamic_values(self) -> dict[str, str]:
