@@ -1,14 +1,18 @@
 import datetime
 import os
+import textwrap
 
 # Configuration for the Sphinx documentation builder.
 # All configuration specific to your project should be done in this file.
 #
+# If you're new to Sphinx and don't want any advanced or custom features,
+# just go through the items marked 'TODO'.
+#
 # A complete list of built-in Sphinx configuration values:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 #
-# Our starter pack uses the custom Canonical Sphinx extension
-# to keep all documentation based on it consistent and on brand:
+# The Sphinx Stack uses the Canonical Sphinx theme to keep all documentation consistent
+# and on brand:
 # https://github.com/canonical/canonical-sphinx
 
 
@@ -18,19 +22,17 @@ import os
 
 # Project name
 project = "Debcraft"
+
+# Author name; used in the default copyright statement in the page footer
 author = "Canonical"
 
-# Format the product name + version for the TOC and HTML title
-# When the product begins versioning, uncomment this block
-# release = <starcraft>.__version__
-# if ".post" in release:
-#     release = "dev"
-# else:
-#     major, minor, *_ = release.split(".")
-#     release = f"{major}.{minor}"
+# Version string in sidebar
+# TODO: Uncomment and replace 'starcraft' with the product's main module on release
+# major, minor, *_ = starcraft.__version__.split(".")
+# release = "dev" if os.environ.get("READTHEDOCS_VERSION") == "latest" else f"{major}.{minor}"
 
-# Copyright string; shown at the bottom of the page
-copyright = "2023-%s, %s" % (datetime.date.today().year, author)
+# The year in the copyright statement
+copyright = f"2023-{datetime.date.today().year}"
 
 # Documentation website URL
 ogp_site_url = "https://canonical-debcraft.readthedocs-hosted.com/"
@@ -39,12 +41,11 @@ ogp_site_url = "https://canonical-debcraft.readthedocs-hosted.com/"
 ogp_site_name = project
 
 # Preview image URL
-#
-# TODO: To customise the preview image, update as needed.
 ogp_image = "https://assets.ubuntu.com/v1/253da317-image-document-ubuntudocs.svg"
 
 # Product favicon; shown in bookmarks, browser tabs, etc.
-# html_favicon = '.sphinx/_static/favicon.png'
+# TODO: To customise the favicon, uncomment and update the next line.
+# html_favicon = ".sphinx/_static/favicon.png"
 
 # Dictionary of values to pass into the Sphinx context for all pages:
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#confval-html_context
@@ -52,33 +53,44 @@ html_context = {
     # Product page URL; can be different from product docs URL
     "product_page": "github.com/canonical/debcraft",
     # Product tag image; the orange part of your logo, shown in the page header
-    # 'product_tag': '_static/tag.png',
+    # "product_tag": "_static/tag.png",
+    # Your Discourse instance URL
     "discourse": "",
     # Your Mattermost channel URL
     "mattermost": "https://chat.canonical.com/canonical/channels/documentation",
     # Your Matrix channel URL
-    #"matrix": "https://matrix.to/#/#debcraft-development:ubuntu.com",
-    # Your documentation GitHub repository URL
+    # "matrix": "https://matrix.to/#/#debcraft-development:ubuntu.com",
+    # Your documentation GitHub repository URL. If set, links for viewing the
+    # documentation source files and creating GitHub issues are added at the bottom of
+    # each page.
     "github_url": "https://github.com/canonical/debcraft",
     # Docs branch in the repo; used in links for viewing the source files
-    'repo_default_branch': 'main',
+    "repo_default_branch": "main",
     # Docs location in the repo; used in links for viewing the source files
     "repo_folder": "/docs/",
     # List contributors on individual pages
     "display_contributors": False,
     # Required for feedback button
-    'github_issues': 'enabled',
+    "github_issues": "enabled",
+    # Passes the top-level 'author' value to the theme
+    "author": author,
+    # Documentation license information
+    "license": {
+        # For the name, use the standard shorthand identifier from
+        # https://spdx.org/licenses
+        "name": "GPL-3.0",
+        # Link directly to the project's license statement.
+        "url": "https://github.com/canonical/debcraft/blob/main/LICENSE",
+    },
 }
-
-#html_extra_path = []
 
 # Enable the edit button on pages
 html_theme_options = {
-  'source_edit_link': "https://github.com/canonical/debcraft",
+  "source_edit_link": "https://github.com/canonical/debcraft",
 }
 
-# Project slug; see https://meta.discourse.org/t/what-is-category-slug/87897
-# slug = ''
+# The project slug passed to the sphinx-notfound-page extension
+slug = "debcraft"
 
 
 #########################
@@ -89,16 +101,18 @@ html_theme_options = {
 html_baseurl = os.environ.get("READTHEDOCS_CANONICAL_URL", "/")
 
 # sphinx-sitemap uses html_baseurl to generate the full URL for each page:
-sitemap_url_scheme = '{link}'
+sitemap_url_scheme = "{link}"
 
 # Include `lastmod` dates in the sitemap:
 # sitemap_show_lastmod = True
 
-# Exclude generated pages from the sitemap:
+# Exclude pages that aren't user-facing from the sitemap (e.g., module pages
+# generated by autodoc).
+# Pages excluded from the sitemap:
 sitemap_excludes = [
-    '404/',
-    'genindex/',
-    'search/',
+    "404/",
+    "genindex/",
+    "search/",
 ]
 
 
@@ -114,32 +128,59 @@ templates_path = ["_templates"]
 # Redirects #
 #############
 
+# Add redirects to the 'redirects.txt' file
+# https://sphinxext-rediraffe.readthedocs.io/en/latest/
+
+# To set up redirects in the Read the Docs project dashboard:
+# https://docs.readthedocs.io/en/stable/guides/redirects.html
+
 rediraffe_redirects = "redirects.txt"
 
+# Strips '/index.html' from destination URLs when building with 'dirhtml'
+rediraffe_dir_only = True
+
+############################
+# sphinx-llm configuration #
+############################
+
+# This description is included in llms.txt to provide some initial context for your
+# product docs.
+llms_txt_description = textwrap.dedent(
+    """\
+    This is the documentation for Debcraft, a command-line tool for creating Debian
+    packages, the traditional software format for Debian-based Linux distributions.
+    """
+)
+
+# The base URL for references built by sphinx-markdown-builder.
+if os.environ.get("READTHEDOCS"):
+    markdown_http_base = html_baseurl
 
 ###########################
 # Link checker exceptions #
 ###########################
 
-# A regex list of URLs that are ignored by 'make linkcheck'
-linkcheck_anchors_ignore = [
-    "#",
-    ":",
-    r"https://github\.com/.*",
-]
+# Whole sites and individuals URLs to ignore
 linkcheck_ignore = [
-    # Ignore releases, since we'll include the next release before it exists.
-    r"^https://github.com/canonical/[a-z]*craft[a-z-]*/releases/.*",
     # Entire domains to ignore due to flakiness or issues
+    r"^https://github.com",
     r"^https://www.gnu.org/",
     r"^https://crates.io/",
     r"^https://([\w-]*\.)?npmjs.org",
     r"^https://rsync.samba.org",
     r"^https://ubuntu.com",
+    r"^https://matrix.to/#",
+    r"^https://gitlab.gnome.org",
 ]
+
+# Anchor strings to ignore
+# linkcheck_anchors_ignore = []
 
 # Give linkcheck multiple tries on failure
 linkcheck_retries = 20
+
+# Report timeouts as 'timeout' instead of 'broken'
+linkcheck_report_timeouts_as_broken = False
 
 
 ########################
@@ -148,17 +189,18 @@ linkcheck_retries = 20
 
 # Custom Sphinx extensions; see
 # https://www.sphinx-doc.org/en/master/usage/extensions/index.html
-# NOTE: The canonical_sphinx extension is required for the starter pack.
 extensions = [
     "canonical_sphinx",
     "notfound.extension",
     "sphinx_design",
+    "sphinx_rerediraffe",
     # "sphinx_tabs.tabs",
     # "sphinxcontrib.jquery"
     "sphinxext.opengraph",
     # "sphinx_config_options",
     # "sphinx_contributor_listing",
     # "sphinx_filtered_toctree",
+    "sphinx_llm.txt",
     "sphinx_related_links",
     "sphinx_roles",
     "sphinx_terminal",
@@ -169,7 +211,6 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx_sitemap",
     # Custom Craft extensions
-    "sphinxext.rediraffe",
     "sphinx.ext.autodoc",
     "sphinx.ext.doctest",
     "sphinx.ext.viewcode",
@@ -181,26 +222,28 @@ exclude_patterns = [
     "reuse",
 ]
 
-# Adds custom CSS files, located under 'html_static_path'
-html_css_files = [
-    'css/cookie-banner.css'
-]
+# Adds custom CSS files, located remotely or in 'html_static_path'.
+# TODO: Uncomment to enable Google Analytics on public projects.
+# html_css_files = [
+#     "https://assets.ubuntu.com/v1/d86746ef-cookie_banner.css",
+# ]
 
-# Adds custom JavaScript files, located under 'html_static_path'
-html_js_files = [
-    'js/bundle.js',
-]
+# Adds custom JavaScript files, located remotely or in 'html_static_path'.
+# TODO: Uncomment to enable Google Analytics on public projects.
+# html_js_files = [
+#     "https://assets.ubuntu.com/v1/287a5e8f-bundle.js",
+# ]
 
-# Specifies a reST snippet to be appended to each .rst file
-rst_epilog = """
-"""
+# Appends extra markup to the end of every document written in reST
+# rst_epilog = """
+# """
 
 # Feedback button at the top; enabled by default
 # disable_feedback_button = True
 
 # Your manpage URL
-# manpages_url = 'https://manpages.ubuntu.com/manpages/{codename}/en/' + \
-#     'man{section}/{page}.{section}.html'
+# manpages_url = "https://manpages.ubuntu.com/manpages/{codename}/en/" + \
+#     "man{section}/{page}.{section}.html"
 
 # Specifies a reST snippet to be prepended to each .rst file
 # This defines a :center: role that centers table cell content.
@@ -223,7 +266,7 @@ if "discourse_prefix" not in html_context and "discourse" in html_context:
 # Add configuration for intersphinx mapping
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "starflow": ("https://canonical-starflow.readthedocs-hosted.com", None),
+    "starflow": ("https://documentation.ubuntu.com/starflow/latest", None),
 }
 
 # Block Intersphinx from looking up external sources with internal references. In other
@@ -239,12 +282,3 @@ intersphinx_disabled_reftypes = ["std:*"]
 set_type_checking_flag = True
 typehints_fully_qualified = False
 always_document_param_types = True
-
-# Github config
-github_username = "canonical"
-github_repository = "debcraft"
-
-# endregion
-
-# Client-side page redirects.
-rediraffe_redirects = "redirects.txt"

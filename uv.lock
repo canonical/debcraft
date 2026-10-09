@@ -1,5 +1,5 @@
 version = 1
-revision = 3
+revision = 5
 requires-python = ">=3.10"
 resolution-markers = [
     "python_full_version >= '3.13' and sys_platform == 'linux'",
@@ -386,9 +386,9 @@ dependencies = [
     { name = "snap-http" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/3c/b6/74682e7ad5da84d51fbb43a2dfb6bc3622836491918fdc0f3de1f46c099b/craft_application-7.3.0.tar.gz", hash = "sha256:4102567ca08cc306ff0022ca573687e72579b21c7aeee19d63705e5718af43cd", size = 725843, upload-time = "2026-09-23T20:49:55.537422Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/3c/b6/74682e7ad5da84d51fbb43a2dfb6bc3622836491918fdc0f3de1f46c099b/craft_application-7.3.0.tar.gz", hash = "sha256:4102567ca08cc306ff0022ca573687e72579b21c7aeee19d63705e5718af43cd", size = 725843, upload-time = "2026-09-23T20:49:55.537Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1c/60/27198bf033998eccc7e46528c755a5d9032b96688881d960dcdebcddd03a/craft_application-7.3.0-py3-none-any.whl", hash = "sha256:ef58e272a73d2b073c70dd5cb585db21179442824d2957a4dfab2ee661cba507", size = 217496, upload-time = "2026-09-23T20:49:53.950920Z" },
+    { url = "https://files.pythonhosted.org/packages/1c/60/27198bf033998eccc7e46528c755a5d9032b96688881d960dcdebcddd03a/craft_application-7.3.0-py3-none-any.whl", hash = "sha256:ef58e272a73d2b073c70dd5cb585db21179442824d2957a4dfab2ee661cba507", size = 217496, upload-time = "2026-09-23T20:49:53.95Z" },
 ]
 
 [[package]]
@@ -459,16 +459,16 @@ wheels = [
 
 [[package]]
 name = "craft-platforms"
-version = "0.10.0"
+version = "0.12.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "annotated-types" },
     { name = "distro" },
     { name = "typing-extensions" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/44/78/f2c3ef342c9e9fee0127516aee113a28c487a999d35ce4aa944a58bd5939/craft_platforms-0.10.0.tar.gz", hash = "sha256:85b8630c0f7436b0832466c1dba8deb040502fdadc1d225fbed15d1e1e38f729", size = 220454, upload-time = "2025-07-17T19:35:11.436Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/a0/f2/507e3b1bd017f51bea6c70205744239b62eac20c552fa0ee1f1c30019752/craft_platforms-0.12.0.tar.gz", hash = "sha256:497b6421fc5f464ee1f31da60ae1211bd3101722770afae72e0b330e54883e9d", size = 349924, upload-time = "2026-07-10T20:16:14.836Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/ee/61/9985a7bd77fdafd14fd5de658877202f867802849de61f1346d7d124dcd5/craft_platforms-0.10.0-py3-none-any.whl", hash = "sha256:5be0a53a9ef6ac6341c44842378c6293b09148d371ac1a4ef26d1014b330907a", size = 30262, upload-time = "2025-07-17T19:35:09.619Z" },
+    { url = "https://files.pythonhosted.org/packages/94/d5/d7eb7180085f70756372acfc27e782affe21fda791d801cff6fc10bb047a/craft_platforms-0.12.0-py3-none-any.whl", hash = "sha256:71fff4a3aeb075df878cada38bb89b0d36c9efb5423973db7625da983b8ee6f6", size = 39405, upload-time = "2026-07-10T20:16:13.496Z" },
 ]
 
 [[package]]
@@ -579,11 +579,12 @@ docs = [
     { name = "packaging" },
     { name = "rst2html" },
     { name = "sphinx-autobuild" },
-    { name = "sphinx-design", version = "0.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-questing' and extra == 'group-8-debcraft-dev-resolute')" },
-    { name = "sphinx-design", version = "0.7.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-questing' and extra == 'group-8-debcraft-dev-resolute')" },
+    { name = "sphinx-design" },
     { name = "sphinx-lint" },
+    { name = "sphinx-llm" },
     { name = "sphinx-notfound-page" },
     { name = "sphinx-related-links" },
+    { name = "sphinx-rerediraffe" },
     { name = "sphinx-roles" },
     { name = "sphinx-sitemap" },
     { name = "sphinx-terminal" },
@@ -592,16 +593,17 @@ docs = [
     { name = "sphinxext-rediraffe" },
     { name = "vale" },
 ]
-docs-starter-pack = [
+docs-sphinx-stack = [
     { name = "canonical-sphinx" },
     { name = "myst-parser" },
     { name = "packaging" },
     { name = "rst2html" },
     { name = "sphinx-autobuild" },
-    { name = "sphinx-design", version = "0.6.1", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version < '3.11' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-questing' and extra == 'group-8-debcraft-dev-resolute')" },
-    { name = "sphinx-design", version = "0.7.0", source = { registry = "https://pypi.org/simple" }, marker = "python_full_version >= '3.11' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-questing' and extra == 'group-8-debcraft-dev-resolute')" },
+    { name = "sphinx-design" },
+    { name = "sphinx-llm" },
     { name = "sphinx-notfound-page" },
     { name = "sphinx-related-links" },
+    { name = "sphinx-rerediraffe" },
     { name = "sphinx-roles" },
     { name = "sphinx-sitemap" },
     { name = "sphinx-terminal" },
@@ -645,37 +647,41 @@ dev-questing = [{ name = "python-apt", marker = "sys_platform == 'linux'", speci
 dev-resolute = [{ name = "python-apt", marker = "sys_platform == 'linux'", specifier = "~=3.0.0", index = "https://people.canonical.com/~lengau/python-apt-ubuntu-wheels/" }]
 docs = [
     { name = "canonical-sphinx", specifier = "~=0.6" },
-    { name = "myst-parser", specifier = ">=4.0.1" },
-    { name = "packaging", specifier = ">=25.0" },
+    { name = "myst-parser", specifier = "~=4.0" },
+    { name = "packaging", specifier = "~=26.1" },
     { name = "rst2html", specifier = ">=2020.7.4" },
     { name = "sphinx-autobuild", specifier = ">=2024.10.3" },
-    { name = "sphinx-design", specifier = ">=0.6.1" },
+    { name = "sphinx-design", specifier = "==0.6.1" },
     { name = "sphinx-lint", specifier = "~=1.0" },
-    { name = "sphinx-notfound-page", specifier = ">=1.1.0" },
-    { name = "sphinx-related-links", specifier = ">=0.1.2" },
-    { name = "sphinx-roles", specifier = ">=0.1.0" },
-    { name = "sphinx-sitemap", specifier = "==2.9.0" },
-    { name = "sphinx-terminal", specifier = ">=1.0.2" },
-    { name = "sphinxcontrib-jquery", specifier = ">=4.1" },
-    { name = "sphinxext-opengraph", specifier = ">=0.13.0" },
+    { name = "sphinx-llm", specifier = "~=0.4" },
+    { name = "sphinx-notfound-page", specifier = "~=1.1" },
+    { name = "sphinx-related-links", specifier = "~=0.1" },
+    { name = "sphinx-rerediraffe", specifier = ">=0.0.3,<1.0.0" },
+    { name = "sphinx-roles", specifier = "~=0.1" },
+    { name = "sphinx-sitemap", specifier = "~=2.9" },
+    { name = "sphinx-terminal", specifier = "~=1.0" },
+    { name = "sphinxcontrib-jquery", specifier = "~=4.1" },
+    { name = "sphinxext-opengraph", specifier = "~=0.13" },
     { name = "sphinxext-rediraffe", specifier = "==0.3.0" },
-    { name = "vale", specifier = ">=3.13.0.0" },
+    { name = "vale", specifier = "~=3.13" },
 ]
-docs-starter-pack = [
+docs-sphinx-stack = [
     { name = "canonical-sphinx", specifier = "~=0.6" },
-    { name = "myst-parser", specifier = ">=4.0.1" },
-    { name = "packaging", specifier = ">=25.0" },
+    { name = "myst-parser", specifier = "~=4.0" },
+    { name = "packaging", specifier = "~=26.1" },
     { name = "rst2html", specifier = ">=2020.7.4" },
     { name = "sphinx-autobuild", specifier = ">=2024.10.3" },
-    { name = "sphinx-design", specifier = ">=0.6.1" },
-    { name = "sphinx-notfound-page", specifier = ">=1.1.0" },
-    { name = "sphinx-related-links", specifier = ">=0.1.2" },
-    { name = "sphinx-roles", specifier = ">=0.1.0" },
-    { name = "sphinx-sitemap", specifier = "==2.9.0" },
-    { name = "sphinx-terminal", specifier = ">=1.0.2" },
-    { name = "sphinxcontrib-jquery", specifier = ">=4.1" },
-    { name = "sphinxext-opengraph", specifier = ">=0.13.0" },
-    { name = "vale", specifier = ">=3.13.0.0" },
+    { name = "sphinx-design", specifier = "==0.6.1" },
+    { name = "sphinx-llm", specifier = "~=0.4" },
+    { name = "sphinx-notfound-page", specifier = "~=1.1" },
+    { name = "sphinx-related-links", specifier = "~=0.1" },
+    { name = "sphinx-rerediraffe", specifier = ">=0.0.3,<1.0.0" },
+    { name = "sphinx-roles", specifier = "~=0.1" },
+    { name = "sphinx-sitemap", specifier = "~=2.9" },
+    { name = "sphinx-terminal", specifier = "~=1.0" },
+    { name = "sphinxcontrib-jquery", specifier = "~=4.1" },
+    { name = "sphinxext-opengraph", specifier = "~=0.13" },
+    { name = "vale", specifier = "~=3.13" },
 ]
 lint = []
 tics = [
@@ -1133,11 +1139,11 @@ wheels = [
 
 [[package]]
 name = "packaging"
-version = "25.0"
+version = "26.3"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/a1/d4/1fc4078c65507b51b96ca8f8c3ba19e6a61c8253c72794544580a7b6c24d/packaging-25.0.tar.gz", hash = "sha256:d443872c98d677bf60f6a1f2f8c1cb748e8fe762d2bf9d3148b5599295b0fc4f", size = 165727, upload-time = "2025-04-19T11:48:59.673Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/7d/fa/3944b40b07da9ce895c0e6303a5ab7d53da063554f534556b134a54d6093/packaging-26.3.tar.gz", hash = "sha256:94edc256424af38762eb31306eed28beb9f0efc50a8837492c9d6fd6004aed79", size = 313412, upload-time = "2026-08-04T18:15:28.737Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/20/12/38679034af332785aac8774540895e234f4d07f7545804097de4b666afd8/packaging-25.0-py3-none-any.whl", hash = "sha256:29572ef2b1f17581046b3a2227d5c611fb25ec70ca1ba8554b24b0e69331a484", size = 66469, upload-time = "2025-04-19T11:48:57.875Z" },
+    { url = "https://files.pythonhosted.org/packages/63/34/ba1c580383c9eada3711951fef0795c80b829a078d72188184bcab9dd527/packaging-26.3-py3-none-any.whl", hash = "sha256:d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c", size = 129956, upload-time = "2026-08-04T18:15:27.159Z" },
 ]
 
 [[package]]
@@ -1863,32 +1869,12 @@ wheels = [
 name = "sphinx-design"
 version = "0.6.1"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version < '3.11' and sys_platform == 'linux'",
-]
 dependencies = [
-    { name = "sphinx", marker = "python_full_version < '3.11' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-questing' and extra == 'group-8-debcraft-dev-resolute')" },
+    { name = "sphinx" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/2b/69/b34e0cb5336f09c6866d53b4a19d76c227cdec1bbc7ac4de63ca7d58c9c7/sphinx_design-0.6.1.tar.gz", hash = "sha256:b44eea3719386d04d765c1a8257caca2b3e6f8421d7b3a5e742c0fd45f84e632", size = 2193689, upload-time = "2024-08-02T13:48:44.277Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/c6/43/65c0acbd8cc6f50195a3a1fc195c404988b15c67090e73c7a41a9f57d6bd/sphinx_design-0.6.1-py3-none-any.whl", hash = "sha256:b11f37db1a802a183d61b159d9a202314d4d2fe29c163437001324fe2f19549c", size = 2215338, upload-time = "2024-08-02T13:48:42.106Z" },
-]
-
-[[package]]
-name = "sphinx-design"
-version = "0.7.0"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.13' and sys_platform == 'linux'",
-    "python_full_version == '3.12.*' and sys_platform == 'linux'",
-    "python_full_version == '3.11.*' and sys_platform == 'linux'",
-]
-dependencies = [
-    { name = "sphinx", marker = "python_full_version >= '3.11' or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-noble') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-jammy' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-plucky') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-noble' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-questing') or (extra == 'group-8-debcraft-dev-plucky' and extra == 'group-8-debcraft-dev-resolute') or (extra == 'group-8-debcraft-dev-questing' and extra == 'group-8-debcraft-dev-resolute')" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/13/7b/804f311da4663a4aecc6cf7abd83443f3d4ded970826d0c958edc77d4527/sphinx_design-0.7.0.tar.gz", hash = "sha256:d2a3f5b19c24b916adb52f97c5f00efab4009ca337812001109084a740ec9b7a", size = 2203582, upload-time = "2026-01-19T13:12:53.297Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/30/cf/45dd359f6ca0c3762ce0490f681da242f0530c49c81050c035c016bfdd3a/sphinx_design-0.7.0-py3-none-any.whl", hash = "sha256:f82bf179951d58f55dca78ab3706aeafa496b741a91b1911d371441127d64282", size = 2220350, upload-time = "2026-01-19T13:12:51.077Z" },
 ]
 
 [[package]]
@@ -1917,6 +1903,33 @@ wheels = [
 ]
 
 [[package]]
+name = "sphinx-llm"
+version = "0.4.1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "sphinx" },
+    { name = "sphinx-markdown-builder" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/59/23/fe184bf9c6761c2cd04dc5b5456b717f626143663a3004f628636a2f7b0e/sphinx_llm-0.4.1.tar.gz", hash = "sha256:0789185dcbbecc00b5e25aa3db6342b98dad6a9def96088a9e50fa0203fda090", size = 280250, upload-time = "2026-04-02T09:09:18.881Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/31/2b/a54c49b42b25a6eb6039daf882f06488812c28e32734e944b2f7b6f82554/sphinx_llm-0.4.1-py3-none-any.whl", hash = "sha256:d7c8ee2a6335636b628ea2b26cd1e1dee1f0cf9c40fe51b20f201af1c05b95f5", size = 28453, upload-time = "2026-04-02T09:09:17.632Z" },
+]
+
+[[package]]
+name = "sphinx-markdown-builder"
+version = "0.6.11"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "docutils" },
+    { name = "sphinx" },
+    { name = "tabulate" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/ad/13/102d7134743120db25e636ffb57a30818e95a416583dca83aadac9c5dd87/sphinx_markdown_builder-0.6.11.tar.gz", hash = "sha256:ba3bf33e0e42ff30ae686ac73957a95e6d045790dcfbaca012dd8ae01794e577", size = 24020, upload-time = "2026-08-16T06:51:38.158Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/c9/71/06b415631c2e494c80546073b46013d1715dceb3abe30bd63b34b4e7d9ca/sphinx_markdown_builder-0.6.11-py3-none-any.whl", hash = "sha256:acfb94d6ee66c7a47da0ca0420578fa16f115812af25b8fd21755d5909aacf51", size = 18088, upload-time = "2026-08-16T06:51:36.81Z" },
+]
+
+[[package]]
 name = "sphinx-notfound-page"
 version = "1.1.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1941,6 +1954,18 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/91/94/f46c27a759b9c1f489ae18710ea2b5c1610d486586a8499d88c32be79040/sphinx_related_links-0.1.2.tar.gz", hash = "sha256:7e4951f4fa60b21e0806dda53db41be565b589e22b58cc18d09c2676a49d00ca", size = 84209, upload-time = "2025-12-15T19:09:42.554Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/3d/bd/6971dde17d8f1446a1b52d22d3b937df8f7fd380b94d109c3d9e3f2bfd62/sphinx_related_links-0.1.2-py3-none-any.whl", hash = "sha256:0f894cff31f330aa0fbbfb2d6cccc0bc07153a56925427d9f3dc4a1d9b0e08eb", size = 19873, upload-time = "2025-12-15T19:09:41.008Z" },
+]
+
+[[package]]
+name = "sphinx-rerediraffe"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "sphinx" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/c9/53/5858d87b2b202a5cadb391af710b3a2276e1c644dc1ec11c2c35a8aef636/sphinx_rerediraffe-0.1.0.tar.gz", hash = "sha256:d5df6c3ab6fb8e0d7ff3cc441556f6125b8a58f7903185993e03c26a2b23ca68", size = 25562, upload-time = "2026-10-04T23:40:39.19Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/ad/7f/06af7575dc74e209cbc59776b5920bd6d524fc61b4d3fa91eebe3496fc49/sphinx_rerediraffe-0.1.0-py3-none-any.whl", hash = "sha256:1f4f8907d37e1ab47ccf6d52d7836b91f10dc9c5df0aa61b43c3ce37b27f5cb4", size = 8612, upload-time = "2026-10-04T23:40:37.793Z" },
 ]
 
 [[package]]
@@ -2083,6 +2108,15 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/25/44/ec35f1b6e83094b997da438a02c8c9b0ade2b1e84cfc48bd4656780760a6/starlette-1.2.1.tar.gz", hash = "sha256:9b9b5ebb992e67d6093741e63c2f59e4f6fff986f81163c087867bd7b924b3f6", size = 2701854, upload-time = "2026-05-31T01:07:51.847Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/1c/54/196d0c1db10af76baa4f64894448505d60d3cdf70ef92cbb35f46a4e4c71/starlette-1.2.1-py3-none-any.whl", hash = "sha256:4de0082d08c8f6764a85a54cf1120d6939507a19905c7768acad2a9f875d2b89", size = 73350, upload-time = "2026-05-31T01:07:50.09Z" },
+]
+
+[[package]]
+name = "tabulate"
+version = "0.10.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/46/58/8c37dea7bbf769b20d58e7ace7e5edfe65b849442b00ffcdd56be88697c6/tabulate-0.10.0.tar.gz", hash = "sha256:e2cfde8f79420f6deeffdeda9aaec3b6bc5abce947655d17ac662b126e48a60d", size = 91754, upload-time = "2026-03-04T18:55:34.402Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/99/55/db07de81b5c630da5cbf5c7df646580ca26dfaefa593667fc6f2fe016d2e/tabulate-0.10.0-py3-none-any.whl", hash = "sha256:f0b0622e567335c8fabaaa659f1b33bcb6ddfe2e496071b743aa113f8774f2d3", size = 39814, upload-time = "2026-03-04T18:55:31.284Z" },
 ]
 
 [[package]]
