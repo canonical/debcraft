@@ -228,14 +228,14 @@ class _DebianTemplater(Template):
     #     (?P<invalid>{_VALID_CONFIG_TEMPLATE_REGEX}(?!\#))  What an invalid match looks like -- in this case, an
     #                                                        identifier that isn't terminated by a '#'.
     #   )                                                    End
-    pattern = rf"""
+    pattern = re.compile(rf"""
         \#(?:
             (?P<escaped>\#)                             |
             (?P<named>{_VALID_CONFIG_TEMPLATE_REGEX})\# |
             (?P<braced>(?!))                            |
             (?P<invalid>{_VALID_CONFIG_TEMPLATE_REGEX}(?!\#))
         )
-    """  # ty: ignore[invalid-assignment]
+    """)
     delimiter = "#"
 
     def get_dynamic_values(self) -> dict[str, str]:
