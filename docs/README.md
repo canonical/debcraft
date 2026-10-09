@@ -14,9 +14,9 @@ possible, so when changes come we don't have to recreate them. The process isn't
 
 ### Gather the changes
 
-You first need the recent history of the standard documentation implementation in Starbase. We'll provide one way you could gather it.
+You first need the recent history of the standard documentation implementation in <!-- vale off -->Starbase<!-- vale on -->. We'll provide one way you could gather it.
 
-Inside Starbase, find the commit that most recently updated the version of the Sphinx Stack:
+Inside <!-- vale off -->Starbase<!-- vale on -->, find the commit that most recently updated the version of the Sphinx Stack:
 
 ```bash
 git log --grep "sphinx stack" -i
@@ -32,7 +32,7 @@ git --no-pager diff <commit>~1 --name-only -- docs/ .readthedocs.yaml common.mk 
 
 Next, bring the updates into the subproject. It's simplest to copy over the files, and then review the resulting Git diff. It's likely some of the changes will erase sections of the files, especially in changes to the documents themselves. You'll review each change line-by-line in any case, so you can restore any unwanted deletions as you work through them.
 
-<!-- Ignore "Starcraft" here because this file is brought directly into child repositories. -->
+<!-- Ignore "Starcraft" and "Starbase" here because this file is brought directly into child repositories. -->
 
 As you review, look for instances of <!-- vale off -->`Starcraft`<!-- vale on --> and `TODO` comments for places where the code needs customizing. If you can't decide on how to configure a change, consult the [Sphinx Stack release notes](https://documentation.ubuntu.com/sphinx-stack/latest/) for idiomatic documentation of the feature.
 
