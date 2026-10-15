@@ -310,7 +310,10 @@ build-constraint-dependencies = [
   "maturin<1.10.0 ; python_version < '3.14'",
 ]
 constraint-dependencies = [
-  # Basic constraints to allow --resolution=lowest
+  # Basic constraints to allow --resolution=lowest.
+  #
+  # Applications should avoid CVEs in transitive dependencies by setting a minimum
+  # version in this section.
   "cffi>=1.15",
   "iniconfig>=1.1.0",
   "httplib2>=0.20.0",
