@@ -312,7 +312,10 @@ build-constraint-dependencies = [
   "maturin<1.10.0 ; python_version < '3.14'",
 ]
 constraint-dependencies = [
-  # Basic constraints to allow --resolution=lowest
+  # Basic constraints to allow --resolution=lowest.
+  #
+  # Applications should avoid CVEs in transitive dependencies by setting a minimum
+  # version in this section.
   "cffi>=1.15",
   "iniconfig>=1.1.0",
   "httplib2>=0.20.0",
@@ -320,7 +323,7 @@ constraint-dependencies = [
   "lxml>=5.0",
   "markdown>=3.0",
   "markupsafe>=2.0",
-  "oauthlib>=3.0.0",
+  "oauthlib>=4.0.0",
   "protobuf>=5.0",
   "pynacl>=1.5",
   "pyparsing>=3.0.0",
@@ -332,7 +335,7 @@ constraint-dependencies = [
   "sphinx-basic-ng>=1.0.0b1",
   "starlette>=1.0.1",
   "tornado>=4.0",
-  "urllib3>=2.0",
+  "urllib3>=2.8.0",
   "webencodings>=0.4.0",
   "wheel>=0.38",
 ]
