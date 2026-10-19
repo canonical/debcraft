@@ -27,7 +27,7 @@ def test_run(mocker, tmp_path):
 
     install_dir = tmp_path / "install"
     install_dir.mkdir()
-    # os.access requires the files to exist to check their permission bits.
+    # The helper reads the files' permission bits, so they must exist.
     exe = install_dir / "foo"
     exe.touch()
     exe.chmod(0o755)

@@ -16,7 +16,6 @@
 
 """Debcraft strip helper."""
 
-import os
 import pathlib
 import subprocess
 from typing import Any
@@ -52,7 +51,7 @@ class Strip(Helper):
             # Like dh_strip, executables are identified by permission bits
             # since PIE executables have ELF type ET_DYN.
             args = ["strip", "--remove-section=.comment", "--remove-section=.note"]
-            if not os.access(elf_file.path, os.X_OK):
+            if not elf_file.path.stat().st_mode & 0o111:
                 args.append("--strip-unneeded")
             args.append(elf_file.path)
             try:
