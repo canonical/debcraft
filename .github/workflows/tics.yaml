@@ -2,13 +2,16 @@ name: TICS
 on:
   push:
     branches:
-      # - "main"
+      - "main"
       # For troubleshooting
       - "work/tiobe**"
 
 jobs:
   TICS:
+    permissions:
+      contents: read
     uses: canonical/starflow/.github/workflows/tics.yaml@main
     with:
       project: "debcraft"
-      secrets: inherit
+    secrets:
+      TICSAUTHTOKEN: ${{ secrets.TICSAUTHTOKEN }}
