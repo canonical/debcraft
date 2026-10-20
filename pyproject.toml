@@ -13,6 +13,7 @@ classifiers = [
 dependencies = [
   "craft-application>=7.3.0",
   "craft-parts>=2.35.0",
+  "craft-providers~=3.8.0",
   "pyelftools>=0.32",
   "zstandard>=0.25.0",
 ]

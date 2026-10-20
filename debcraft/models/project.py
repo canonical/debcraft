@@ -26,7 +26,6 @@ from craft_application import models
 from craft_application.models import PlatformsDict
 from craft_application.models.project import DevelBaseInfo
 from craft_providers import bases
-from craft_providers.bases import BuilddBaseAlias
 from craft_providers.errors import BaseConfigurationError
 from typing_extensions import Self, override
 
@@ -51,6 +50,7 @@ BuildBaseT = Annotated[
         "ubuntu@22.04",
         "ubuntu@24.04",
         "ubuntu@26.04",
+        "ubuntu@26.10",
         "devel",
     ],
     pydantic.Field(validate_default=True),
@@ -179,12 +179,7 @@ class Project(models.Project):
     @classmethod
     @override
     def _get_devel_bases(cls) -> Iterable[DevelBaseInfo]:
-        return [
-            DevelBaseInfo(
-                current_devel_base=BuilddBaseAlias.STONKING,
-                devel_base=BuilddBaseAlias.DEVEL,
-            )
-        ]
+        return ()
 
 
 class PackagesProject(models.CraftBaseModel, extra="ignore"):

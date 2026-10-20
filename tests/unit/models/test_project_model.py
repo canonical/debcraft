@@ -125,16 +125,35 @@ def test_project_base_invalid(default_project_raw):
         project.Project.model_validate(default_project_raw)
 
 
-@pytest.mark.parametrize("build_base", [None, "ubuntu@24.04", "ubuntu@26.04", "devel"])
+@pytest.mark.parametrize(
+    "build_base",
+    [
+        None,
+        "ubuntu@22.04",
+        "ubuntu@24.04",
+        "ubuntu@26.04",
+        "ubuntu@26.10",
+        "devel",
+    ],
+)
 def test_project_build_base_valid(default_project_raw, build_base):
     default_project_raw["build-base"] = build_base
     project.Project.model_validate(default_project_raw)
 
 
 def test_project_build_base_invalid(default_project_raw):
-    default_project_raw["build-base"] = "ubuntu@26.10"
+    default_project_raw["build-base"] = "ubuntu@20.04"
     with pytest.raises(ValueError, match="build-base"):
         project.Project.model_validate(default_project_raw)
+
+
+def test_project_base_and_build_base_26_10(default_project_raw):
+    default_project_raw["base"] = "ubuntu@26.10"
+    default_project_raw["build-base"] = "ubuntu@26.10"
+    prj = project.Project.model_validate(default_project_raw)
+
+    assert prj.base == "ubuntu@26.10"
+    assert prj.build_base == "ubuntu@26.10"
 
 
 @pytest.mark.parametrize(
@@ -142,6 +161,7 @@ def test_project_build_base_invalid(default_project_raw):
     [
         ("devel", bases.get_base_alias(("ubuntu", "devel"))),
         ("ubuntu@24.04", bases.get_base_alias(("ubuntu", "24.04"))),
+        ("ubuntu@26.10", bases.get_base_alias(("ubuntu", "26.10"))),
     ],
 )
 def test_providers_base_success(base: str, expected):
@@ -156,6 +176,4 @@ def test_providers_base_error():
 def test_get_devel_bases():
     devel_bases = list(project.Project._get_devel_bases())
 
-    assert len(devel_bases) == 1
-    assert devel_bases[0].current_devel_base is project.BuilddBaseAlias.STONKING
-    assert devel_bases[0].devel_base is project.BuilddBaseAlias.DEVEL
+    assert len(devel_bases) == 0
