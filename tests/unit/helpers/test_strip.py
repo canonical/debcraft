@@ -27,14 +27,39 @@ def test_run(mocker, tmp_path):
 
     install_dir = tmp_path / "install"
     install_dir.mkdir()
+    # The helper reads the files' permission bits, so they must exist.
+    exe = install_dir / "foo"
+    exe.touch()
+    exe.chmod(0o755)
+    lib = install_dir / "libfoo.so"
+    lib.touch()
+    lib.chmod(0o644)
     mocker.patch(
         "debcraft.elf.elf_utils.get_elf_files",
-        return_value=[ElfFile(path=install_dir / "foo")],
+        return_value=[ElfFile(path=exe), ElfFile(path=lib)],
     )
 
     helper = strip.Strip()
     helper.run(install_dir=install_dir)
 
     assert fake_subprocess_run.mock_calls == [
-        call(["strip", "--strip-unneeded", install_dir / "foo"], check=True)
+        call(
+            [
+                "strip",
+                "--remove-section=.comment",
+                "--remove-section=.note",
+                exe,
+            ],
+            check=True,
+        ),
+        call(
+            [
+                "strip",
+                "--remove-section=.comment",
+                "--remove-section=.note",
+                "--strip-unneeded",
+                lib,
+            ],
+            check=True,
+        ),
     ]

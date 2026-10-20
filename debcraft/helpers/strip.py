@@ -46,9 +46,17 @@ class Strip(Helper):
 
         for elf_file in installed_elf_files:
             rel_path = elf_file.path.relative_to(install_dir)
+            # Match dh_strip: executables are stripped without
+            # --strip-unneeded; shared libraries must keep it.
+            # Like dh_strip, executables are identified by permission bits
+            # since PIE executables have ELF type ET_DYN.
+            args = ["strip", "--remove-section=.comment", "--remove-section=.note"]
+            if not elf_file.path.stat().st_mode & 0o111:
+                args.append("--strip-unneeded")
+            args.append(elf_file.path)
             try:
                 emit.progress(f"Strip binary: {rel_path!s}")
-                subprocess.run(["strip", "--strip-unneeded", elf_file.path], check=True)
+                subprocess.run(args, check=True)
             except subprocess.CalledProcessError as error:
                 raise errors.DebcraftError(
                     f"cannot strip {rel_path!s}", details=error.stderr
