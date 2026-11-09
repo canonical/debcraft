@@ -16,6 +16,8 @@ dependencies = [
   "craft-providers~=3.8.0",
   "pyelftools>=0.32",
   "zstandard>=0.25.0",
+  "pygit2>=1.13.0,<1.15.0; python_version=='3.12'",  # pin pygit2 to versions compatible with libgit2-1.7 for core24
+  "pygit2>=1.19.0,<1.21.0; python_version=='3.14'",  # for core26
 ]
 dynamic = ["version"]
 
