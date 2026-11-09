@@ -56,6 +56,21 @@ parts:
     organize:
       "usr/lib/python3/dist-packages/*": "lib/python3.12/site-packages/"
 
+  debcraft-build-deps:
+    plugin: nil
+    build-packages:
+      - cargo-1.91
+      - rustc-1.91
+    override-build: |
+      # We need newer versions of cargo and rustc than the cargo
+      # and rustc packages provide, but they don't set the `cargo`
+      # and `rustc` commands needed by maturin.
+      # These commands allow rust-based libraries like pydantic-core
+      # and cryptography to build using the non-default rust.
+      mkdir -p "${CRAFT_PART_INSTALL}/bin"
+      ln -sf "$(command -v cargo-1.91)" "${CRAFT_PART_INSTALL}/bin/cargo"
+      ln -sf "$(command -v rustc-1.91)" "${CRAFT_PART_INSTALL}/bin/rustc"
+
   debcraft:
     source: .
     plugin: python
@@ -92,7 +107,7 @@ parts:
       - -usr/share/man
       - -usr/share/lintian
       - -usr/share/doc
-    after: [debcraft-libs]
+    after: [debcraft-libs, debcraft-build-deps]
 
   debcraft-bytecode:
     after: [debcraft, debcraft-scripts]
