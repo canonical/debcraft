@@ -11,5 +11,9 @@ is self-contained and delivers a working result that marks a learning milestone 
 an opportunity for further exploration. If you're a newcomer to Debcraft, this is the
 best way to start.
 
+- :ref:`craft-a-debian-package`
+
 .. toctree::
     :hidden:
+
+    craft-a-debian-package
