@@ -2,7 +2,6 @@
 # https://github.com/canonical/starbase
 
 SOURCES=$(wildcard *.py) $(PROJECT) tests
-DOCS=docs
 
 # Env vars for the docs Sphinx Stack. They must be exported so make can pass them to the
 # docs Makefile.
