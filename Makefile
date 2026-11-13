@@ -1,7 +1,4 @@
 PROJECT=debcraft
-# Install docs dependencies into a separate venv from the main uv project venv,
-# kept outside docs/ so Sphinx does not read the venv as source files
-export DOCS_VENVDIR ?= ../.venv-docs
 # Define when more than the main package tree requires coverage
 # like is the case for snapcraft (snapcraft and snapcraft_legacy):
 # COVERAGE_SOURCE="debcraft"
