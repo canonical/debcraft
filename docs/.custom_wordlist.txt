@@ -1,4 +1,5 @@
 # Leave a blank line at the end of this file to support concatenation
+Autotools
 backend
 backends
 Canonical('s)?
@@ -7,6 +8,7 @@ cjk
 cryptographically
 Debcraft
 docstrings?
+dpkg
 dvipng
 fonts
 freefont
@@ -14,7 +16,9 @@ Furo
 github
 GitHub
 GPG
+Gzip
 gyre
+htop
 html
 https
 Intersphinx
@@ -25,7 +29,9 @@ lang
 lastmod
 LaTeX
 latexmk
+Lintian
 Makefile
+mkdir
 Multipass
 MyST
 Numpy
@@ -51,8 +57,10 @@ Sphinx
 Spread
 spread_test_example
 Starcraft
+strace
 subproject
 subprojects
+sudo
 SVG
 tex
 texlive

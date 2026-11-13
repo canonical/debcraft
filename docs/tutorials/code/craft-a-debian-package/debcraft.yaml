@@ -1,0 +1,53 @@
+name: htop
+version: "3.5.3-1"
+summary: Interactive process viewer
+description: |
+  Htop is an ncurses-based process viewer similar to top, but it
+  allows one to scroll the list vertically and horizontally to see
+  all processes and their full command lines.
+
+  Tasks related to processes (killing, renicing) can be done without
+  entering their PIDs.
+base: ubuntu@26.04
+maintainer: J. Random Hacker <jrandomhacker@example.com>
+original-maintainer: Daniel Lange <DLange@debian.org>
+section: utils
+
+packages:
+  htop:
+    suggests:
+      - libnl-3-200
+      - libnl-genl-3-200
+      - lm-sensors
+      - lsof
+      - strace
+
+parts:
+  htop:
+    plugin: autotools
+    source: https://github.com/htop-dev/htop
+    source-type: git
+    source-tag: 3.5.3
+    build-packages:
+      - libncurses-dev
+      - libnl-3-dev
+      - libnl-genl-3-dev
+      - libsensors-dev
+      - pkg-config
+    autotools-configure-parameters:
+      - --prefix=/usr
+      - --enable-affinity
+      - --enable-delayacct
+      - --enable-sensors
+      - --enable-unicode
+    organize:
+      (build)/README.md: usr/share/doc/htop/
+      (build)/NEWS: usr/share/doc/htop/
+      (build)/ChangeLog: usr/share/doc/htop/changelog
+      (build)/AUTHORS: usr/share/doc/htop/
+  distro-files:
+    plugin: dump
+    source: debian
+    organize:
+      changelog.Debian: usr/share/doc/htop/
+      copyright: usr/share/doc/htop/

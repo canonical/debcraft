@@ -1,0 +1,26 @@
+summary: Test the "Craft a Debian package" tutorial
+
+execute: |
+  sudo snap install debcraft --edge --classic
+  sudo snap install lxd
+  sudo usermod -aG lxd $USER
+  newgrp lxd
+  sudo lxd init --auto
+  sudo apt install lintian
+  mkdir htop
+  cd htop
+  debcraft init
+  cp ../debcraft-minimal.yaml debcraft.yaml
+  debcraft pack
+  sudo apt install ./htop_3.5.3-1_amd64.deb
+  htop
+  lintian htop_3.5.3-1_amd64.deb
+  dpkg -c htop_3.5.3-1_amd64.deb
+  mkdir debian
+  touch debian/changelog.Debian debian/copyright
+  cp ../debian/changelog.Debian debian/changelog.Debian
+  cp ../debian/copyright debian/copyright
+  cp ../debcraft.yaml debcraft.yaml
+  debcraft pack
+  dpkg -c htop_3.5.3-1_amd64.deb
+  lintian htop_3.5.3-1_amd64.deb

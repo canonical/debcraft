@@ -2,8 +2,6 @@
     :description: Debcraft is a command-line tool for creating Debian packages, the traditional software format for Debian-based Linux distributions.
 
 
-.. debcraft documentation root file
-
 Debcraft
 =========
 
@@ -12,6 +10,8 @@ software format for Debian-based Linux distributions.
 
 .. list-table::
 
+    * - | :ref:`Tutorial <tutorials>`
+        | **Get started** with a hands-on introduction to crafting Debian packages.
     * - | :ref:`Explanation <explanation>`
         | **Discussion and clarification** of key topics
 
@@ -31,4 +31,5 @@ and constructive feedback.
 .. toctree::
     :hidden:
 
+    Tutorial <tutorials/index>
     explanation/index

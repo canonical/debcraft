@@ -1,0 +1,5 @@
+htop (3.5.3-1) unstable; urgency=low
+
+  * Initial release (closes: #123456)
+
+ -- J. Random Hacker <jrandomhacker@example.com>  Thu, 05 Nov 2026 10:36:40 -0800

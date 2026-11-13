@@ -225,7 +225,6 @@ exclude_patterns = [
     "how-to/index.rst",
     "reference/index.rst",
     "release-notes/index.rst",
-    "tutorials/index.rst",
 ]
 
 # Adds custom CSS files, located remotely or in 'html_static_path'.
