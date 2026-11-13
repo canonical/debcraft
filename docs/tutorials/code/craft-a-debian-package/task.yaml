@@ -3,8 +3,10 @@ summary: Test the "Craft a Debian package" tutorial
 execute: |
   sudo snap install debcraft --edge --classic
   sudo snap install lxd
-  sudo usermod -a -G lxd $USER
+  sudo usermod -aG lxd $USER
+  newgrp lxd
   sudo lxd init --auto
+  sudo apt install lintian
   mkdir htop
   cd htop
   debcraft init

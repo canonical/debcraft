@@ -64,6 +64,15 @@ Next, install and initialize LXD, which creates the environment for Debcraft bui
     :start-at: sudo snap install lxd
     :end-at: sudo lxd init --auto
 
+We also need to install Lintian, which we'll use to check our package for compliance
+with Debian policy:
+
+.. literalinclude:: code/craft-a-debian-package/task.yaml
+    :language: bash
+    :dedent: 2
+    :start-at: sudo apt install lintian
+    :end-at: sudo apt install lintian
+
 
 Set up the project
 ------------------
@@ -215,7 +224,7 @@ The output should read as follows:
 .. terminal::
     :scroll:
 
-    lintian -i htop_3.5.3-1_amd64.deb
+    lintian htop_3.5.3-1_amd64.deb
 
     N:
     E: htop: no-changelog usr/share/doc/htop/changelog.Debian.gz (non-native package)
