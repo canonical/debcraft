@@ -70,6 +70,8 @@ parts:
       mkdir -p "${CRAFT_PART_INSTALL}/bin"
       ln -sf "$(command -v cargo-1.91)" "${CRAFT_PART_INSTALL}/bin/cargo"
       ln -sf "$(command -v rustc-1.91)" "${CRAFT_PART_INSTALL}/bin/rustc"
+    prime:
+      - -*
 
   debcraft:
     source: .
