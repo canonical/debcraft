@@ -16,7 +16,7 @@
 """Configuration for debcraft unit tests."""
 
 import pathlib
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import craft_application
 import debcraft
@@ -27,6 +27,9 @@ import pytest
 from debcraft import models, services
 from debcraft.services import lifecycle
 from typing_extensions import override
+
+if TYPE_CHECKING:
+    from craft_platforms import PlatformDict
 
 
 @pytest.fixture
@@ -77,9 +80,7 @@ def fake_project_service_class(
         def set(self, value: models.Project) -> None:
             """Set the project model. Only for use during testing!"""
             self._project_model = value
-            self._platform = next(
-                iter(value.platforms)  # ty: ignore[no-matching-overload]
-            )
+            self._platform = next(iter(cast("PlatformDict", value.platforms)))
             self._build_for = value.platforms[self._platform].build_for[0]  # ty: ignore[not-subscriptable]
 
     return FakeProjectService

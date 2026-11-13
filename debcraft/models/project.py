@@ -97,10 +97,10 @@ class Project(models.Project):
     maintainer: str
     original_maintainer: str | None = None
     uploaders: list[str] | None = None
-    base: BaseT  # ty: ignore[invalid-mutable-override]
-    build_base: BuildBaseT | None = None  # ty: ignore[invalid-mutable-override]
+    base: BaseT  # ty: ignore[incompatible-mutable-override]
+    build_base: BuildBaseT | None = None  # ty: ignore[incompatible-mutable-override]
 
-    platforms: PlatformsDict | None = pydantic.Field(  # ty: ignore[invalid-attribute-override]
+    platforms: PlatformsDict | None = pydantic.Field(  # ty: ignore[incompatible-attribute-override]
         default=None,
         description="Determines which architectures the project builds and runs on.",
         examples=[
